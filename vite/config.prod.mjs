@@ -19,7 +19,7 @@ const phasermsg = () => {
 };
 
 export default defineConfig({
-    base: "./",
+    base: "/alien-invasion-game/",
     plugins: [react(), phasermsg()],
     logLevel: "warning",
     build: {
