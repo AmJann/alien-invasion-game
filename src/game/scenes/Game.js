@@ -1,18 +1,22 @@
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
+import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 
 export class Game extends Scene {
     constructor() {
         super("Game");
     }
     preload() {
-        this.load.image(
-            "embeddedTiles",
-            "../../../public/assets/embeddedTiles.png"
-        );
+        this.load.image("embeddedTiles", "/assets/embeddedTiles.png");
         this.load.tilemapTiledJSON(
             "alienGameMap1",
-            "../../../assets/alienGameMap1.tmj"
+            "/assets/alienGameMap1.tmj"
+        );
+        this.load.scenePlugin(
+            "animatedTiles",
+            AnimatedTiles,
+            "animatedTiles",
+            "animatedTiles"
         );
     }
 
@@ -42,10 +46,12 @@ export class Game extends Scene {
             tileWidth: 16,
             tileHeight: 16,
         });
+        this.sys.animatedTiles.init(map);
         const tileset = map.addTilesetImage("embeddedTiles", "embeddedTiles");
         const layer1 = map.createLayer("groundLayer1", tileset, 0, 0);
         const layer2 = map.createLayer("TileLayer2", tileset, 0, 0);
         const layer3 = map.createLayer("TileLayer3", tileset, 0, 0);
+        this.animatedTiles.init(map);
         EventBus.emit("current-scene-ready", this);
     }
 
