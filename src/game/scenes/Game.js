@@ -7,13 +7,10 @@ export class Game extends Scene {
         super("Game");
     }
     preload() {
-        this.load.image(
-            "embeddedTiles",
-            "../../../public/assets/embeddedTiles.png"
-        );
+        this.load.image("embeddedTiles", "/assets/embeddedTiles.png");
         this.load.tilemapTiledJSON(
             "alienGameMap1",
-            "../../../assets/alienGameMap1.tmj"
+            "/assets/alienGameMap1.tmj"
         );
         this.load.scenePlugin(
             "animatedTiles",
