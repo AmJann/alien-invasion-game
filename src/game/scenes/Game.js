@@ -55,6 +55,30 @@ export class Game extends Scene {
         const layer2 = map.createLayer("TileLayer2", tileset, 0, 0);
         const layer3 = map.createLayer("TileLayer3", tileset, 0, 0);
         this.animatedTiles.init(map);
+
+        const player = this.add.sprite(16, 15, 'player', 'goblin_walk_1.png')
+        const player2 = this.add.sprite(500, 650, 'player', 'goblin_hurt_1.png')
+        this.anims.create({
+            key: 'player-walk-right',
+            frames: this.anims.generateFrameNames('player', { start: 1, end: 8, prefix: 'goblin_walk_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+        this.anims.create({
+            key: 'player-idle-right',
+            frames: this.anims.generateFrameNames('player', { start: 1, end: 8, prefix: 'goblin_idle_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+        this.anims.create({
+            key: 'player-hurt-right',
+            frames: this.anims.generateFrameNames('player', { start: 1, end: 8, prefix: 'goblin_hurt_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+        player.anims.play('player-walk-right')
+        player2.anims.play('player-hurt-right')
+
         EventBus.emit("current-scene-ready", this);
     }
 
