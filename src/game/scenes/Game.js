@@ -1,7 +1,6 @@
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
-import { useState } from "react";
 //sets players current direction
 let currentDirection = "right";
 //sets player movement speed
