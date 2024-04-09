@@ -2,7 +2,9 @@ import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { useState } from "react";
+//sets players current direction
 let currentDirection = "right";
+//sets player movement speed
 let speed = 150;
 
 export class Game extends Scene {
@@ -28,32 +30,12 @@ export class Game extends Scene {
 
         this.load.spritesheet(
             "player",
-            import.meta.env.BASE_URL + "assets/goblin_spritesheet.png", // path
+            import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
             { frameWidth: 16, frameHeight: 16 }
         );
     }
 
     create() {
-        // this.cameras.main.setBackgroundColor(0x00ff00);
-
-        // this.add.image(512, 384, "background").setAlpha(0.5);
-
-        // this.add
-        //     .text(
-        //         512,
-        //         384,
-        //         "Make something fun!\nand share it with us:\nsupport@phaser.io",
-        //         {
-        //             fontFamily: "Arial Black",
-        //             fontSize: 38,
-        //             color: "#ffffff",
-        //             stroke: "#000000",
-        //             strokeThickness: 8,
-        //             align: "center",
-        //         }
-        //     )
-        //     .setOrigin(0.5)
-        //     .setDepth(100);
         const map = this.make.tilemap({
             key: "alienGameMap3",
             tileWidth: 16,
@@ -68,14 +50,14 @@ export class Game extends Scene {
         const layer3 = map.createLayer("TileLayer3", tileset, 0, 0);
         const layer4 = map.createLayer("TileLayer4", tileset, 0, 0);
         this.animatedTiles.init(map);
-
+        //adds player with physics
         const player = (this.player = this.physics.add.sprite(
             300,
             400,
             "player",
             "goblin_idle_1.png"
         ));
-
+        //sets size of collision box for player
         this.player.body.setSize(8, 6);
         const player2 = this.add.sprite(
             500,
@@ -83,11 +65,15 @@ export class Game extends Scene {
             "player",
             "goblin_hurt_1.png"
         );
-
+        //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
+
+        //sets collisions for player amongst these layers
         this.physics.add.collider(this.player, layer2);
         this.physics.add.collider(this.player, layer4);
+        this.physics.add.collider(this.player, groundLayer1);
 
+        //sets collisions by tile id in layers
         layer2.setCollisionBetween(1, 3000);
         layer4.setCollisionBetween(1, 357);
         layer4.setCollisionBetween(359, 3000);
@@ -145,6 +131,7 @@ export class Game extends Scene {
             repeat: -1,
             frameRate: 12,
         });
+
         this.anims.create({
             key: "player-hurt-right",
             frames: this.anims.generateFrameNames("player", {
@@ -167,43 +154,49 @@ export class Game extends Scene {
     }
 
     update() {
+        //keeps player from continuing to move after pressing key
         this.player.setVelocityX(0);
         this.player.setVelocityY(0);
+
+        //player walk right
         if (this.cursors.right.isDown) {
             this.player.setVelocityX(speed);
             this.player.anims.play("player-walk-right", true);
             currentDirection = "right";
-        } else if (this.cursors.left.isDown) {
+        }
+
+        //player walk left
+        else if (this.cursors.left.isDown) {
             this.player.setVelocityX(-speed);
             this.player.anims.play("player-walk-left", true);
             currentDirection = "left";
-        } else if (this.cursors.up.isDown && currentDirection === "left") {
+        }
+
+        //player walk up with character facing left or right based on current direction
+        else if (this.cursors.up.isDown && currentDirection === "left") {
             this.player.setVelocityY(-speed);
             this.player.anims.play("player-walk-left", true);
         } else if (this.cursors.up.isDown && currentDirection === "right") {
             this.player.setVelocityY(-speed);
             this.player.anims.play("player-walk-right", true);
-        } else if (this.cursors.down.isDown && currentDirection === "left") {
+        }
+
+        //player walk down with character facing left or right based on current direction
+        else if (this.cursors.down.isDown && currentDirection === "left") {
             this.player.setVelocityY(speed);
             this.player.anims.play("player-walk-left", true);
         } else if (this.cursors.down.isDown && currentDirection === "right") {
             this.player.setVelocityY(speed);
             this.player.anims.play("player-walk-right", true);
-        } else if (currentDirection === "left") {
+        }
+
+        //player idle left or right based on current direction
+        else if (currentDirection === "left") {
             this.player.setVelocityX(0);
             this.player.anims.play("player-idle-left", true);
         } else if (currentDirection === "right") {
             this.player.setVelocityX(0);
             this.player.anims.play("player-idle-right", true);
         }
-        // else {
-        //     this.player.setVelocityX(0);
-        //     this.player.setVelocityY(0);
-        //     if (currentDirection === "left") {
-        //         this.player.anims.play("player-idle-left", true);
-        //     } else {
-        //         this.player.anims.play("player-idle-right", true);
-        //     }
-        // }
     }
 }
