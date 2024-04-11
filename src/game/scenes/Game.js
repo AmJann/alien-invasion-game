@@ -32,7 +32,7 @@ export class Game extends Scene {
             import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
             { frameWidth: 16, frameHeight: 16 }
         );
-        this.textures.addSpriteSheetFromAtlas('humans',
+        this.textures.addSpriteSheetFromAtlas('npc',
             {
                 frameWidth: 16, frameHeight: 16, atlas: import.meta.env.BASE_URL + '/characters/human/humans.png',
             })
@@ -149,9 +149,38 @@ export class Game extends Scene {
             repeat: -1,
             frameRate: 12,
         });
+
+        // human animations
+        this.anims.create({
+            key: 'human-walk-right',
+            frames: this.anims.generateFrameNames('humans', { start: 1, end: 8, prefix: 'base_walking_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+        this.anims.create({
+            key: 'human-idle-right',
+            frames: this.anims.generateFrameNames('humans', { start: 1, end: 9, prefix: 'base_idle_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+        this.anims.create({
+            key: 'human-hurt-right',
+            frames: this.anims.generateFrameNames('humans', { start: 1, end: 8, prefix: 'base_hurt_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+
+        
+        this.anims.create({
+            key: 'human-longhair-hurt-right',
+            frames: this.anims.generateFrameNames('humans', { start: 1, end: 8, prefix: 'longhair_hurt_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+
         player.anims.play("player-walk-right");
         player2.anims.play("player-hurt-right");
-
+        human3.anims.play('human-idle-right')
         EventBus.emit("current-scene-ready", this);
     }
 
