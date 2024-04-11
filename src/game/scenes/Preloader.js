@@ -35,6 +35,7 @@ export class Preloader extends Scene
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
         this.load.atlas('player', '/characters/alien/goblin_spritesheet.png', '/characters/alien/goblin_spritesheet.json')
+        this.load.atlas('humans','/characters/human/humans.png', '/characters/human/humans.json')
     }
 
     create ()

@@ -32,6 +32,10 @@ export class Game extends Scene {
             import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
             { frameWidth: 16, frameHeight: 16 }
         );
+        this.textures.addSpriteSheetFromAtlas('humans',
+            {
+                frameWidth: 16, frameHeight: 16, atlas: import.meta.env.BASE_URL + '/characters/human/humans.png',
+            })
     }
 
     create() {
@@ -59,11 +63,14 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 6);
         const player2 = this.add.sprite(
-            500,
-            650,
+            350,
+            400,
             "player",
             "goblin_hurt_1.png"
         );
+        // create human NPC
+        const human3 = this.add.container(400, 400, [this.add.sprite(0,0, )])
+
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
 
