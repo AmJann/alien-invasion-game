@@ -34,8 +34,12 @@ export class Game extends Scene {
         );
         this.textures.addSpriteSheetFromAtlas('npc',
             {
-                frameWidth: 16, frameHeight: 16, atlas: import.meta.env.BASE_URL + '/characters/human/humans.png',
+                frameWidth: 16, frameHeight: 16, atlas: 'humans', frame: 'base_idle_1.png'
             })
+        this.textures.addSpriteSheetFromAtlas('npc_longhair',
+        {
+            frameWidth: 16, frameHeight: 16, atlas: 'humans', frame: 'longhair_idle_1.png'
+        })
     }
 
     create() {
@@ -68,9 +72,7 @@ export class Game extends Scene {
             "player",
             "goblin_hurt_1.png"
         );
-        // create human NPC
-        const human3 = this.add.container(400, 400, [this.add.sprite(0,0, )])
-
+        
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -177,10 +179,23 @@ export class Game extends Scene {
             repeat: -1,
             frameRate: 12
         })
-
+        this.anims.create({
+            key: 'human-longhair-idle-right',
+            frames: this.anims.generateFrameNames('humans', { start: 1, end: 9, prefix: 'longhair_idle_', suffix: '.png' }), 
+            repeat: -1,
+            frameRate: 12
+        })
+        // create human NPC
+        //const human3 = this.add.container(400, 400, [this.add.sprite(0,0, 'npc'), this.add.sprite(0,0, 'npc_longhair')])
+        let human4 = this.add.sprite(350, 450, 'npc')
+        
+        let longhair = this.add.sprite(350, 450, 'npc_longhair')
+        
+        this.human3 = this.add.container(350, 450, [human4, longhair])
         player.anims.play("player-walk-right");
         player2.anims.play("player-hurt-right");
-        human3.anims.play('human-idle-right')
+        this.human3.list[0].play('human-idle-right')
+        this.human3.list[1].play('human-longhair-idle-right')
         EventBus.emit("current-scene-ready", this);
     }
 
