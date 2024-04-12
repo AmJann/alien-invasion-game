@@ -18,7 +18,7 @@ const config = {
     physics: {
         default: "arcade",
         arcade: {
-            debug: false,
+            debug: true, // swapping false for true to see if we get some helpful debug output
         },
     },
 };
