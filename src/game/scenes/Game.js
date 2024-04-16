@@ -75,7 +75,16 @@ export class Game extends Scene {
         const flowers = map.createLayer("flowers", tileset, 0, 0);
 
         this.animatedTiles.init(map);
+        const human = (this.human = this.physics.add.sprite(
+            400,
+            400,
+            'human',
+            'base_idle_1.png'
+        ));
+        this.human.body.setSize(22, 20)
+        human.setPushable(false);
         //adds player with physics
+        
         const player = (this.player = this.physics.add.sprite(
             300,
             400,
@@ -91,13 +100,7 @@ export class Game extends Scene {
             "goblin_hurt_1.png"
         ));
         this.player2.body.setSize(12,16)
-        const human = (this.human = this.physics.add.sprite(
-            400,
-            400,
-            'human',
-            'base_idle_1.png'
-        ));
-        this.human.body.setSize(22,26)
+        
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -111,6 +114,19 @@ export class Game extends Scene {
         this.physics.add.collider(this.player, crops);
         this.physics.add.collider(this.player, elevatedGroundLayer);
         this.physics.add.collider(this.player, bridgePosts);
+
+
+        // set collisions between NPC and player + world
+        this.physics.add.collider(this.human, this.player, ()=> console.log('something'))
+        this.physics.add.collider(this.human, waterLayer);
+        this.physics.add.collider(this.human, houseLayer1);
+        this.physics.add.collider(this.human, houseLayer2);
+        this.physics.add.collider(this.human, treeLayer);
+        this.physics.add.collider(this.human, moundsRocks);
+        this.physics.add.collider(this.human, fenceLayer);
+        this.physics.add.collider(this.human, crops);
+        this.physics.add.collider(this.human, elevatedGroundLayer);
+        this.physics.add.collider(this.human, bridgePosts);
 
         //sets collisions by tile id in layers
         waterLayer.setCollisionBetween(1, 3000);
