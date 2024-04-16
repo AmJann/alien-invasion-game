@@ -112,9 +112,10 @@ export class Game extends Scene {
         elevatedGroundLayer.setCollisionBetween(1, 3000);
         fenceLayer.setCollisionBetween(1, 3000);
         crops.setCollisionBetween(1, 3000);
+        bridgePosts.setCollisionBetween(1, 3000);
 
         this.cameras.main.startFollow(player);
-        this.cameras.main.setZoom(3, 3);
+        this.cameras.main.setZoom(2.5, 2.5);
 
         this.anims.create({
             key: "player-walk-right",
