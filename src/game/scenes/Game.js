@@ -13,13 +13,14 @@ export class Game extends Scene {
     }
     preload() {
         this.load.image(
-            "embeddedTiles",
-            import.meta.env.BASE_URL + "assets/embeddedTiles.png"
+            "gameTiles",
+            import.meta.env.BASE_URL + "assets/gameTiles.png"
         );
         this.load.tilemapTiledJSON(
-            "alienGameMap3",
-            import.meta.env.BASE_URL + "assets/alienGameMap3.tmj"
+            "alienMap",
+            import.meta.env.BASE_URL + "assets/alienMap.tmj"
         );
+
         this.load.scenePlugin(
             "animatedTiles",
             AnimatedTiles,
@@ -35,19 +36,43 @@ export class Game extends Scene {
     }
 
     create() {
+        this.add.image(
+            "gameTiles",
+            import.meta.env.BASE_URL + "assets/gameTiles.png"
+        );
+
         const map = this.make.tilemap({
-            key: "alienGameMap3",
+            key: "alienMap",
             tileWidth: 16,
             tileHeight: 16,
         });
         this.sys.animatedTiles.init(map);
-        const tileset = map.addTilesetImage("embeddedTiles", "embeddedTiles");
-        const groundLayer1 = map.createLayer("groundLayer1", tileset, 0, 0);
-        const groundLayer2 = map.createLayer("groundLayer2", tileset, 0, 0);
-        const groundLayer3 = map.createLayer("groundLayer3", tileset, 0, 0);
-        const layer2 = map.createLayer("TileLayer2", tileset, 0, 0);
-        const layer3 = map.createLayer("TileLayer3", tileset, 0, 0);
-        const layer4 = map.createLayer("TileLayer4", tileset, 0, 0);
+
+        const tileset = map.addTilesetImage("gameTiles", "gameTiles");
+        const groundLayer = map.createLayer("groundLayer", tileset, 0, 0);
+        const waterLayer = map.createLayer("waterLayer", tileset, 0, 0);
+        const groundEdgesLayer = map.createLayer(
+            "groundEdgesLayer",
+            tileset,
+            0,
+            0
+        );
+        const moundsRocks = map.createLayer("moundsRocks", tileset, 0, 0);
+        const elevatedGroundLayer = map.createLayer(
+            "elevatedGroundLayer",
+            tileset,
+            0,
+            0
+        );
+        const bridgeLadder = map.createLayer("bridgeLadder", tileset, 0, 0);
+        const bridgePosts = map.createLayer("bridgePosts", tileset, 0, 0);
+        const crops = map.createLayer("crops", tileset, 0, 0);
+        const houseLayer1 = map.createLayer("houseLayer1", tileset, 0, 0);
+        const houseLayer2 = map.createLayer("houseLayer2", tileset, 0, 0);
+        const treeLayer = map.createLayer("treeLayer", tileset, 0, 0);
+        const fenceLayer = map.createLayer("fenceLayer", tileset, 0, 0);
+        const flowers = map.createLayer("flowers", tileset, 0, 0);
+
         this.animatedTiles.init(map);
         //adds player with physics
         const player = (this.player = this.physics.add.sprite(
@@ -68,18 +93,25 @@ export class Game extends Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
 
         //sets collisions for player amongst these layers
-        this.physics.add.collider(this.player, layer2);
-        this.physics.add.collider(this.player, layer4);
-        this.physics.add.collider(this.player, groundLayer1);
+        this.physics.add.collider(this.player, waterLayer);
+        this.physics.add.collider(this.player, houseLayer1);
+        this.physics.add.collider(this.player, houseLayer2);
+        this.physics.add.collider(this.player, treeLayer);
+        this.physics.add.collider(this.player, moundsRocks);
+        this.physics.add.collider(this.player, fenceLayer);
+        this.physics.add.collider(this.player, crops);
+        this.physics.add.collider(this.player, elevatedGroundLayer);
+        this.physics.add.collider(this.player, bridgePosts);
 
         //sets collisions by tile id in layers
-        layer2.setCollisionBetween(1, 3000);
-        layer4.setCollisionBetween(1, 357);
-        layer4.setCollisionBetween(359, 3000);
-        groundLayer1.setCollisionBetween(162, 167);
-        groundLayer1.setCollisionBetween(1226, 1231);
-        groundLayer1.setCollisionBetween(1290, 1295);
-        groundLayer1.setCollisionBetween(1354, 1359);
+        waterLayer.setCollisionBetween(1, 3000);
+        houseLayer1.setCollisionBetween(1, 3000);
+        houseLayer2.setCollisionBetween(1, 3000);
+        treeLayer.setCollisionBetween(1, 3000);
+        moundsRocks.setCollisionBetween(1, 3000);
+        elevatedGroundLayer.setCollisionBetween(1, 3000);
+        fenceLayer.setCollisionBetween(1, 3000);
+        crops.setCollisionBetween(1, 3000);
 
         this.cameras.main.startFollow(player);
         this.cameras.main.setZoom(3, 3);
