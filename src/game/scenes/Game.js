@@ -18,7 +18,7 @@ export class Game extends Scene {
         );
         this.load.tilemapTiledJSON(
             "alienMap",
-            import.meta.env.BASE_URL + "assets/alienMap.tmj"
+            import.meta.env.BASE_URL + "assets/alienMap.json"
         );
 
         this.load.scenePlugin(
