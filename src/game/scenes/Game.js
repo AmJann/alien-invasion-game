@@ -93,6 +93,9 @@ export class Game extends Scene {
         ));
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
+        // prevent player from walking off of the map
+        player.setCollideWorldBounds(true)
+
         const player2 = (this.player2 = this.physics.add.sprite(
             350,
             400,
