@@ -181,9 +181,9 @@ export class Game extends Scene {
         EventBus.emit("current-scene-ready", this);
     }
 
-    changeScene() {
-        this.scene.start("GameOver");
-    }
+    // changeScene() {
+    //     this.scene.start("GameOver");
+    // }
 
     update() {
         //keeps player from continuing to move after pressing key
@@ -230,5 +230,8 @@ export class Game extends Scene {
             this.player.setVelocityX(0);
             this.player.anims.play("player-idle-right", true);
         }
+        this.time.delayedCall(5000, () => {
+            this.scene.start("Fight");
+        });
     }
 }
