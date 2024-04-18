@@ -292,43 +292,48 @@ export class Game extends Scene {
 
 
         //player walk right
+        let velX = 0
+        let velY = 0
         if (this.cursors.right.isDown) {
-            this.player.setVelocityX(speed);
+            velX = speed
             this.player.anims.play("player-walk-right", true);
             currentDirection = "right";
         }
 
         //player walk left
-        else if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-speed);
+        if (this.cursors.left.isDown) {
+            velX = -speed
             this.player.anims.play("player-walk-left", true);
             currentDirection = "left";
         }
 
         //player walk up with character facing left or right based on current direction
-        else if (this.cursors.up.isDown && currentDirection === "left") {
-            this.player.setVelocityY(-speed);
+        if (this.cursors.up.isDown && currentDirection === "left") {
+            velY = -speed
+           
             this.player.anims.play("player-walk-left", true);
         } else if (this.cursors.up.isDown && currentDirection === "right") {
-            this.player.setVelocityY(-speed);
+            velY = -speed
+            
             this.player.anims.play("player-walk-right", true);
         }
 
         //player walk down with character facing left or right based on current direction
-        else if (this.cursors.down.isDown && currentDirection === "left") {
-            this.player.setVelocityY(speed);
+        if (this.cursors.down.isDown && currentDirection === "left") {
+            velY = speed
+            
             this.player.anims.play("player-walk-left", true);
         } else if (this.cursors.down.isDown && currentDirection === "right") {
-            this.player.setVelocityY(speed);
+            velY = speed
             this.player.anims.play("player-walk-right", true);
         }
 
         //player idle left or right based on current direction
         else if (currentDirection === "left") {
-            this.player.setVelocityX(0);
+            
             this.player.anims.play("player-idle-left", true);
         } else if (currentDirection === "right") {
-            this.player.setVelocityX(0);
+            
             this.player.anims.play("player-idle-right", true);
         }
         // player attack right
@@ -344,5 +349,6 @@ export class Game extends Scene {
             
             
         }
+        this.player.setVelocity(velX,velY)
     }
 }
