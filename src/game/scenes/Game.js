@@ -383,10 +383,10 @@ export class Game extends Scene {
         }
 
         //player idle left or right based on current direction
-        else if (currentDirection === "left") {
+        if (velX === 0 && velY === 0 && currentDirection === "left") {
             
             this.player.anims.play("player-idle-left", true);
-        } else if (currentDirection === "right") {
+        } else if (velX === 0 && velY === 0 && currentDirection === "right") {
             
             this.player.anims.play("player-idle-right", true);
         }
