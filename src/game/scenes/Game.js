@@ -80,6 +80,7 @@ export class Game extends Scene {
             400,
             'human',
             'base_idle_1.png'
+            
         ));
         this.human.body.setSize(22, 20)
         human.setPushable(false);
@@ -126,7 +127,11 @@ export class Game extends Scene {
         // set collisions between NPC and player + world
         this.physics.add.collider(this.human, this.weapon, () => {
             console.log('A HIT A HIT')
-            
+            this.weapon.setActive(false)
+            this.weapon.setVisible(false)
+            this.weapon.setPosition(0,0)
+            player.anims.play('player-attack-right')
+            this.human.anims.play('human-hurt-right')
         })
         this.physics.add.collider(this.human, waterLayer);
         this.physics.add.collider(this.human, houseLayer1);
@@ -233,7 +238,7 @@ export class Game extends Scene {
                 prefix: "goblin_attack_",
                 suffix: ".png",
             }),
-            repeat: -1,
+            repeat: 1,
             frameRate: 12,
         });
         this.anims.create({
@@ -244,7 +249,7 @@ export class Game extends Scene {
                 prefix: "goblin_attack_left_",
                 suffix: ".png",
             }),
-            repeat: -1,
+            repeat: 1,
             frameRate: 12,
         });
 
@@ -273,6 +278,17 @@ export class Game extends Scene {
             repeat: -1,
             frameRate: 12,
         });
+        this.anims.create({
+            key: 'human-hurt-right',
+            frames: this.anims.generateFrameNames("human", {
+                start: 1,
+                end: 8,
+                prefix: 'base_hurt_',
+                suffix: ".png",
+            }),
+            repeat: 1,
+            frameRate: 12,
+        })
 
 
         player.anims.play("player-idle-right");
@@ -380,14 +396,14 @@ export class Game extends Scene {
             const xPos = this.player.x
             const yPos = this.player.y
             if (currentDirection === 'left') {
-                this.player.anims.play('player-attack-left', true)
-                this.weapon.setPosition(xPos - 16, yPos)
+                //this.player.anims.play('player-attack-left', true)
+                this.weapon.setPosition(xPos - 8, yPos - 5)
                 this.weapon.setActive(true)
                 this.weapon.setVisible(true)
             }
             else {
-                this.player.anims.play('player-attack-right', true)
-                this.weapon.setPosition(xPos + 16, yPos)
+                //this.player.anims.play('player-attack-right', true)
+                this.weapon.setPosition(xPos + 8, yPos - 5)
                 
                 this.weapon.setActive(true)
                 this.weapon.setVisible(true)
@@ -398,7 +414,6 @@ export class Game extends Scene {
         }
         //keeps player from continuing to move after pressing key
         this.player.setVelocity(velX, velY)
-        this.weapon.setActive(false)
-        this.weapon.setVisible(false)
+        
     }
 }
