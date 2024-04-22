@@ -90,7 +90,7 @@ export class Game extends Scene {
         ))
         weapon.setActive(false)
         weapon.setVisible(false)
-        weapon.setSize(10,10)
+        weapon.setSize(25,10 )
         const player = (this.player = this.physics.add.sprite(
             300,
             400,
@@ -130,7 +130,7 @@ export class Game extends Scene {
             this.weapon.setActive(false)
             this.weapon.setVisible(false)
             this.weapon.setPosition(0,0)
-            player.anims.play('player-attack-right')
+            
             this.human.anims.play('human-hurt-right')
         })
         this.physics.add.collider(this.human, waterLayer);
@@ -163,7 +163,9 @@ export class Game extends Scene {
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true)
 
+        
 
+        // Animations
         this.anims.create({
             key: "player-walk-right",
             frames: this.anims.generateFrameNames("player", {
@@ -230,7 +232,7 @@ export class Game extends Scene {
             }),
             frameRate: 12,
         });
-        this.anims.create({
+        player.anims.create({
             key: "player-attack-right",
             frames: this.anims.generateFrameNames("player", {
                 start: 1,
@@ -241,7 +243,7 @@ export class Game extends Scene {
             repeat: 1,
             frameRate: 12,
         });
-        this.anims.create({
+        player.anims.create({
             key: "player-attack-left",
             frames: this.anims.generateFrameNames("player", {
                 start: 1,
@@ -255,7 +257,7 @@ export class Game extends Scene {
 
 
         // Human Animations
-        this.anims.create({
+        human.anims.create({
             key: "human-idle-right",
             frames: this.anims.generateFrameNames("human", {
                 start: 1,
@@ -267,7 +269,7 @@ export class Game extends Scene {
             frameRate: 12,
         });
 
-        this.anims.create({
+        human.anims.create({
             key: "human-idle-left",
             frames: this.anims.generateFrameNames("human", {
                 start: 1,
@@ -278,7 +280,7 @@ export class Game extends Scene {
             repeat: -1,
             frameRate: 12,
         });
-        this.anims.create({
+        human.anims.create({
             key: 'human-hurt-right',
             frames: this.anims.generateFrameNames("human", {
                 start: 1,
@@ -291,14 +293,29 @@ export class Game extends Scene {
         })
 
 
-        player.anims.play("player-idle-right");
+        //player.anims.play("player-attack-right");
         player2.anims.play("player-hurt-right");
         human.anims.play('human-idle-right')
         this.cameras.main.shake(900, .0007);
         //this.cameras.flash(300);
         //this.cameras.fade(300);
+
+
+    //     // spawn a bunch of random NPC zones
+    //     this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
+    //     for (var i = 0; i < 12; i++) {
+    //         var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+    //         var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+    //         // parameters are x, y, width, height
+    //         this.spawns.create(x, y, 65, 65);
+    //     }
+        //     this.physics.add.overlap(player, this.spawns, this.onNPCZoneEnter, false, this);
+        
+        
+        // supposed to listen to the attack animations and wait for them to complete
+        //player.on(Phaser.Animations.Events.ANIMA + 'player-attack-right', () => console.log('did it!'), this)
         EventBus.emit("current-scene-ready", this);
-    }
+     }
 
     changeScene() {
         this.scene.start("GameOver");
@@ -306,21 +323,23 @@ export class Game extends Scene {
    
 
     spawnNPCZones() {
-        this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
-        for (var i = 0; i < 30; i++) {
-            var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-            var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-            // parameters are x, y, width, height
-            this.spawns.create(x, y, 20, 20);
-        }
-        this.physics.add.overlap(this.player, this.spawns, this.onNPCZoneEnter, false, this);
+        
     }
     onNPCZoneEnter(player, zone) {
         // what happens when player enters NPC Zone
         // shake the world
-        this.cameras.main.shake(300);
+        //this.cameras.main.shake(300);
         this.cameras.flash(300);
-        this.cameras.fade(300);
+        // this.cameras.fade(300);
+        this.physics.add.sprite(
+            400,
+            400,
+            'human',
+            'base_walk_1.png'
+            
+        );
+        this.human.body.setSize(22, 20)
+        this.human.setPushable(false);
     }
 
     something(direction) {
@@ -397,16 +416,22 @@ export class Game extends Scene {
             const yPos = this.player.y
             if (currentDirection === 'left') {
                 //this.player.anims.play('player-attack-left', true)
+                this.something(currentDirection)
                 this.weapon.setPosition(xPos - 8, yPos - 5)
                 this.weapon.setActive(true)
                 this.weapon.setVisible(true)
             }
             else {
-                //this.player.anims.play('player-attack-right', true)
+                this.player.anims.play('player-attack-right', true) 
+                
                 this.weapon.setPosition(xPos + 8, yPos - 5)
                 
                 this.weapon.setActive(true)
                 this.weapon.setVisible(true)
+                
+
+               
+                
             }
             
        
