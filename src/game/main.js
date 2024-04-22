@@ -12,6 +12,7 @@ const config = {
     // width: 1024,
     width: 800,
     height: 768,
+    pixelArt: true,
     parent: "game-container",
     backgroundColor: "#028af8",
     scene: [Boot, Preloader, MainMenu, Game, GameOver],
