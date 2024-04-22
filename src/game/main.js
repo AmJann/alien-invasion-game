@@ -12,13 +12,14 @@ const config = {
     // width: 1024,
     width: 800,
     height: 768,
+    pixelArt: true,
     parent: "game-container",
     backgroundColor: "#028af8",
     scene: [Boot, Preloader, MainMenu, Game, GameOver],
     physics: {
         default: "arcade",
         arcade: {
-            debug: false,
+            debug: true, // swapping false for true to see if we get some helpful debug output
         },
     },
 };
