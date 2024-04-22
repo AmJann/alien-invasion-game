@@ -1,6 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
+import { Player } from "../Player";
 //sets players current direction
 let currentDirection = "right";
 //sets player movement speed
@@ -75,7 +76,8 @@ export class Game extends Scene {
 
         this.animatedTiles.init(map);
         //adds player with physics
-        const player = (this.player = this.physics.add.sprite(
+        const player = (this.player = new Player(
+            this,
             300,
             400,
             "player",
