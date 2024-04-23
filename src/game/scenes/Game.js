@@ -122,18 +122,6 @@ export class Game extends Scene {
         this.physics.add.collider(this.player, elevatedGroundLayer);
         this.physics.add.collider(this.player, bridgePosts);
 
-        // set collisions between NPC and player + world
-        this.physics.add.collider(this.human, this.weapon, () => {
-            console.log("A HIT A HIT");
-            this.weapon.setActive(false);
-            this.weapon.setVisible(false);
-            this.weapon.setPosition(0, 0);
-
-            this.human.anims.play("human-hurt-right");
-
-            this.cameras.main.fadeOut(1000, 0, 0, 0);
-        });
-
         this.physics.add.collider(this.human, waterLayer);
         this.physics.add.collider(this.human, houseLayer1);
         this.physics.add.collider(this.human, houseLayer2);
@@ -156,8 +144,10 @@ export class Game extends Scene {
             this.playerPosition = { x: this.player.x, y: this.player.y };
             console.log(this.playerPosition);
 
+            //fadeout to fight scene
             this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
                 if (progress === 1) {
+                    //passes reference to fight scene and fixes blue border issue with fight scene
                     this.scene.launch("Fight", { Game: this });
                 }
             });
@@ -374,6 +364,7 @@ export class Game extends Scene {
     // }
 
     update() {
+        //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
 
         // keeps players and NPCs from moving when they collide
