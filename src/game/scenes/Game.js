@@ -2,6 +2,7 @@ import { EventBus } from "../EventBus";
 import { Scene, Phaser } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { Player } from "../Player";
+import { Weapon } from "../sprites/weaponSprite";
 //sets players current direction
 let currentDirection = "right";
 //sets player movement speed
@@ -12,6 +13,7 @@ export class Game extends Scene {
         super("Game");
         this.player;
         this.human;
+        this.weapon
     }
     preload() {
         this.load.image(
@@ -35,6 +37,11 @@ export class Game extends Scene {
             import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
             { frameWidth: 16, frameHeight: 16 }
         );
+        this.load.spritesheet(
+            'humans',
+            import.meta.env.BASE_URL + " assets/humans_phaser3.png",
+            { frameWidth: 16, frameHeight: 16 }
+        )
         this.textures.addSpriteSheetFromAtlas('npc',
             {
                 frameWidth: 16, frameHeight: 16, atlas: 'humans', frame: 'base_idle_1.png'
@@ -87,16 +94,13 @@ export class Game extends Scene {
         const human = (this.human = this.physics.add.sprite(
             400,
             400,
-            "human",
+            "humans",
             "base_idle_1.png"
         ));
         this.human.body.setSize(22, 20);
         human.setPushable(false);
         //adds player with physics
-        const weapon = (this.weapon = this.physics.add.sprite());
-        weapon.setActive(false);
-        weapon.setVisible(false);
-        weapon.setSize(25, 10);
+     
 
         const player = (this.player = new Player(
             this,
@@ -107,6 +111,11 @@ export class Game extends Scene {
         ));
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
+        const weapon = (this.weapon = this.physics.add.sprite( player.x, player.y));
+        weapon.setSize(25, 10);
+        weapon.setActive(false);
+        weapon.setVisible(false);
+        
 
         const player2 = (this.player2 = this.physics.add.sprite(
             350,
@@ -145,7 +154,7 @@ export class Game extends Scene {
             console.log("A HIT A HIT");
             this.weapon.setActive(false);
             this.weapon.setVisible(false);
-            this.weapon.setPosition(0, 0);
+            // this.weapon.setPosition(0, 0);
 
             this.human.anims.play("human-hurt-right");
 
@@ -286,9 +295,9 @@ export class Game extends Scene {
         });
 
         // Human Animations
-        human.anims.create({
+        this.anims.create({
             key: "human-idle-right",
-            frames: this.anims.generateFrameNames("human", {
+            frames: this.anims.generateFrameNames("humans", {
                 start: 1,
                 end: 9,
                 prefix: "base_idle_",
@@ -298,9 +307,9 @@ export class Game extends Scene {
             frameRate: 12,
         });
 
-        human.anims.create({
+        this.anims.create({
             key: "human-idle-left",
-            frames: this.anims.generateFrameNames("human", {
+            frames: this.anims.generateFrameNames("humans", {
                 start: 1,
                 end: 9,
                 prefix: "base_idle_left_",
@@ -309,9 +318,9 @@ export class Game extends Scene {
             repeat: -1,
             frameRate: 12,
         });
-        human.anims.create({
+        this.anims.create({
             key: "human-hurt-right",
-            frames: this.anims.generateFrameNames("human", {
+            frames: this.anims.generateFrameNames("humans", {
                 start: 1,
                 end: 8,
                 prefix: "base_hurt_",
@@ -429,19 +438,24 @@ export class Game extends Scene {
             // we'll need some method on the player sprite
             const xPos = this.player.x;
             const yPos = this.player.y;
+            
             if (currentDirection === "left") {
                 //this.player.anims.play('player-attack-left', true)
                 this.something(currentDirection);
+                
                 this.weapon.setPosition(xPos - 8, yPos - 5);
+                
                 this.weapon.setActive(true);
                 this.weapon.setVisible(true);
+                
             } else {
                 this.player.anims.play("player-attack-right", true);
-
+                
                 this.weapon.setPosition(xPos + 8, yPos - 5);
-
+                
                 this.weapon.setActive(true);
                 this.weapon.setVisible(true);
+                
             }
         }
         //keeps player from continuing to move after pressing key
@@ -450,5 +464,8 @@ export class Game extends Scene {
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
+        this.weapon.setActive(false)
+        this.weapon.setVisible(false)
+        
     }
 }
