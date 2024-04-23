@@ -85,6 +85,11 @@ export class Game extends Scene {
         this.human.body.setSize(22, 20);
         human.setPushable(false);
         //adds player with physics
+        const weapon = (this.weapon = this.physics.add.sprite());
+        weapon.setActive(false);
+        weapon.setVisible(false);
+        weapon.setSize(25, 10);
+
         const player = (this.player = new Player(
             this,
             300,
@@ -125,7 +130,10 @@ export class Game extends Scene {
             this.weapon.setPosition(0, 0);
 
             this.human.anims.play("human-hurt-right");
+
+            this.cameras.main.fadeOut(1000, 0, 0, 0);
         });
+
         this.physics.add.collider(this.human, waterLayer);
         this.physics.add.collider(this.human, houseLayer1);
         this.physics.add.collider(this.human, houseLayer2);
@@ -144,6 +152,15 @@ export class Game extends Scene {
             this.weapon.setPosition(0, 0);
 
             this.human.anims.play("human-hurt-right");
+
+            this.playerPosition = { x: this.player.x, y: this.player.y };
+            console.log(this.playerPosition);
+
+            this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
+                if (progress === 1) {
+                    this.scene.launch("Fight", { Game: this });
+                }
+            });
         });
         this.physics.add.collider(this.human, waterLayer);
         this.physics.add.collider(this.human, houseLayer1);
@@ -357,6 +374,8 @@ export class Game extends Scene {
     // }
 
     update() {
+        this.playerPosition = { x: this.player.x, y: this.player.y };
+
         // keeps players and NPCs from moving when they collide
         this.human.setVelocityX(0);
         this.human.setVelocityY(0);
@@ -429,8 +448,8 @@ export class Game extends Scene {
         //keeps player from continuing to move after pressing key
         this.player.setVelocity(velX, velY);
 
-        this.time.delayedCall(5000, () => {
-            this.scene.start("Fight");
-        });
+        // this.time.delayedCall(25000, () => {
+        //     this.scene.start("Fight");
+        // });
     }
 }
