@@ -4,6 +4,7 @@ import { GameOver } from "./scenes/GameOver";
 import { MainMenu } from "./scenes/MainMenu";
 import Phaser from "phaser";
 import { Preloader } from "./scenes/Preloader";
+import { Fight } from "./scenes/Fight";
 
 // Find out more information about the Game Config at:
 // https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -12,13 +13,14 @@ const config = {
     // width: 1024,
     width: 800,
     height: 768,
+    pixelArt: true,
     parent: "game-container",
     backgroundColor: "#028af8",
-    scene: [Boot, Preloader, MainMenu, Game, GameOver],
+    scene: [Boot, Preloader, MainMenu, Game, Fight, GameOver],
     physics: {
         default: "arcade",
         arcade: {
-            debug: false,
+            debug: true, // swapping false for true to see if we get some helpful debug output
         },
     },
 };
