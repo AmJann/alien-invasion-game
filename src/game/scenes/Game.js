@@ -3,6 +3,7 @@ import { Scene, Phaser } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { Player } from "../Player";
 import { Weapon } from "../sprites/weaponSprite";
+import { Time } from "phaser";
 //sets players current direction
 let currentDirection = "right";
 //sets player movement speed
@@ -113,8 +114,18 @@ export class Game extends Scene {
         this.player.body.setSize(8, 10);
         const weapon = (this.weapon = this.physics.add.sprite( player.x, player.y));
         weapon.setSize(25, 10);
-        weapon.setActive(false);
-        weapon.setVisible(false);
+        weapon.setActive(false).setVisible(false)
+        // this.weapon = this.add.group({
+        //     defaultKey: 'weapon', maxSize: 10,
+        //     createCallback: function hulkSmash(weapon) {
+        //         weapon.setName(`drawSword`)
+        //         console.log('created', weapon.name)
+        //     },
+        //     removeCallback: function hulkSleep(weapon) {
+        //         console.log('weapon go away??', weapon.name)
+        //     },
+            
+        // })
         
 
         const player2 = (this.player2 = this.physics.add.sprite(
@@ -152,9 +163,7 @@ export class Game extends Scene {
         // set collisions between NPC and player + world
         this.physics.add.collider(this.human, this.weapon, () => {
             console.log("A HIT A HIT");
-            this.weapon.setActive(false);
-            this.weapon.setVisible(false);
-            // this.weapon.setPosition(0, 0);
+            this.weapon.setPosition(-50, -50)
 
             this.human.anims.play("human-hurt-right");
 
@@ -330,6 +339,9 @@ export class Game extends Scene {
             frameRate: 12,
         });
 
+        this.clock = new Time.Clock(this)
+
+
         //player.anims.play("player-attack-right");
         player2.anims.play("player-hurt-right");
         human.anims.play("human-idle-right");
@@ -367,7 +379,20 @@ export class Game extends Scene {
         this.human.body.setSize(22, 20);
         this.human.setPushable(false);
     }
+    drawWeapon(x, y, obj) {
+        
+        obj.setActive(true)
+        obj.setVisible(true)
+        
+        obj.setPosition(x, y)
+        setTimeout(this.sheathWeapon, 500, obj)
+    }
+    sheathWeapon(obj) {
+        
+        obj.setPosition(-50, -50)
+        
 
+    }
     something(direction) {
         if (direction === "left") {
             this.player.anims.play("player-attack-left", true);
@@ -389,7 +414,7 @@ export class Game extends Scene {
         this.human.setVelocityY(0);
         this.player2.setVelocityX(0);
         this.player2.setVelocityY(0);
-
+        
         //player walk right
         let velX = 0;
         let velY = 0;
@@ -442,19 +467,18 @@ export class Game extends Scene {
             if (currentDirection === "left") {
                 //this.player.anims.play('player-attack-left', true)
                 this.something(currentDirection);
+                this.drawWeapon(xPos - 8, yPos - 5, this.weapon)
                 
-                this.weapon.setPosition(xPos - 8, yPos - 5);
                 
-                this.weapon.setActive(true);
-                this.weapon.setVisible(true);
+                
                 
             } else {
                 this.player.anims.play("player-attack-right", true);
+                this.drawWeapon(xPos + 8, yPos - 5, this.weapon)
+                 
                 
-                this.weapon.setPosition(xPos + 8, yPos - 5);
+               
                 
-                this.weapon.setActive(true);
-                this.weapon.setVisible(true);
                 
             }
         }
@@ -464,8 +488,8 @@ export class Game extends Scene {
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
-        this.weapon.setActive(false)
-        this.weapon.setVisible(false)
+        
+        //this.sheathWeapon(this.weapon)
         
     }
 }
