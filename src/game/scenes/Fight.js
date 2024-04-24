@@ -30,8 +30,54 @@ export class Fight extends Phaser.Scene {
         // Add background image
         this.add.image(400, 400, "water_field_bg");
 
-        console.log("Player Position:", this.playerPosition);
-        // Define starting positions for the images
+        //container for player stats (health, name)
+        this.playerInfoContainer = this.add.container(150, 670);
+
+        // health bar
+        this.playerHealthBar = this.add.graphics();
+        this.playerHealthBar.fillStyle(0xff0000, 1);
+        this.playerHealthBar.fillRect(0, 0, 200, 20);
+
+        // text and styling for players name
+        this.playerNameText = this.add.text(0, 25, "Scientist", {
+            font: "courier",
+            fontSize: "24px",
+            fontStyle: "strong",
+            fill: "#000000",
+            strokeThickness: "3",
+        });
+        this.playerNameText.setFontStyle("bold");
+        this.playerNameText.setFontSize("20px");
+
+        // add health bar and name to container
+        this.playerInfoContainer.add([
+            this.playerNameText,
+            this.playerHealthBar,
+        ]);
+
+        //next blocks of code are the same as player healthbar and name but for enemy.
+        // Only coordinates are different
+
+        this.enemyInfoContainer = this.add.container(450, 100);
+
+        this.enemyHealthBar = this.add.graphics();
+        this.enemyHealthBar.fillStyle(0xff0000, 1);
+        this.enemyHealthBar.fillRect(0, 0, 200, 20);
+        this.enemyHealthBar.fill;
+
+        this.enemyNameText = this.add.text(0, 25, "Clown", {
+            font: "courier",
+            fontSize: "24px",
+            fontStyle: "strong",
+            fill: "#000000",
+            strokeThickness: "3",
+        });
+
+        this.enemyNameText.setFontStyle("bold");
+        this.enemyNameText.setFontSize("20px");
+
+        this.enemyInfoContainer.add([this.enemyNameText, this.enemyHealthBar]);
+
         const clownStartX = -300;
         const scientistStartX = 1100;
         const startYClown = 290;
@@ -65,7 +111,6 @@ export class Fight extends Phaser.Scene {
                 // we can put game logic here after the human images finish transition
             },
         });
-
         this.time.delayedCall(6000, () => {
             this.returnToGameScene();
         });
