@@ -10,12 +10,13 @@ import { Fight } from "./scenes/Fight";
 // https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config = {
     type: Phaser.AUTO,
-    // width: 1024,
-    width: 800,
-    height: 768,
+    scale: {
+        width: 800,
+        height: 768,
+    },
     pixelArt: true,
     parent: "game-container",
-    backgroundColor: "#028af8",
+    backgroundColor: "#00000",
     scene: [Boot, Preloader, MainMenu, Game, Fight, GameOver],
     physics: {
         default: "arcade",
