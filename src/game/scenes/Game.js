@@ -1,9 +1,9 @@
 import { EventBus } from "../EventBus";
-import { Scene, Phaser } from "phaser";
+import { Scene, Phaser, GameObjects, Math, Time } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { Player } from "../Player";
-import { Weapon } from "../sprites/weaponSprite";
-import { Time } from "phaser";
+import { humanSprite } from "../sprites/humanSprite";
+
 //sets players current direction
 let currentDirection = "right";
 //sets player movement speed
@@ -112,7 +112,8 @@ export class Game extends Scene {
         ));
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
-        const weapon = (this.weapon = this.physics.add.sprite( player.x, player.y));
+        this.player.setPushable(false)
+        const weapon = (this.weapon = this.physics.add.sprite( -50, -50));
         weapon.setSize(25, 10);
         weapon.setActive(false).setVisible(false)
         // this.weapon = this.add.group({
@@ -161,6 +162,7 @@ export class Game extends Scene {
         this.physics.add.collider(this.human, bridgePosts);
 
         // set collisions between NPC and player + world
+        this.physics.add.collider(this.player, )
         this.physics.add.collider(this.human, this.weapon, () => {
             console.log("A HIT A HIT");
             this.weapon.setPosition(-50, -50)
@@ -178,6 +180,7 @@ export class Game extends Scene {
                 }
             });
         });
+        
         this.physics.add.collider(this.human, waterLayer);
         this.physics.add.collider(this.human, houseLayer1);
         this.physics.add.collider(this.human, houseLayer2);
@@ -339,7 +342,7 @@ export class Game extends Scene {
             frameRate: 12,
         });
 
-        this.clock = new Time.Clock(this)
+       
 
 
         //player.anims.play("player-attack-right");
@@ -349,15 +352,61 @@ export class Game extends Scene {
         //this.cameras.flash(300);
         //this.cameras.fade(300);
 
-        //     // spawn a bunch of random NPC zones
-        //     this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
-        //     for (var i = 0; i < 12; i++) {
-        //         var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-        //         var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-        //         // parameters are x, y, width, height
-        //         this.spawns.create(x, y, 65, 65);
-        //     }
-        //     this.physics.add.overlap(player, this.spawns, this.onNPCZoneEnter, false, this);
+            // spawn a bunch of random NPC zones
+            //this.spawns = this.physics.add.group({ classType: GameObjects.Zone });
+            for (var i = 0; i < 12; i++) {
+                var x = Math.RND.between(0, map.widthInPixels);
+                var y = Math.RND.between(0, map.heightInPixels);
+                // parameters are x, y, width, height
+                //this.spawns.create(x, y, 65, 65);
+                let enemy = new humanSprite(this, x, y, 'humans', 'base_idle_1.png')
+                enemy.setSize(12, 15)
+                enemy.setPushable(false)
+                enemy.setCollideWorldBounds(true)
+                this.physics.add.existing(enemy)
+            this.physics.add.collider(enemy, waterLayer);
+            this.physics.add.collider(enemy, houseLayer1);
+            this.physics.add.collider(enemy, houseLayer2);
+            this.physics.add.collider(enemy, treeLayer);
+            this.physics.add.collider(enemy, moundsRocks);
+            this.physics.add.collider(enemy, fenceLayer);
+            this.physics.add.collider(enemy, crops);
+            this.physics.add.collider(enemy, elevatedGroundLayer);
+            this.physics.add.collider(enemy, bridgePosts);
+                this.physics.add.collider(enemy, this.player);
+                this.physics.add.collider(enemy, this.weapon, () => {
+                    console.log("A HIT A HIT");
+                    this.weapon.setPosition(-50, -50)
+        
+                    enemy.anims.play("human-hurt-right");
+        
+                    this.playerPosition = { x: this.player.x, y: this.player.y };
+
+                    console.log(this.playerPosition);
+        
+                    //fadeout to fight scene
+                    this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
+                        if (progress === 1) {
+                            //passes reference to fight scene and fixes blue border issue with fight scene
+                            this.scene.launch("Fight", { Game: this });
+                        }
+                    });
+                
+                });
+               
+            }
+        // this.physics.add.overlap(player, this.spawns, this.onNPCZoneEnter, false, this);
+        
+        // let npcGroup = this.physics.add.group({
+        //     key: 'humans',
+        //     maxSize: 12,
+        // })
+        // for (let z = 0; z < 12; z++){
+        //     let x = Math.RND.between(0, map.widthInPixels);
+        //     let y = Math.RND.between(0, map.heightInPixels);
+        //     let npc = npcGroup.get(x, y)
+            
+        // }
 
         // supposed to listen to the attack animations and wait for them to complete
         //player.on(Phaser.Animations.Events.ANIMA + 'player-attack-right', () => console.log('did it!'), this)
@@ -369,15 +418,17 @@ export class Game extends Scene {
     }
 
     spawnNPCZones() {}
-    onNPCZoneEnter(player, zone) {
+    onNPCZoneEnter() {
         // what happens when player enters NPC Zone
         // shake the world
         //this.cameras.main.shake(300);
-        this.cameras.flash(300);
+        this.cameras.main.flash(300);
         // this.cameras.fade(300);
-        this.physics.add.sprite(400, 400, "human", "base_walk_1.png");
-        this.human.body.setSize(22, 20);
-        this.human.setPushable(false);
+        let playerX = this.player.x
+        let playerY = this.player.y
+        this.zoneHuman = new humanSprite(this, playerX + 25, playerY , 'humans',"base_idle_1.png" )
+        this.zoneHuman.body.setSize(22, 20);
+        this.zoneHuman.setPushable(false);
     }
     drawWeapon(x, y, obj) {
         
@@ -385,7 +436,8 @@ export class Game extends Scene {
         obj.setVisible(true)
         
         obj.setPosition(x, y)
-        setTimeout(this.sheathWeapon, 500, obj)
+        //setTimeout(this.sheathWeapon, 250, obj)
+        this.time.delayedCall(300, this.sheathWeapon, [obj])
     }
     sheathWeapon(obj) {
         
