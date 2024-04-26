@@ -1,8 +1,9 @@
 import { EventBus } from "../EventBus";
-import { Scene, Phaser, GameObjects, Math, Time } from "phaser";
+import { Scene, Math} from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { Player } from "../Player";
 import { humanSprite } from "../sprites/humanSprite";
+import { createAnimations } from "../animations";
 
 //sets players current direction
 let currentDirection = "right";
@@ -218,156 +219,8 @@ export class Game extends Scene {
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true);
 
-        // Animations
-        this.anims.create({
-            key: "player-walk-right",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_walk_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-        this.anims.create({
-            key: "player-walk-left",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_walk_left_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-
-        this.anims.create({
-            key: "player-idle-right",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_idle_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-
-        this.anims.create({
-            key: "player-idle-left",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_idle_left_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-        this.anims.create({
-            key: "player-hurt-right",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_hurt_",
-                suffix: ".png",
-            }),
-            frameRate: 12,
-        });
-        this.anims.create({
-            key: "player-hurt-left",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_hurt_left_",
-                suffix: ".png",
-            }),
-            frameRate: 12,
-        });
-        player.anims.create({
-            key: "player-attack-right",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 9,
-                prefix: "goblin_attack_",
-                suffix: ".png",
-            }),
-            repeat: 1,
-            frameRate: 12,
-        });
-        player.anims.create({
-            key: "player-attack-left",
-            frames: this.anims.generateFrameNames("player", {
-                start: 1,
-                end: 8,
-                prefix: "goblin_attack_left_",
-                suffix: ".png",
-            }),
-            repeat: 1,
-            frameRate: 12,
-        });
-
-        // Human Animations
-        this.anims.create({
-            key: "human-idle-right",
-            frames: this.anims.generateFrameNames("humans", {
-                start: 1,
-                end: 9,
-                prefix: "base_idle_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-
-        this.anims.create({
-            key: "human-idle-left",
-            frames: this.anims.generateFrameNames("humans", {
-                start: 1,
-                end: 9,
-                prefix: "base_idle_left_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-        this.anims.create({
-            key: "human-hurt-right",
-            frames: this.anims.generateFrameNames("humans", {
-                start: 1,
-                end: 8,
-                prefix: "base_hurt_",
-                suffix: ".png",
-            }),
-            repeat: 1,
-            frameRate: 12,
-        });
-        this.anims.create({
-            key: "human-walk-right",
-            frames: this.anims.generateFrameNames("humans", {
-                start: 1,
-                end: 8,
-                prefix: "base_walking_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-        this.anims.create({
-            key: "human-walk-left",
-            frames: this.anims.generateFrameNames("humans", {
-                start: 1,
-                end: 8,
-                prefix: "base_walking_left_",
-                suffix: ".png",
-            }),
-            repeat: -1,
-            frameRate: 12,
-        });
-
-       
-
+        
+        createAnimations(this.anims)
 
         //player.anims.play("player-attack-right");
         player2.anims.play("player-hurt-right");
@@ -391,11 +244,11 @@ export class Game extends Scene {
             enemy.setPushable(false)
             enemy.setCollideWorldBounds(true)
             this.physics.add.existing(enemy)
-            // if (enemy.facing === 'left') {
-            //     enemy.anims.play('human-walk-left')
-            // } else {
-            //     enemy.anims.play('human-walk-right')
-            // }
+            if (enemy.facing === 'left') {
+                enemy.anims.play('human-walk-left')
+            } else {
+                enemy.anims.play('human-walk-right')
+            }
         enemy.body.onCollide = true   
         this.physics.add.collider(enemy, waterLayer, enemy.handleCollision, undefined, this);
         this.physics.add.collider(enemy, houseLayer1, enemy.handleCollision, undefined, this);
