@@ -343,13 +343,35 @@ export class Game extends Scene {
             repeat: 1,
             frameRate: 12,
         });
+        this.anims.create({
+            key: "human-walk-right",
+            frames: this.anims.generateFrameNames("humans", {
+                start: 1,
+                end: 8,
+                prefix: "base_walking_",
+                suffix: ".png",
+            }),
+            repeat: -1,
+            frameRate: 12,
+        });
+        this.anims.create({
+            key: "human-walk-left",
+            frames: this.anims.generateFrameNames("humans", {
+                start: 1,
+                end: 8,
+                prefix: "base_walking_left_",
+                suffix: ".png",
+            }),
+            repeat: -1,
+            frameRate: 12,
+        });
 
        
 
 
         //player.anims.play("player-attack-right");
         player2.anims.play("player-hurt-right");
-        human.anims.play("human-idle-right");
+        human.anims.play("human-walk-right");
         this.cameras.main.shake(900, 0.0007);
         //this.cameras.flash(300);
         //this.cameras.fade(300);
@@ -369,6 +391,11 @@ export class Game extends Scene {
             enemy.setPushable(false)
             enemy.setCollideWorldBounds(true)
             this.physics.add.existing(enemy)
+            // if (enemy.facing === 'left') {
+            //     enemy.anims.play('human-walk-left')
+            // } else {
+            //     enemy.anims.play('human-walk-right')
+            // }
         enemy.body.onCollide = true   
         this.physics.add.collider(enemy, waterLayer, enemy.handleCollision, undefined, this);
         this.physics.add.collider(enemy, houseLayer1, enemy.handleCollision, undefined, this);
@@ -383,8 +410,13 @@ export class Game extends Scene {
         this.physics.add.collider(enemy, this.weapon, () => {
             console.log("A HIT A HIT");
             this.weapon.setPosition(-50, -50)
-
-            enemy.anims.play("human-hurt-right");
+            enemy.setVelocity(0, 0)
+            if (enemy.facing === 'left'){
+                enemy.anims.play("human-hurt-left");
+            } else {
+                enemy.anims.play("human-hurt-right");
+            }
+            
 
             this.playerPosition = { x: this.player.x, y: this.player.y };
 

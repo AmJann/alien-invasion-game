@@ -9,6 +9,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
         scene.sys.updateList.add(this);
         scene.sys.displayList.add(this);
         this.direction = 1
+        this.facing = 'right'
         //this.setScale(2);
         scene.physics.world.enableBody(this);
         //this.setImmovable(true);
@@ -31,32 +32,25 @@ export class humanSprite extends Physics.Arcade.Sprite {
 
     changeDirection(direction) {
         let newDirection = Math.Between(0, 3)
-        while (newDirection === direction) {
-            newDirection = Math.Between(0,3)
-        }
+        // while (newDirection === direction) {
+        //     newDirection = Math.Between(0,3)
+        // }
         return newDirection
 
     }
+    
     handleCollision() {
         
         this.direction = () => {
-            return Math.Between(0, 3)
+            let newDir = Math.Between(0, 3)
+            while (newDir === this.direction) {
+                newDir = Math.Between(0, 3)
+            }
+            return newDir       
+        }
 
-        }
-        const velocity = Math.Between(0,55)
-        let xVel = 0
-        let yVel = 0
-        if (this.direction === 0) {
-            yVel = -velocity
-        } else if(this.direction === 1){
-            xVel = velocity
-        } else if(this.direction === 2){
-            yVel = velocity
-        } else {
-            xVel = -velocity
-        }
-        let vec = Math.Vector2(xVel,yVel)
-        //this.velocity(vec)
+        
+        
         
         
     }
@@ -67,16 +61,36 @@ export class humanSprite extends Physics.Arcade.Sprite {
         let xVel = 0
         let yVel = 0
         if (this.direction === 0) {
-            yVel = -velocity
-        } else if(this.direction === 1){
-            xVel = velocity
+            yVel -= velocity
+        } else if (this.direction === 1) {
+            this.facing = 'right'
+            
+            xVel += velocity
         } else if(this.direction === 2){
-            yVel = velocity
+            yVel += velocity
         } else {
-            xVel = -velocity
+
+            this.facing = 'left'
+            
+            xVel -= velocity
         }
-        //let vec = Math.Vector2(xVel,yVel)
-        //this.velocity(vec)
+        // play the correct animation
+        if (xVel === 0 && yVel === 0) {
+            
+            if (this.facing === 'left') {
+                
+                this.anims.play('human-idle-left')
+            } else {
+                this.anims.play('human-idle-right')
+            }
+        } else {
+            if (this.facing === 'left') {
+                this.anims.play('human-walk-left')
+            } else {
+                this.anims.play('human-walk-right')
+            }
+        }
         this.setVelocity(xVel, yVel)
+        
     }
 }
