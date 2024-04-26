@@ -131,6 +131,17 @@ export function createAnimations(anims = Animations.anims) {
         frameRate: 12,
     });
     anims.create({
+        key: "human-hurt-left",
+        frames: anims.generateFrameNames("humans", {
+            start: 1,
+            end: 8,
+            prefix: "base_hurt_left_",
+            suffix: ".png",
+        }),
+        repeat: 1,
+        frameRate: 12,
+    });
+    anims.create({
         key: "human-walk-right",
         frames: anims.generateFrameNames("humans", {
             start: 1,
