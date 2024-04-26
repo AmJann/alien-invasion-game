@@ -52,7 +52,7 @@ export class Game extends Scene {
             frameWidth: 16, frameHeight: 16, atlas: 'humans', frame: 'longhair_idle_1.png'
         })
     }
-
+   
     create() {
         this.add.image(
             "gameTiles",
@@ -98,6 +98,8 @@ export class Game extends Scene {
             "humans",
             "base_idle_1.png"
         ));
+       
+
         this.human.body.setSize(22, 20);
         human.setPushable(false);
         //adds player with physics
@@ -351,50 +353,54 @@ export class Game extends Scene {
         this.cameras.main.shake(900, 0.0007);
         //this.cameras.flash(300);
         //this.cameras.fade(300);
+        
 
-            // spawn a bunch of random NPC zones
-            //this.spawns = this.physics.add.group({ classType: GameObjects.Zone });
-            for (var i = 0; i < 12; i++) {
-                var x = Math.RND.between(0, map.widthInPixels);
-                var y = Math.RND.between(0, map.heightInPixels);
-                // parameters are x, y, width, height
-                //this.spawns.create(x, y, 65, 65);
-                let enemy = new humanSprite(this, x, y, 'humans', 'base_idle_1.png')
-                enemy.setSize(12, 15)
-                enemy.setPushable(false)
-                enemy.setCollideWorldBounds(true)
-                this.physics.add.existing(enemy)
-            this.physics.add.collider(enemy, waterLayer);
-            this.physics.add.collider(enemy, houseLayer1);
-            this.physics.add.collider(enemy, houseLayer2);
-            this.physics.add.collider(enemy, treeLayer);
-            this.physics.add.collider(enemy, moundsRocks);
-            this.physics.add.collider(enemy, fenceLayer);
-            this.physics.add.collider(enemy, crops);
-            this.physics.add.collider(enemy, elevatedGroundLayer);
-            this.physics.add.collider(enemy, bridgePosts);
-                this.physics.add.collider(enemy, this.player);
-                this.physics.add.collider(enemy, this.weapon, () => {
-                    console.log("A HIT A HIT");
-                    this.weapon.setPosition(-50, -50)
-        
-                    enemy.anims.play("human-hurt-right");
-        
-                    this.playerPosition = { x: this.player.x, y: this.player.y };
+        /////////////
+        // Working NPC Code
+        ///////////
+       
+        for (var i = 0; i < 12; i++) {
+            var x = Math.RND.between(0, map.widthInPixels);
+            var y = Math.RND.between(0, map.heightInPixels);
+            // parameters are x, y, width, height
+            //this.spawns.create(x, y, 65, 65);
+            let enemy = (this.enemy = new humanSprite(this, x, y, 'humans', 'base_idle_1.png'))
+            enemy.setSize(12, 15)
+            enemy.setPushable(false)
+            enemy.setCollideWorldBounds(true)
+            this.physics.add.existing(enemy)
+        enemy.body.onCollide = true   
+        this.physics.add.collider(enemy, waterLayer, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, houseLayer1, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, houseLayer2, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, treeLayer, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, moundsRocks, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, fenceLayer, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, crops, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, elevatedGroundLayer, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, bridgePosts, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, this.player, enemy.handleCollision, undefined, this);
+        this.physics.add.collider(enemy, this.weapon, () => {
+            console.log("A HIT A HIT");
+            this.weapon.setPosition(-50, -50)
 
-                    console.log(this.playerPosition);
+            enemy.anims.play("human-hurt-right");
+
+            this.playerPosition = { x: this.player.x, y: this.player.y };
+
+            console.log(this.playerPosition);
+
+            //fadeout to fight scene
+            this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
+                if (progress === 1) {
+                    //passes reference to fight scene and fixes blue border issue with fight scene
+                    this.scene.launch("Fight", { Game: this });
+                }
+            });
         
-                    //fadeout to fight scene
-                    this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
-                        if (progress === 1) {
-                            //passes reference to fight scene and fixes blue border issue with fight scene
-                            this.scene.launch("Fight", { Game: this });
-                        }
-                    });
-                
-                });
-               
-            }
+        });
+            
+        }
         // this.physics.add.overlap(player, this.spawns, this.onNPCZoneEnter, false, this);
         
         // let npcGroup = this.physics.add.group({
@@ -416,7 +422,7 @@ export class Game extends Scene {
     changeScene() {
         this.scene.start("GameOver");
     }
-
+    
     spawnNPCZones() {}
     onNPCZoneEnter() {
         // what happens when player enters NPC Zone
