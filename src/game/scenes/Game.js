@@ -68,14 +68,11 @@ export class Game extends Scene {
         this.sys.animatedTiles.init(map);
 
         const tileset = map.addTilesetImage("gameTiles", "gameTiles");
-        const groundLayer = map.createLayer("groundLayer", tileset, 0, 0);
+        //const groundLayer =
+        map.createLayer("groundLayer", tileset, 0, 0);
         const waterLayer = map.createLayer("waterLayer", tileset, 0, 0);
-        const groundEdgesLayer = map.createLayer(
-            "groundEdgesLayer",
-            tileset,
-            0,
-            0
-        );
+        //const groundEdgesLayer =
+        map.createLayer("groundEdgesLayer", tileset,0,0);
         const moundsRocks = map.createLayer("moundsRocks", tileset, 0, 0);
         const elevatedGroundLayer = map.createLayer(
             "elevatedGroundLayer",
@@ -83,14 +80,16 @@ export class Game extends Scene {
             0,
             0
         );
-        const bridgeLadder = map.createLayer("bridgeLadder", tileset, 0, 0);
+        // const bridgeLadder =
+        map.createLayer("bridgeLadder", tileset, 0, 0);
         const bridgePosts = map.createLayer("bridgePosts", tileset, 0, 0);
         const crops = map.createLayer("crops", tileset, 0, 0);
         const houseLayer1 = map.createLayer("houseLayer1", tileset, 0, 0);
         const houseLayer2 = map.createLayer("houseLayer2", tileset, 0, 0);
         const treeLayer = map.createLayer("treeLayer", tileset, 0, 0);
         const fenceLayer = map.createLayer("fenceLayer", tileset, 0, 0);
-        const flowers = map.createLayer("flowers", tileset, 0, 0);
+        //const flowers =
+        map.createLayer("flowers", tileset, 0, 0);
 
         this.animatedTiles.init(map);
         const human = (this.human = this.physics.add.sprite(
@@ -264,11 +263,7 @@ export class Game extends Scene {
             console.log("A HIT A HIT");
             this.weapon.setPosition(-50, -50)
             enemy.setVelocity(0, 0)
-            if (enemy.facing === 'left'){
-                enemy.anims.play("human-hurt-left");
-            } else {
-                enemy.anims.play("human-hurt-right");
-            }
+            enemy.takeDamage()
             
 
             this.playerPosition = { x: this.player.x, y: this.player.y };
