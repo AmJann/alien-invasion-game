@@ -1,10 +1,18 @@
 import humans from "../humans.js";
+import { Player } from "../Player.js";
 
 export class Fight extends Phaser.Scene {
     constructor() {
         super("Fight");
         this.humans = humans;
         this.enemy = null;
+        this.player = null;
+    }
+
+    init(data) {
+        // Access the passed data object here
+        this.playerPosition = data.playerPosition;
+        this.player = data.player;
     }
 
     preload() {
@@ -22,18 +30,13 @@ export class Fight extends Phaser.Scene {
             import.meta.env.BASE_URL + this.enemy.mainImage
         );
         this.load.image(
-            "scientist",
-            import.meta.env.BASE_URL +
-                "assets/characters/humans/no-bg-imgs/scientist-char-4-250.png"
+            this.player.inventory[0].name,
+            import.meta.env.BASE_URL + this.player.inventory[0]["mainImage"]
         );
     }
 
-    init(data) {
-        // Access the passed data object here
-        this.playerPosition = data.playerPosition;
-    }
-
     create() {
+        console.log(this.player);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
         console.log("here", this.humans);
@@ -74,13 +77,18 @@ export class Fight extends Phaser.Scene {
         this.playerHealthBar.fillRect(0, 0, 200, 20);
 
         // text and styling for players name
-        this.playerNameText = this.add.text(0, 25, "Scientist", {
-            font: "courier",
-            fontSize: "24px",
-            fontStyle: "strong",
-            fill: "#000000",
-            strokeThickness: "3",
-        });
+        this.playerNameText = this.add.text(
+            0,
+            25,
+            this.player.inventory[0]["name"],
+            {
+                font: "courier",
+                fontSize: "24px",
+                fontStyle: "strong",
+                fill: "#000000",
+                strokeThickness: "3",
+            }
+        );
         this.playerNameText.setFontStyle("bold");
         this.playerNameText.setFontSize("20px");
 
@@ -110,22 +118,22 @@ export class Fight extends Phaser.Scene {
 
         this.enemyInfoContainer.add([this.enemyNameText, this.enemyHealthBar]);
 
-        const clownStartX = -300;
-        const scientistStartX = 1100;
-        const startYClown = 290;
-        const startYScientist = 480;
+        const enemyStartX = -300;
+        const playerStartX = 1100;
+        const enemyStartY = 290;
+        const playerStartY = 480;
 
         // Add human images at starting positions
         const enemy = this.add.image(
-            clownStartX,
-            startYClown,
+            enemyStartX,
+            enemyStartY,
             this.enemy.name,
             0
         );
-        const scientist = this.add.image(
-            scientistStartX,
-            startYScientist,
-            "scientist",
+        const player = this.add.image(
+            playerStartX,
+            playerStartY,
+            this.player.inventory[0]["name"],
             0
         );
 
@@ -139,7 +147,7 @@ export class Fight extends Phaser.Scene {
         });
 
         this.tweens.add({
-            targets: scientist,
+            targets: player,
             x: 250,
             duration: 1000,
             ease: "Power2",
