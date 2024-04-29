@@ -12,6 +12,7 @@ export class Game extends Scene {
         super("Game");
         this.player;
         this.human;
+        this.playerPosition = { x: 300, y: 400 };
     }
     preload() {
         this.load.image(
@@ -92,11 +93,14 @@ export class Game extends Scene {
 
         const player = (this.player = new Player(
             this,
-            300,
-            400,
+            this.playerPosition.x,
+            this.playerPosition.y,
             "player",
             "goblin_idle_1.png"
         ));
+        //add player position from constructor
+        this.player.setPosition(this.playerPosition.x, this.playerPosition.y);
+
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
 
@@ -148,7 +152,10 @@ export class Game extends Scene {
             this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
                 if (progress === 1) {
                     //passes reference to fight scene and fixes blue border issue with fight scene
-                    this.scene.launch("Fight", { Game: this });
+                    this.scene.launch("Fight", {
+                        playerPosition: this.playerPosition,
+                        player: this.player,
+                    });
                 }
             });
         });
