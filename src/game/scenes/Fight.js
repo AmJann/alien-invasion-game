@@ -7,6 +7,8 @@ export class Fight extends Phaser.Scene {
         this.humans = humans;
         this.enemy = null;
         this.player = null;
+        this.attackTween = null;
+        this.playerImg = null;
     }
 
     init(data) {
@@ -119,7 +121,7 @@ export class Fight extends Phaser.Scene {
         this.enemyInfoContainer.add([this.enemyNameText, this.enemyHealthBar]);
 
         const enemyStartX = -300;
-        const playerStartX = 1100;
+        let playerStartX = 1100;
         const enemyStartY = 290;
         const playerStartY = 480;
 
@@ -130,12 +132,14 @@ export class Fight extends Phaser.Scene {
             this.enemy.name,
             0
         );
-        const player = this.add.image(
-            playerStartX,
-            playerStartY,
-            this.player.inventory[0]["name"],
-            0
-        );
+        this.playerImg = this.add
+            .image(
+                playerStartX,
+                playerStartY,
+                this.player.inventory[0]["name"],
+                0
+            )
+            .setFlipX(true);
 
         // Tween animations for character movement
         this.tweens.add({
@@ -146,16 +150,19 @@ export class Fight extends Phaser.Scene {
             delay: 1000,
         });
 
+        // Create a tween for the sprite
+
         this.tweens.add({
-            targets: player,
+            targets: this.playerImg,
             x: 250,
             duration: 1000,
             ease: "Power2",
             delay: 1500,
             onComplete: () => {
-                // we can put game logic here after the human images finish transition
+                playerStartX = 250;
             },
         });
+
         this.time.delayedCall(60000, () => {
             this.returnToGameScene();
         });
@@ -190,9 +197,29 @@ export class Fight extends Phaser.Scene {
         return button;
     }
 
-    attack() {
-        // attack logic here
+    battle() {
+        let playerTurn = true;
+        if (playerTurn === true) {
+        } else {
+            button.off();
+        }
     }
+
+    attack() {
+        this.playerImg.x = 250;
+
+        this.attackTween = this.tweens.add({
+            targets: this.playerImg,
+            x: 340,
+            y: 450,
+            duration: 150,
+            ease: "Linear",
+            yoyo: true,
+            repeat: 0,
+        });
+    }
+
+    computerAttack() {}
 
     switchHuman() {
         //switch out human here
