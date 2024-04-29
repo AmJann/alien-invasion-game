@@ -37,6 +37,10 @@ export class Fight extends Phaser.Scene {
             import.meta.env.BASE_URL + this.enemy.mainImage
         );
         this.load.image(
+            "enemyDefeatImage",
+            import.meta.env.BASE_URL + this.enemy.defeatImage
+        );
+        this.load.image(
             this.player.inventory[0].name,
             import.meta.env.BASE_URL + this.player.inventory[0]["mainImage"]
         );
@@ -125,7 +129,7 @@ export class Fight extends Phaser.Scene {
         this.enemyInfoContainer.add([this.enemyNameText, this.enemyHealthBar]);
 
         const enemyStartX = -300;
-        let playerStartX = 1100;
+        let playerStartX = 800;
         const enemyStartY = 290;
         const playerStartY = 480;
 
@@ -151,7 +155,7 @@ export class Fight extends Phaser.Scene {
             x: 550,
             duration: 1000,
             ease: "Power2",
-            delay: 1000,
+            delay: 500,
         });
 
         // Create a tween for the sprite
@@ -161,7 +165,7 @@ export class Fight extends Phaser.Scene {
             x: 250,
             duration: 1000,
             ease: "Power2",
-            delay: 1500,
+            delay: 0,
             onComplete: () => {
                 playerStartX = 250;
             },
@@ -202,11 +206,32 @@ export class Fight extends Phaser.Scene {
     }
 
     battle() {
-        let playerTurn = true;
-        if (playerTurn === true) {
-        } else {
-            button.off();
-        }
+        // Disable buttons at the start of the enemy's turn
+        this.disableButtons();
+
+        // Example enemy turn logic
+        setTimeout(() => {
+            // Perform enemy's attack logic here
+
+            // Re-enable buttons at the end of the enemy's turn
+            this.enableButtons();
+        }, 3000); // Adjust delay as needed
+    }
+
+    disableButtons() {
+        // Disable all action buttons
+        this.attackButton.disableInteractive();
+        this.switchButton.disableInteractive();
+        this.itemButton.disableInteractive();
+        this.runButton.disableInteractive();
+    }
+
+    enableButtons() {
+        // Enable all action buttons
+        this.attackButton.setInteractive();
+        this.switchButton.setInteractive();
+        this.itemButton.setInteractive();
+        this.runButton.setInteractive();
     }
 
     computerAttack() {
@@ -215,7 +240,7 @@ export class Fight extends Phaser.Scene {
             targets: this.enemyImg,
             x: 340,
             y: 450,
-            delay: 3000,
+            delay: 2000,
             duration: 150,
             ease: "Linear",
             yoyo: true,
@@ -317,7 +342,17 @@ export class Fight extends Phaser.Scene {
                 this.reduceEnemyHealth(damage);
 
                 if (this.enemy.health <= 0) {
-                    // Handle enemy defeat
+                    // Remove the current enemy image
+                    this.enemyImg.destroy();
+                    // Add the defeated enemy image
+                    this.enemyImg = this.add.image(
+                        400,
+                        300,
+                        "enemyDefeatImage"
+                    );
+                    setTimeout(() => {
+                        this.returnToGameScene();
+                    }, 6000);
                 } else {
                     this.computerAttack();
                 }
@@ -335,7 +370,9 @@ export class Fight extends Phaser.Scene {
         const newWidth = (this.enemy.health / this.enemy.maxHealth) * 200;
         this.enemyHealthBar.clear();
         this.enemyHealthBar.fillStyle(0xff0000, 1);
-        this.enemyHealthBar.fillRect(0, 0, newWidth, 20);
+        if (this.enemy.health >= 0) {
+            this.enemyHealthBar.fillRect(0, 0, newWidth, 20);
+        }
     }
 
     switchHuman() {
