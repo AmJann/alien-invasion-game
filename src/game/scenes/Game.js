@@ -1,7 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Scene, Math} from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
-import { Player } from "../Player";
+import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
 import { createAnimations } from "../animations";
 
@@ -15,11 +15,8 @@ export class Game extends Scene {
         super("Game");
         this.player;
         this.human;
-<<<<<<< HEAD
-        this.weapon
-=======
         this.playerPosition = { x: 300, y: 400 };
->>>>>>> main
+        this.weapon
     }
     preload() {
         this.load.image(
@@ -273,7 +270,8 @@ export class Game extends Scene {
             console.log("A HIT A HIT");
             this.weapon.setPosition(-50, -50)
             enemy.setVelocity(0, 0)
-            enemy.takeDamage()
+            //enemy.takeDamage()
+            enemy.anims.play('human-hurt-right')
             
 
             this.playerPosition = { x: this.player.x, y: this.player.y };
@@ -284,7 +282,10 @@ export class Game extends Scene {
             this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
                 if (progress === 1) {
                     //passes reference to fight scene and fixes blue border issue with fight scene
-                    this.scene.launch("Fight", { Game: this });
+                    this.scene.launch("Fight", {
+                        playerPosition: this.playerPosition,
+                        player: this.player,
+                    });
                 }
             });
         
