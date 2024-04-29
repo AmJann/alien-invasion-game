@@ -9,6 +9,7 @@ export class Fight extends Phaser.Scene {
         this.player = null;
         this.attackTween = null;
         this.playerImg = null;
+        this.playerTurn = true;
     }
 
     init(data) {
@@ -41,7 +42,6 @@ export class Fight extends Phaser.Scene {
         console.log(this.player);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
-        console.log("here", this.humans);
 
         const playerNameHealthBackground = this.add.rectangle(
             280,
@@ -126,7 +126,7 @@ export class Fight extends Phaser.Scene {
         const playerStartY = 480;
 
         // Add human images at starting positions
-        const enemy = this.add.image(
+        this.enemy = this.add.image(
             enemyStartX,
             enemyStartY,
             this.enemy.name,
@@ -143,7 +143,7 @@ export class Fight extends Phaser.Scene {
 
         // Tween animations for character movement
         this.tweens.add({
-            targets: enemy,
+            targets: this.enemy,
             x: 550,
             duration: 1000,
             ease: "Power2",
@@ -205,21 +205,37 @@ export class Fight extends Phaser.Scene {
         }
     }
 
+    computerAttack() {
+        this.attackTween = this.tweens.add({
+            targets: this.enemy,
+            x: 340,
+            y: 450,
+            delay: 3000,
+            duration: 150,
+            ease: "Linear",
+            yoyo: true,
+            repeat: 0,
+            onComplete: () => {},
+        });
+    }
+
     attack() {
         this.playerImg.x = 250;
 
         this.attackTween = this.tweens.add({
             targets: this.playerImg,
-            x: 340,
-            y: 450,
+            x: 530,
+            y: 270,
             duration: 150,
             ease: "Linear",
             yoyo: true,
             repeat: 0,
+            onComplete: () => {
+                this.playerTurn = false;
+                this.computerAttack();
+            },
         });
     }
-
-    computerAttack() {}
 
     switchHuman() {
         //switch out human here
