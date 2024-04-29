@@ -14,7 +14,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    removeItemFromInventory(human) {
+    removeHumanFromInventory(human) {
         const index = this.inventory.indexOf(human);
         if (index !== -1) {
             this.inventory.splice(index, 1);

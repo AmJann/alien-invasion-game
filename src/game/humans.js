@@ -2,6 +2,7 @@ const humans = [
     {
         name: "Clown",
         health: 100,
+        maxHealth: 100,
         attack1: {
             name: "Slash",
             damage: 20,
@@ -20,12 +21,13 @@ const humans = [
     {
         name: "Scientist",
         health: 90,
+        maxHealth: 90,
         attack1: {
-            name: "Lab Rat Bite",
+            name: "Mutagen Meltdown",
             damage: 20,
         },
         attack2: {
-            name: "Punch",
+            name: "Periodic Pummel",
             damage: 15,
         },
         special: {
@@ -38,6 +40,7 @@ const humans = [
     {
         name: "Firefighter",
         health: 110,
+        maxHealth: 110,
         attack1: {
             name: "Scorch",
             damage: 20,
@@ -56,6 +59,7 @@ const humans = [
     {
         name: "Farmer",
         health: 80,
+        maxHealth: 80,
         attack1: {
             name: "Pitchfork Punch",
             damage: 20,
@@ -74,6 +78,7 @@ const humans = [
     {
         name: "Nuck Chorris",
         health: 130,
+        maxHealth: 130,
         attack1: {
             name: "Roundhouse Kick",
             damage: 25,

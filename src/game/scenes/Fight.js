@@ -9,7 +9,10 @@ export class Fight extends Phaser.Scene {
         this.player = null;
         this.attackTween = null;
         this.playerImg = null;
+        this.enemyImg = null;
         this.playerTurn = true;
+        this.playerCurrentHuman = null;
+        this.currentPlayerAttack = null;
     }
 
     init(data) {
@@ -21,8 +24,9 @@ export class Fight extends Phaser.Scene {
     preload() {
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
+        console.log("preload enemy", this.enemy);
         console.log(import.meta.env.BASE_URL + this.enemy.mainImage);
-
+        this.playerCurrentHuman = this.player.inventory[0];
         // Preload images
         this.load.image(
             "water_field_bg",
@@ -126,7 +130,7 @@ export class Fight extends Phaser.Scene {
         const playerStartY = 480;
 
         // Add human images at starting positions
-        this.enemy = this.add.image(
+        this.enemyImg = this.add.image(
             enemyStartX,
             enemyStartY,
             this.enemy.name,
@@ -143,7 +147,7 @@ export class Fight extends Phaser.Scene {
 
         // Tween animations for character movement
         this.tweens.add({
-            targets: this.enemy,
+            targets: this.enemyImg,
             x: 550,
             duration: 1000,
             ease: "Power2",
@@ -167,12 +171,12 @@ export class Fight extends Phaser.Scene {
             this.returnToGameScene();
         });
 
-        this.createActionButton("Attack", 250, 660, () => this.attack());
-        this.createActionButton("Switch Human", 500, 660, () =>
+        this.createActionButton("Attack", 400, 660, () => this.attack());
+        this.createActionButton("Switch Human", 570, 660, () =>
             this.switchHuman()
         );
-        this.createActionButton("Item", 250, 735, () => this.useItem());
-        this.createActionButton("Run", 500, 735, () => this.run());
+        this.createActionButton("Item", 400, 735, () => this.useItem());
+        this.createActionButton("Run", 570, 735, () => this.run());
     }
 
     createActionButton(text, x, y, callback) {
@@ -206,8 +210,9 @@ export class Fight extends Phaser.Scene {
     }
 
     computerAttack() {
+        //computer attacks after player with 3 second delay
         this.attackTween = this.tweens.add({
-            targets: this.enemy,
+            targets: this.enemyImg,
             x: 340,
             y: 450,
             delay: 3000,
@@ -219,8 +224,85 @@ export class Fight extends Phaser.Scene {
         });
     }
 
+    createAttackMenu() {
+        // Create a container for the attack menu
+        this.attackMenuContainer = this.add.container(223, 695);
+
+        // Add background for the attack menu
+        const menuBackground = this.add.rectangle(0, 0, 210, 150, 0x333333);
+        this.attackMenuContainer.add(menuBackground);
+
+        // Add attack options
+        const attack1 = this.createAttackOption(
+            0,
+            -40,
+            this.playerCurrentHuman.attack1["name"]
+        );
+        const attack2 = this.createAttackOption(
+            0,
+            0,
+            this.playerCurrentHuman.attack2["name"]
+        );
+        const special = this.createAttackOption(
+            0,
+            40,
+            this.playerCurrentHuman.special["name"]
+        );
+
+        // Add attack options to the container
+        this.attackMenuContainer.add([attack1, attack2, special]);
+
+        attack1.setInteractive();
+        attack2.setInteractive();
+        special.setInteractive();
+
+        //sets current attack to be able to apply damage
+        attack1.on("pointerdown", () =>
+            this.performAttack(
+                (this.currentPlayerAttack = this.player.inventory[0].attack1)
+            )
+        );
+        attack2.on("pointerdown", () =>
+            this.performAttack(
+                (this.currentPlayerAttack = this.player.inventory[0].attack2)
+            )
+        );
+        special.on("pointerdown", () =>
+            this.performAttack(
+                (this.currentPlayerAttack = this.player.inventory[0].special)
+            )
+        );
+
+        // Add the attack menu to the scene
+        this.add.existing(this.attackMenuContainer);
+    }
+
+    createAttackOption(x, y, text) {
+        const attackOption = this.add.text(x, y, text, { fill: "#ffffff" });
+
+        attackOption.setPadding(10, 5, 10, 5);
+
+        attackOption.setOrigin(0.5);
+
+        attackOption.on("pointerover", () =>
+            attackOption.setBackgroundColor("#555555")
+        );
+        attackOption.on("pointerout", () =>
+            attackOption.setBackgroundColor("#333333")
+        );
+
+        return attackOption;
+    }
+
     attack() {
+        // Create and show the attack menu
+        this.createAttackMenu();
+    }
+
+    performAttack(attackName) {
         this.playerImg.x = 250;
+        //hide/destroy attack menu
+        this.attackMenuContainer.destroy();
 
         this.attackTween = this.tweens.add({
             targets: this.playerImg,
@@ -231,10 +313,29 @@ export class Fight extends Phaser.Scene {
             yoyo: true,
             repeat: 0,
             onComplete: () => {
-                this.playerTurn = false;
-                this.computerAttack();
+                const damage = this.currentPlayerAttack.damage;
+                this.reduceEnemyHealth(damage);
+
+                if (this.enemy.health <= 0) {
+                    // Handle enemy defeat
+                } else {
+                    this.computerAttack();
+                }
             },
         });
+    }
+
+    reduceEnemyHealth(damage) {
+        // Reduce enemy health
+
+        console.log("attack enemy", this.enemy);
+        this.enemy.health -= damage;
+
+        // Update enemy health bar display
+        const newWidth = (this.enemy.health / this.enemy.maxHealth) * 200;
+        this.enemyHealthBar.clear();
+        this.enemyHealthBar.fillStyle(0xff0000, 1);
+        this.enemyHealthBar.fillRect(0, 0, newWidth, 20);
     }
 
     switchHuman() {
