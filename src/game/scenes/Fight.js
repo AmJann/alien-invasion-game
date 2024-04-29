@@ -1,5 +1,5 @@
-import humans from "../humans.js";
-import { Player } from "../Player.js";
+import humans from "../humans";
+import { Player } from "../sprites/Player.js";
 
 export class Fight extends Phaser.Scene {
     constructor() {

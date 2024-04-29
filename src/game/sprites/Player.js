@@ -1,4 +1,4 @@
-import humans from "./humans";
+import humans from "../humans";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
