@@ -346,8 +346,8 @@ export class Fight extends Phaser.Scene {
                     this.enemyImg.destroy();
                     // Add the defeated enemy image
                     this.enemyImg = this.add.image(
-                        400,
-                        300,
+                        550,
+                        290,
                         "enemyDefeatImage"
                     );
                     setTimeout(() => {

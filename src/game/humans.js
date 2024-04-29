@@ -39,7 +39,7 @@ const humans = [
         mainImage:
             "assets/characters/humans/no-bg-imgs/scientist-char/4-scientist-char.png",
         defeatImage:
-            "assets/characters/humans/no-bg-imgs/clown-char/2-scientist-char.png",
+            "assets/characters/humans/no-bg-imgs/scientist-char/2-scientist-char.png",
     },
     {
         name: "Firefighter",
@@ -60,7 +60,7 @@ const humans = [
         mainImage:
             "assets/characters/humans/no-bg-imgs/firefighter-char/8-firefighter-char.png",
         defeatImage:
-            "assets/characters/humans/no-bg-imgs/clown-char/2-firefighter-char.png",
+            "assets/characters/humans/no-bg-imgs/firefighter-char/2-firefighter-char.png",
     },
     {
         name: "Farmer",
@@ -81,7 +81,7 @@ const humans = [
         mainImage:
             "assets/characters/humans/no-bg-imgs/farmer-char/8-farmer-char.png",
         defeatImage:
-            "assets/characters/humans/no-bg-imgs/clown-char/3-farmer-char.png",
+            "assets/characters/humans/no-bg-imgs/farmer-char/3-farmer-char.png",
     },
     {
         name: "Nuck Chorris",
@@ -102,7 +102,7 @@ const humans = [
         mainImage:
             "assets/characters/humans/no-bg-imgs/chuck-char/8-chuck-char.png",
         defeatImage:
-            "assets/characters/humans/no-bg-imgs/clown-char/1-chuck-char.png",
+            "assets/characters/humans/no-bg-imgs/chuck-char/1-chuck-char.png",
     },
 ];
 
