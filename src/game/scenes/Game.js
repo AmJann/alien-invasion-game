@@ -1,5 +1,5 @@
 import { EventBus } from "../EventBus";
-import { Scene, Math} from "phaser";
+import { Scene, Math } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
@@ -16,7 +16,7 @@ export class Game extends Scene {
         this.player;
         this.human;
         this.playerPosition = { x: 300, y: 400 };
-        this.weapon
+        this.weapon;
     }
     preload() {
         this.load.image(
@@ -41,20 +41,24 @@ export class Game extends Scene {
             { frameWidth: 16, frameHeight: 16 }
         );
         this.load.spritesheet(
-            'humans',
+            "humans",
             import.meta.env.BASE_URL + " assets/humans_phaser3.png",
             { frameWidth: 16, frameHeight: 16 }
-        )
-        this.textures.addSpriteSheetFromAtlas('npc',
-            {
-                frameWidth: 16, frameHeight: 16, atlas: 'humans', frame: 'base_idle_1.png'
-            })
-        this.textures.addSpriteSheetFromAtlas('npc_longhair',
-        {
-            frameWidth: 16, frameHeight: 16, atlas: 'humans', frame: 'longhair_idle_1.png'
-        })
+        );
+        this.textures.addSpriteSheetFromAtlas("npc", {
+            frameWidth: 16,
+            frameHeight: 16,
+            atlas: "humans",
+            frame: "base_idle_1.png",
+        });
+        this.textures.addSpriteSheetFromAtlas("npc_longhair", {
+            frameWidth: 16,
+            frameHeight: 16,
+            atlas: "humans",
+            frame: "longhair_idle_1.png",
+        });
     }
-   
+
     create() {
         this.add.image(
             "gameTiles",
@@ -73,7 +77,7 @@ export class Game extends Scene {
         map.createLayer("groundLayer", tileset, 0, 0);
         const waterLayer = map.createLayer("waterLayer", tileset, 0, 0);
         //const groundEdgesLayer =
-        map.createLayer("groundEdgesLayer", tileset,0,0);
+        map.createLayer("groundEdgesLayer", tileset, 0, 0);
         const moundsRocks = map.createLayer("moundsRocks", tileset, 0, 0);
         const elevatedGroundLayer = map.createLayer(
             "elevatedGroundLayer",
@@ -99,12 +103,10 @@ export class Game extends Scene {
             "humans",
             "base_idle_1.png"
         ));
-       
 
         this.human.body.setSize(22, 20);
         human.setPushable(false);
         //adds player with physics
-     
 
         const player = (this.player = new Player(
             this,
@@ -118,10 +120,10 @@ export class Game extends Scene {
 
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
-        this.player.setPushable(false)
-        const weapon = (this.weapon = this.physics.add.sprite( -50, -50));
+        this.player.setPushable(false);
+        const weapon = (this.weapon = this.physics.add.sprite(-50, -50));
         weapon.setSize(25, 10);
-        weapon.setActive(false).setVisible(false)
+        weapon.setActive(false).setVisible(false);
         // this.weapon = this.add.group({
         //     defaultKey: 'weapon', maxSize: 10,
         //     createCallback: function hulkSmash(weapon) {
@@ -131,9 +133,8 @@ export class Game extends Scene {
         //     removeCallback: function hulkSleep(weapon) {
         //         console.log('weapon go away??', weapon.name)
         //     },
-            
+
         // })
-        
 
         const player2 = (this.player2 = this.physics.add.sprite(
             350,
@@ -168,17 +169,12 @@ export class Game extends Scene {
         this.physics.add.collider(this.human, bridgePosts);
 
         // set collisions between NPC and player + world
-        this.physics.add.collider(this.player, )
+        // this.physics.add.collider(this.player);
         this.physics.add.collider(this.human, this.weapon, () => {
             console.log("A HIT A HIT");
-            this.weapon.setPosition(-50, -50)
+            this.weapon.setPosition(-50, -50);
 
-            this.human.anims.play("human-hurt-right");
-
-            this.playerPosition = { x: this.player.x, y: this.player.y };
-            console.log(this.playerPosition);
-
-            //fadeout to fight scene
+           //fadeout to fight scene
             this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
                 if (progress === 1) {
                     //passes reference to fight scene and fixes blue border issue with fight scene
@@ -189,7 +185,7 @@ export class Game extends Scene {
                 }
             });
         });
-        
+
         this.physics.add.collider(this.human, waterLayer);
         this.physics.add.collider(this.human, houseLayer1);
         this.physics.add.collider(this.human, houseLayer2);
@@ -225,8 +221,7 @@ export class Game extends Scene {
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true);
 
-        
-        createAnimations(this.anims)
+        createAnimations(this.anims);
 
         //player.anims.play("player-attack-right");
         player2.anims.play("player-hurt-right");
@@ -234,66 +229,137 @@ export class Game extends Scene {
         this.cameras.main.shake(900, 0.0007);
         //this.cameras.flash(300);
         //this.cameras.fade(300);
-        
 
         /////////////
         // Working NPC Code
         ///////////
-       
+
         for (var i = 0; i < 12; i++) {
             var x = Math.RND.between(0, map.widthInPixels);
             var y = Math.RND.between(0, map.heightInPixels);
             // parameters are x, y, width, height
             //this.spawns.create(x, y, 65, 65);
-            let enemy = (this.enemy = new humanSprite(this, x, y, 'humans', 'base_idle_1.png'))
-            enemy.setSize(12, 15)
-            enemy.setPushable(false)
-            enemy.setCollideWorldBounds(true)
-            this.physics.add.existing(enemy)
-            if (enemy.facing === 'left') {
-                enemy.anims.play('human-walk-left')
+            let enemy = (this.enemy = new humanSprite(
+                this,
+                x,
+                y,
+                "humans",
+                "base_idle_1.png"
+            ));
+            enemy.setSize(12, 15);
+            enemy.setPushable(false);
+            enemy.setCollideWorldBounds(true);
+            // this.physics.add.existing(enemy)
+            if (enemy.facing === "left") {
+                enemy.anims.play("human-walk-left");
             } else {
-                enemy.anims.play('human-walk-right')
+                enemy.anims.play("human-walk-right");
             }
-        enemy.body.onCollide = true   
-        this.physics.add.collider(enemy, waterLayer, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, houseLayer1, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, houseLayer2, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, treeLayer, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, moundsRocks, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, fenceLayer, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, crops, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, elevatedGroundLayer, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, bridgePosts, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, this.player, enemy.handleCollision, undefined, this);
-        this.physics.add.collider(enemy, this.weapon, () => {
-            console.log("A HIT A HIT");
-            this.weapon.setPosition(-50, -50)
-            enemy.setVelocity(0, 0)
-            //enemy.takeDamage()
-            enemy.anims.play('human-hurt-right')
-            
+            enemy.body.onCollide = true;
+            if (
+                enemy.body.x <= 6 ||
+                enemy.body.x > 794 ||
+                enemy.body.y < 6 ||
+                enemy.body.x > 760
+            ) {
+                enemy.changeDirection();
+            }
+            this.physics.add.collider(
+                enemy,
+                waterLayer,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                houseLayer1,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                houseLayer2,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                treeLayer,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                moundsRocks,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                fenceLayer,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                crops,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                elevatedGroundLayer,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(
+                enemy,
+                bridgePosts,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
 
-            this.playerPosition = { x: this.player.x, y: this.player.y };
+            this.physics.add.collider(
+                enemy,
+                this.player,
+                enemy.handleCollision,
+                undefined,
+                this
+            );
+            this.physics.add.collider(enemy, this.weapon, () => {
+                console.log("A HIT A HIT");
+                this.weapon.setPosition(-50, -50);
+                enemy.setVelocity(0, 0);
+                enemy.currentState = 'smacked'
+                //enemy.takeDamage()
+                enemy.killNPC();
 
-            console.log(this.playerPosition);
-
-            //fadeout to fight scene
-            this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
-                if (progress === 1) {
-                    //passes reference to fight scene and fixes blue border issue with fight scene
-                    this.scene.launch("Fight", {
-                        playerPosition: this.playerPosition,
-                        player: this.player,
+                //fadeout to fight scene
+                this.time.delayedCall(800, () => {
+                    this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
+                        if (progress === 1) {
+                            //passes reference to fight scene and fixes blue border issue with fight scene
+                            this.scene.launch("Fight", {
+                                playerPosition: this.playerPosition,
+                                player: this.player,
+                            });
+                        }
                     });
-                }
+                })
+                
             });
-        
-        });
-            
         }
         // this.physics.add.overlap(player, this.spawns, this.onNPCZoneEnter, false, this);
-        
+
         // let npcGroup = this.physics.add.group({
         //     key: 'humans',
         //     maxSize: 12,
@@ -302,7 +368,7 @@ export class Game extends Scene {
         //     let x = Math.RND.between(0, map.widthInPixels);
         //     let y = Math.RND.between(0, map.heightInPixels);
         //     let npc = npcGroup.get(x, y)
-            
+
         // }
 
         // supposed to listen to the attack animations and wait for them to complete
@@ -313,7 +379,7 @@ export class Game extends Scene {
     changeScene() {
         this.scene.start("GameOver");
     }
-    
+
     spawnNPCZones() {}
     onNPCZoneEnter() {
         // what happens when player enters NPC Zone
@@ -321,26 +387,28 @@ export class Game extends Scene {
         //this.cameras.main.shake(300);
         this.cameras.main.flash(300);
         // this.cameras.fade(300);
-        let playerX = this.player.x
-        let playerY = this.player.y
-        this.zoneHuman = new humanSprite(this, playerX + 25, playerY , 'humans',"base_idle_1.png" )
+        let playerX = this.player.x;
+        let playerY = this.player.y;
+        this.zoneHuman = new humanSprite(
+            this,
+            playerX + 25,
+            playerY,
+            "humans",
+            "base_idle_1.png"
+        );
         this.zoneHuman.body.setSize(22, 20);
         this.zoneHuman.setPushable(false);
     }
     drawWeapon(x, y, obj) {
-        
-        obj.setActive(true)
-        obj.setVisible(true)
-        
-        obj.setPosition(x, y)
+        obj.setActive(true);
+        obj.setVisible(true);
+
+        obj.setPosition(x, y);
         //setTimeout(this.sheathWeapon, 250, obj)
-        this.time.delayedCall(300, this.sheathWeapon, [obj])
+        this.time.delayedCall(300, this.sheathWeapon, [obj]);
     }
     sheathWeapon(obj) {
-        
-        obj.setPosition(-50, -50)
-        
-
+        obj.setPosition(-50, -50);
     }
     something(direction) {
         if (direction === "left") {
@@ -357,13 +425,12 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-
         // keeps players and NPCs from moving when they collide
         this.human.setVelocityX(0);
         this.human.setVelocityY(0);
         this.player2.setVelocityX(0);
         this.player2.setVelocityY(0);
-        
+
         //player walk right
         let velX = 0;
         let velY = 0;
@@ -412,23 +479,14 @@ export class Game extends Scene {
             // we'll need some method on the player sprite
             const xPos = this.player.x;
             const yPos = this.player.y;
-            
+
             if (currentDirection === "left") {
                 //this.player.anims.play('player-attack-left', true)
                 this.something(currentDirection);
-                this.drawWeapon(xPos - 8, yPos - 5, this.weapon)
-                
-                
-                
-                
+                this.drawWeapon(xPos - 8, yPos - 5, this.weapon);
             } else {
                 this.player.anims.play("player-attack-right", true);
-                this.drawWeapon(xPos + 8, yPos - 5, this.weapon)
-                 
-                
-               
-                
-                
+                this.drawWeapon(xPos + 8, yPos - 5, this.weapon);
             }
         }
         //keeps player from continuing to move after pressing key
@@ -437,8 +495,7 @@ export class Game extends Scene {
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
-        
+
         //this.sheathWeapon(this.weapon)
-        
     }
 }
