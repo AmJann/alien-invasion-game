@@ -410,13 +410,7 @@ export class Game extends Scene {
     sheathWeapon(obj) {
         obj.setPosition(-50, -50);
     }
-    something(direction) {
-        if (direction === "left") {
-            this.player.anims.play("player-attack-left", true);
-        } else {
-            this.player.anims.play("player-attack-right", true);
-        }
-    }
+    
 
     // changeScene() {
     //     this.scene.start("GameOver");
@@ -434,10 +428,12 @@ export class Game extends Scene {
         //player walk right
         let velX = 0;
         let velY = 0;
+        if(this.player.currentState == 'walking'){
         if (this.cursors.right.isDown) {
             velX = speed;
             this.player.anims.play("player-walk-right", true);
             currentDirection = "right";
+            this.player.currentDirection = 'right'
         }
 
         //player walk left
@@ -445,6 +441,7 @@ export class Game extends Scene {
             velX = -speed;
             this.player.anims.play("player-walk-left", true);
             currentDirection = "left";
+            this.player.currentDirection = 'left'
         }
 
         //player walk up with character facing left or right based on current direction
@@ -474,20 +471,23 @@ export class Game extends Scene {
         } else if (velX === 0 && velY === 0 && currentDirection === "right") {
             this.player.anims.play("player-idle-right", true);
         }
+    }
         // player attack right
         if (this.cursors.space.isDown) {
             // we'll need some method on the player sprite
             const xPos = this.player.x;
             const yPos = this.player.y;
-
+            this.player.currentState = 'attacking'
             if (currentDirection === "left") {
-                //this.player.anims.play('player-attack-left', true)
-                this.something(currentDirection);
+                this.player.currentDirection = 'left'
+                this.player.swingWeapon()
                 this.drawWeapon(xPos - 8, yPos - 5, this.weapon);
             } else {
-                this.player.anims.play("player-attack-right", true);
+                this.player.currentDirection = 'right'
+                this.player.swingWeapon()
                 this.drawWeapon(xPos + 8, yPos - 5, this.weapon);
             }
+            this.time.delayedCall(600, ()=> {this.player.currentState = 'walking'})
         }
         //keeps player from continuing to move after pressing key
         this.player.setVelocity(velX, velY);

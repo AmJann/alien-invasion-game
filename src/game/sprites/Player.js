@@ -6,6 +6,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.inventory = [humans[1]];
+        this.currentDirection = 'right'
+        this.currentState = 'walking'
     }
 
     addHumanToInventory(human) {
@@ -20,12 +22,22 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.inventory.splice(index, 1);
         }
     }
-
+    swingWeapon() {
+        if (this.currentDirection == 'right') {
+            this.anims.play('player-attack-right', true)
+        } else {
+            this.anims.play('player-attack-left', true)
+        }
+    }
     hasHuman(human) {
         return this.inventory.includes(human);
     }
 
     humanList() {
         return this.inventory;
+    }
+    preUpdate(t, dt) {
+        super.preUpdate(t, dt);
+        
     }
 }
