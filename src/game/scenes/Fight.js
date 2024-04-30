@@ -1,5 +1,6 @@
 import humans from "../humans";
 import { Player } from "../sprites/Player.js";
+let hurtAnimationRan = false;
 
 export class Fight extends Phaser.Scene {
     constructor() {
@@ -24,6 +25,10 @@ export class Fight extends Phaser.Scene {
     preload() {
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
+        if (this.enemy.health < 0) {
+            this.enemy.health = this.enemy.maxHealth;
+        }
+
         console.log("preload enemy", this.enemy);
         console.log(import.meta.env.BASE_URL + this.enemy.mainImage);
         this.playerCurrentHuman = this.player.inventory[0];
@@ -37,8 +42,12 @@ export class Fight extends Phaser.Scene {
             import.meta.env.BASE_URL + this.enemy.mainImage
         );
         this.load.image(
-            "enemyDefeatImage",
-            import.meta.env.BASE_URL + this.enemy.defeatImage
+            this.enemy.defeatImage.name,
+            import.meta.env.BASE_URL + this.enemy.defeatImage.path
+        );
+        this.load.image(
+            this.enemy.hurtImage.name,
+            import.meta.env.BASE_URL + this.enemy.hurtImage.path
         );
         this.load.image(
             this.player.inventory[0].name,
@@ -324,7 +333,7 @@ export class Fight extends Phaser.Scene {
         this.createAttackMenu();
     }
 
-    performAttack(attackName) {
+    performAttack() {
         this.playerImg.x = 250;
         //hide/destroy attack menu
         this.attackMenuContainer.destroy();
@@ -339,20 +348,48 @@ export class Fight extends Phaser.Scene {
             repeat: 0,
             onComplete: () => {
                 const damage = this.currentPlayerAttack.damage;
+                console.log("damage before reduce health", damage);
                 this.reduceEnemyHealth(damage);
-
-                if (this.enemy.health <= 0) {
+                if (
+                    this.enemy.health > 0 &&
+                    this.enemy.health < 50 &&
+                    !hurtAnimationRan
+                ) {
                     // Remove the current enemy image
                     this.enemyImg.destroy();
                     // Add the defeated enemy image
                     this.enemyImg = this.add.image(
-                        550,
+                        800,
                         290,
-                        "enemyDefeatImage"
+                        this.enemy.hurtImage.name
                     );
+                    this.tweens.add({
+                        targets: this.enemyImg,
+                        x: 550,
+                        duration: 500,
+                        ease: "Power2",
+                        delay: 0,
+                    });
+                }
+                if (this.enemy.health < 1) {
+                    // Remove the current enemy image
+                    this.enemyImg.destroy();
+                    // Add the defeated enemy image
+                    this.enemyImg = this.add.image(
+                        800,
+                        290,
+                        this.enemy.defeatImage.name
+                    );
+                    this.tweens.add({
+                        targets: this.enemyImg,
+                        x: 550,
+                        duration: 500,
+                        ease: "Power2",
+                        delay: 0,
+                    });
                     setTimeout(() => {
                         this.returnToGameScene();
-                    }, 6000);
+                    }, 2500);
                 } else {
                     this.computerAttack();
                 }
@@ -362,11 +399,13 @@ export class Fight extends Phaser.Scene {
 
     reduceEnemyHealth(damage) {
         // Reduce enemy health
-
+        console.log("damage after", damage);
         console.log("attack enemy", this.enemy);
+        console.log("this damage", this.currentPlayerAttack.damage);
         this.enemy.health -= damage;
 
         // Update enemy health bar display
+        console.log("both healths", this.enemy.health, this.enemy.maxHealth);
         const newWidth = (this.enemy.health / this.enemy.maxHealth) * 200;
         this.enemyHealthBar.clear();
         this.enemyHealthBar.fillStyle(0xff0000, 1);
