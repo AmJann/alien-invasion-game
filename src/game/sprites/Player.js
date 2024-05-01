@@ -3,8 +3,7 @@ import humans from "../humans";
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
+        
         this.inventory = [humans[1]];
         this.currentDirection = "right";
         this.currentState = "walking";
@@ -12,7 +11,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.speed = 150;
         this.weapon = this.scene.physics.add.sprite(-50, -50);
         this.weapon.setSize(30, 15);
-        this.weapon.setActive(false).setVisible(false);
+        this.weapon.setActive(true).setVisible(true);
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
     }
 
     addHumanToInventory(human) {
@@ -42,8 +43,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return this.inventory;
     }
     drawWeapon(x, y, obj) {
-        obj.setActive(true);
-        obj.setVisible(true);
+        
 
         obj.setPosition(x, y);
 

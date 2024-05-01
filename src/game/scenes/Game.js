@@ -12,7 +12,7 @@ export class Game extends Scene {
         this.player;
         this.human;
         this.playerPosition = { x: 300, y: 400 };
-        this.weapon;
+        
     }
     preload() {
         this.load.image(
@@ -117,10 +117,10 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
-        // const weapon = (this.weapon = this.physics.add.sprite(-50, -50));
+        // const weapon = (this.player.weapon = this.physics.add.sprite(-50, -50));
         // weapon.setSize(25, 10);
         // weapon.setActive(false).setVisible(false);
-        // this.weapon = this.add.group({
+        // this.player.weapon = this.add.group({
         //     defaultKey: 'weapon', maxSize: 10,
         //     createCallback: function hulkSmash(weapon) {
         //         weapon.setName(`drawSword`)
@@ -159,16 +159,16 @@ export class Game extends Scene {
         this.physics.add.collider(this.human, houseLayer2);
         this.physics.add.collider(this.human, treeLayer);
         this.physics.add.collider(this.human, moundsRocks);
-        this.physics.add.collider(this.human, fenceLayer);
+        this.physics.add.collider(this.human, fenceLayer), ()=>{console.log('hit the fence')};
         this.physics.add.collider(this.human, crops);
         this.physics.add.collider(this.human, elevatedGroundLayer);
         this.physics.add.collider(this.human, bridgePosts);
 
         // set collisions between NPC and player + world
         // this.physics.add.collider(this.player);
-        this.physics.add.collider(this.human, this.weapon, () => {
+        this.physics.add.collider(this.human, this.player.weapon, () => {
             console.log("A HIT A HIT");
-            this.weapon.setPosition(-50, -50);
+            this.player.weapon.setPosition(-50, -50);
 
            //fadeout to fight scene
             this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
@@ -217,6 +217,7 @@ export class Game extends Scene {
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true);
 
+        // create all player, NPC animations
         createAnimations(this.anims);
 
         //player.anims.play("player-attack-right");
@@ -331,9 +332,9 @@ export class Game extends Scene {
                 undefined,
                 this
             );
-            this.physics.add.collider(enemy, this.weapon, () => {
+            this.physics.add.collider(enemy, this.player.weapon, () => {
                 console.log("A HIT A HIT");
-                this.weapon.setPosition(-50, -50);
+                
                 enemy.setVelocity(0, 0);
                 enemy.currentState = 'smacked'
                 //enemy.takeDamage()
@@ -407,7 +408,7 @@ export class Game extends Scene {
         this.human.setVelocityY(0);
         this.player2.setVelocityX(0);
         this.player2.setVelocityY(0);
-
+        
         
 
         // this.time.delayedCall(25000, () => {
