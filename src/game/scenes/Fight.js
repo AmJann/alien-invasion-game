@@ -500,40 +500,83 @@ export class Fight extends Phaser.Scene {
     switchHuman() {
         // Check if the player has more than one human in the inventory
         if (this.player.inventory.length > 1) {
+            // Define the dimensions of the container
+            const containerWidth = 210;
+            const containerHeight = 170;
+
             // Create a container to hold the list of humans
-            const switchHumanContainer = this.add.container(223, 695);
+            const switchHumanContainer = this.add.container(223, 675);
 
             // Background for the list
-            const background = this.add.rectangle(0, 0, 210, 150, 0x333333);
+            const background = this.add.rectangle(
+                0,
+                0,
+                containerWidth,
+                containerHeight,
+                0x333333
+            );
             switchHumanContainer.add(background);
 
-            // Create text for each human in the inventory
-            this.player.inventory.forEach((human, index) => {
+            // Calculate the vertical spacing between each name
+            const verticalSpacing = 30;
+
+            // Calculate the maximum number of names that can fit vertically within the container
+            const maxNames = Math.floor(containerHeight / verticalSpacing);
+
+            // Iterate over the inventory, limiting the loop to the maximum number of names
+            this.player.inventory.slice(0, maxNames).forEach((human, index) => {
+                // Calculate the y-coordinate for the current text element
+                const yPos =
+                    -containerHeight / 2 +
+                    verticalSpacing / 2 +
+                    index * verticalSpacing;
+
                 const humanText = this.add
-                    .text(0, index * 30 - 30, human.name, { fill: "#ffffff" })
+                    .text(-40, yPos, human.name, { fill: "#ffffff" })
                     .setInteractive();
 
                 // Add click event to switch to the selected human
                 humanText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
-                    // Destroy the list container
+
                     switchHumanContainer.destroy();
-                    // Update the player's image to display the selected human
-                    this.playerImg.setTexture(human.name);
+                    // Load new human image
+                    this.loadHumanImage(human);
+
+                    this.playerNameText.setText(human.name);
+                    // Update player health and health bar
+                    this.updatePlayerHealth();
                 });
 
                 switchHumanContainer.add(humanText);
             });
-
-            // Center the list container
-            // switchHumanContainer.setPosition(
-            //     400 - switchHumanContainer.width / 2,
-            //     400 - switchHumanContainer.height / 2
-            // );
         } else {
             // Inform the player if they have only one human in the inventory
             console.log("You have only one human in your inventory.");
         }
+    }
+
+    updatePlayerHealth() {
+        // Update player health bar display
+        const newWidth =
+            (this.playerCurrentHuman.health /
+                this.playerCurrentHuman.maxHealth) *
+            200;
+        this.playerHealthBar.clear();
+        this.playerHealthBar.fillStyle(0xff0000, 1);
+        if (this.playerCurrentHuman.health >= 0) {
+            this.playerHealthBar.fillRect(0, 0, newWidth, 20);
+        }
+    }
+
+    loadHumanImage(human) {
+        this.load.image(human.name, import.meta.env.BASE_URL + human.mainImage);
+
+        this.load.once("complete", () => {
+            this.playerImg.setTexture(human.name);
+        });
+
+        this.load.start();
     }
 
     useItem() {
