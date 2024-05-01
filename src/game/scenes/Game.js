@@ -121,9 +121,9 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
-        const weapon = (this.weapon = this.physics.add.sprite(-50, -50));
-        weapon.setSize(25, 10);
-        weapon.setActive(false).setVisible(false);
+        // const weapon = (this.weapon = this.physics.add.sprite(-50, -50));
+        // weapon.setSize(25, 10);
+        // weapon.setActive(false).setVisible(false);
         // this.weapon = this.add.group({
         //     defaultKey: 'weapon', maxSize: 10,
         //     createCallback: function hulkSmash(weapon) {
@@ -426,71 +426,71 @@ export class Game extends Scene {
         this.player2.setVelocityY(0);
 
         //player walk right
-        let velX = 0;
-        let velY = 0;
-        if(this.player.currentState == 'walking'){
-        if (this.cursors.right.isDown) {
-            velX = speed;
-            this.player.anims.play("player-walk-right", true);
-            currentDirection = "right";
-            this.player.currentDirection = 'right'
-        }
+    //     let velX = 0;
+    //     let velY = 0;
+    //     //if(this.player.currentState == 'walking'){
+    //     if (this.cursors.right.isDown) {
+    //         velX = speed;
+    //         this.player.anims.play("player-walk-right");
+    //         currentDirection = "right";
+    //         this.player.currentDirection = 'right'
+    //     }
 
-        //player walk left
-        if (this.cursors.left.isDown) {
-            velX = -speed;
-            this.player.anims.play("player-walk-left", true);
-            currentDirection = "left";
-            this.player.currentDirection = 'left'
-        }
+    //     //player walk left
+    //     if (this.cursors.left.isDown) {
+    //         velX = -speed;
+    //         this.player.anims.play("player-walk-left");
+    //         currentDirection = "left";
+    //         this.player.currentDirection = 'left'
+    //     }
 
-        //player walk up with character facing left or right based on current direction
-        if (this.cursors.up.isDown && currentDirection === "left") {
-            velY = -speed;
+    //     //player walk up with character facing left or right based on current direction
+    //     if (this.cursors.up.isDown && currentDirection === "left") {
+    //         velY = -speed;
 
-            this.player.anims.play("player-walk-left", true);
-        } else if (this.cursors.up.isDown && currentDirection === "right") {
-            velY = -speed;
+    //         this.player.anims.play("player-walk-left");
+    //     } else if (this.cursors.up.isDown && currentDirection === "right") {
+    //         velY = -speed;
 
-            this.player.anims.play("player-walk-right", true);
-        }
+    //         this.player.anims.play("player-walk-right");
+    //     }
 
-        //player walk down with character facing left or right based on current direction
-        if (this.cursors.down.isDown && currentDirection === "left") {
-            velY = speed;
+    //     //player walk down with character facing left or right based on current direction
+    //     if (this.cursors.down.isDown && currentDirection === "left") {
+    //         velY = speed;
 
-            this.player.anims.play("player-walk-left", true);
-        } else if (this.cursors.down.isDown && currentDirection === "right") {
-            velY = speed;
-            this.player.anims.play("player-walk-right", true);
-        }
+    //         this.player.anims.play("player-walk-left");
+    //     } else if (this.cursors.down.isDown && currentDirection === "right") {
+    //         velY = speed;
+    //         this.player.anims.play("player-walk-right");
+    //     }
 
-        //player idle left or right based on current direction
-        if (velX === 0 && velY === 0 && currentDirection === "left") {
-            this.player.anims.play("player-idle-left", true);
-        } else if (velX === 0 && velY === 0 && currentDirection === "right") {
-            this.player.anims.play("player-idle-right", true);
-        }
-    }
-        // player attack right
-        if (this.cursors.space.isDown) {
-            // we'll need some method on the player sprite
-            const xPos = this.player.x;
-            const yPos = this.player.y;
-            this.player.currentState = 'attacking'
-            if (currentDirection === "left") {
-                this.player.currentDirection = 'left'
-                this.player.swingWeapon()
-                this.drawWeapon(xPos - 8, yPos - 5, this.weapon);
-            } else {
-                this.player.currentDirection = 'right'
-                this.player.swingWeapon()
-                this.drawWeapon(xPos + 8, yPos - 5, this.weapon);
-            }
-            this.time.delayedCall(600, ()=> {this.player.currentState = 'walking'})
-        }
-        //keeps player from continuing to move after pressing key
-        this.player.setVelocity(velX, velY);
+    //     //player idle left or right based on current direction
+    //     if (velX === 0 && velY === 0 && currentDirection === "left") {
+    //         this.player.anims.play("player-idle-left");
+    //     } else if (velX === 0 && velY === 0 && currentDirection === "right") {
+    //         this.player.anims.play("player-idle-right");
+    //     }
+    // //}
+    //     // player attack right
+    //     if (this.cursors.space.isDown) {
+    //         // we'll need some method on the player sprite
+    //         const xPos = this.player.x;
+    //         const yPos = this.player.y;
+    //         this.player.currentState = 'attacking'
+    //         if (currentDirection === "left") {
+    //             this.player.currentDirection = 'left'
+    //             this.player.swingWeapon()
+    //             this.drawWeapon(xPos - 8, yPos - 5, this.weapon);
+    //         } else {
+    //             this.player.currentDirection = 'right'
+    //             this.player.swingWeapon()
+    //             this.drawWeapon(xPos + 8, yPos - 5, this.weapon);
+    //         }
+    //         this.time.delayedCall(600, ()=> {this.player.currentState = 'walking'})
+    //     }
+    //     //keeps player from continuing to move after pressing key
+    //     this.player.setVelocity(velX, velY);
 
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
