@@ -5,10 +5,6 @@ import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
 import { createAnimations } from "../animations";
 
-//sets players current direction
-let currentDirection = "right";
-//sets player movement speed
-let speed = 150;
 
 export class Game extends Scene {
     constructor() {
@@ -399,19 +395,6 @@ export class Game extends Scene {
         this.zoneHuman.body.setSize(22, 20);
         this.zoneHuman.setPushable(false);
     }
-    drawWeapon(x, y, obj) {
-        obj.setActive(true);
-        obj.setVisible(true);
-
-        obj.setPosition(x, y);
-        //setTimeout(this.sheathWeapon, 250, obj)
-        this.time.delayedCall(300, this.sheathWeapon, [obj]);
-    }
-    sheathWeapon(obj) {
-        obj.setPosition(-50, -50);
-    }
-    
-
     // changeScene() {
     //     this.scene.start("GameOver");
     // }
@@ -425,77 +408,12 @@ export class Game extends Scene {
         this.player2.setVelocityX(0);
         this.player2.setVelocityY(0);
 
-        //player walk right
-    //     let velX = 0;
-    //     let velY = 0;
-    //     //if(this.player.currentState == 'walking'){
-    //     if (this.cursors.right.isDown) {
-    //         velX = speed;
-    //         this.player.anims.play("player-walk-right");
-    //         currentDirection = "right";
-    //         this.player.currentDirection = 'right'
-    //     }
-
-    //     //player walk left
-    //     if (this.cursors.left.isDown) {
-    //         velX = -speed;
-    //         this.player.anims.play("player-walk-left");
-    //         currentDirection = "left";
-    //         this.player.currentDirection = 'left'
-    //     }
-
-    //     //player walk up with character facing left or right based on current direction
-    //     if (this.cursors.up.isDown && currentDirection === "left") {
-    //         velY = -speed;
-
-    //         this.player.anims.play("player-walk-left");
-    //     } else if (this.cursors.up.isDown && currentDirection === "right") {
-    //         velY = -speed;
-
-    //         this.player.anims.play("player-walk-right");
-    //     }
-
-    //     //player walk down with character facing left or right based on current direction
-    //     if (this.cursors.down.isDown && currentDirection === "left") {
-    //         velY = speed;
-
-    //         this.player.anims.play("player-walk-left");
-    //     } else if (this.cursors.down.isDown && currentDirection === "right") {
-    //         velY = speed;
-    //         this.player.anims.play("player-walk-right");
-    //     }
-
-    //     //player idle left or right based on current direction
-    //     if (velX === 0 && velY === 0 && currentDirection === "left") {
-    //         this.player.anims.play("player-idle-left");
-    //     } else if (velX === 0 && velY === 0 && currentDirection === "right") {
-    //         this.player.anims.play("player-idle-right");
-    //     }
-    // //}
-    //     // player attack right
-    //     if (this.cursors.space.isDown) {
-    //         // we'll need some method on the player sprite
-    //         const xPos = this.player.x;
-    //         const yPos = this.player.y;
-    //         this.player.currentState = 'attacking'
-    //         if (currentDirection === "left") {
-    //             this.player.currentDirection = 'left'
-    //             this.player.swingWeapon()
-    //             this.drawWeapon(xPos - 8, yPos - 5, this.weapon);
-    //         } else {
-    //             this.player.currentDirection = 'right'
-    //             this.player.swingWeapon()
-    //             this.drawWeapon(xPos + 8, yPos - 5, this.weapon);
-    //         }
-    //         this.time.delayedCall(600, ()=> {this.player.currentState = 'walking'})
-    //     }
-    //     //keeps player from continuing to move after pressing key
-    //     this.player.setVelocity(velX, velY);
+        
 
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
 
-        //this.sheathWeapon(this.weapon)
+        
     }
 }
