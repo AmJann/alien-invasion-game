@@ -119,6 +119,7 @@ export class Fight extends Phaser.Scene {
         this.playerHealthBar.fillStyle(0xff0000, 1);
         this.playerHealthBar.fillRect(0, 0, 200, 20);
 
+        this.updatePlayerHealth();
         // text and styling for players name
         this.playerNameText = this.add.text(
             0,
@@ -202,10 +203,6 @@ export class Fight extends Phaser.Scene {
             onComplete: () => {
                 playerStartX = 250;
             },
-        });
-
-        this.time.delayedCall(60000, () => {
-            this.returnToGameScene();
         });
 
         this.attackButton = this.createActionButton("Attack", 400, 660, () =>
@@ -317,24 +314,24 @@ export class Fight extends Phaser.Scene {
         });
     }
 
-    reducePlayerHealth(damage) {
-        console.log("enemy", this.enemy);
-        console.log("player", this.playerCurrentHuman.health);
-        // Reduce player health
-        this.playerCurrentHuman.health -= damage;
+    // reducePlayerHealth(damage) {
+    //     console.log("enemy", this.enemy);
+    //     console.log("player", this.playerCurrentHuman.health);
+    //     // Reduce player health
+    //     this.playerCurrentHuman.health -= damage;
 
-        // Update player health bar display
-        const newWidth =
-            (this.playerCurrentHuman.health /
-                this.playerCurrentHuman.maxHealth) *
-            200;
-        this.playerHealthBar.clear();
-        this.playerHealthBar.fillStyle(0xff0000, 1);
-        if (this.playerCurrentHuman.health >= 0) {
-            this.playerHealthBar.fillRect(0, 0, newWidth, 20);
-        }
-        console.log("playerCurrentHuman", this.playerCurrentHuman.health);
-    }
+    //     // Update player health bar display
+    //     const newWidth =
+    //         (this.playerCurrentHuman.health /
+    //             this.playerCurrentHuman.maxHealth) *
+    //         200;
+    //     this.playerHealthBar.clear();
+    //     this.playerHealthBar.fillStyle(0xff0000, 1);
+    //     if (this.playerCurrentHuman.health >= 0) {
+    //         this.playerHealthBar.fillRect(0, 0, newWidth, 20);
+    //     }
+    //     console.log("playerCurrentHuman", this.playerCurrentHuman.health);
+    // }
 
     createAttackMenu() {
         // Create a container for the attack menu
@@ -501,7 +498,7 @@ export class Fight extends Phaser.Scene {
         // Check if the player has more than one human in the inventory
         if (this.player.inventory.length > 1) {
             // Define the dimensions of the container
-            const containerWidth = 210;
+            const containerWidth = 220;
             const containerHeight = 170;
 
             // Create a container to hold the list of humans
@@ -531,9 +528,19 @@ export class Fight extends Phaser.Scene {
                     verticalSpacing / 2 +
                     index * verticalSpacing;
 
+                // Check if the human's health is zero
+                const isDisabled = human.health <= 0;
+
                 const humanText = this.add
-                    .text(-40, yPos, human.name, { fill: "#ffffff" })
+                    .text(-100, yPos, `${human.name} HP: ${human.health}`, {
+                        fill: isDisabled ? "#666666" : "#ffffff",
+                    })
                     .setInteractive();
+
+                // Disable interaction if health is zero
+                if (isDisabled) {
+                    humanText.disableInteractive();
+                }
 
                 // Add click event to switch to the selected human
                 humanText.on("pointerdown", () => {
@@ -546,6 +553,8 @@ export class Fight extends Phaser.Scene {
                     this.playerNameText.setText(human.name);
                     // Update player health and health bar
                     this.updatePlayerHealth();
+
+                    this.computerAttack();
                 });
 
                 switchHumanContainer.add(humanText);
@@ -556,17 +565,115 @@ export class Fight extends Phaser.Scene {
         }
     }
 
-    updatePlayerHealth() {
-        // Update player health bar display
-        const newWidth =
-            (this.playerCurrentHuman.health /
-                this.playerCurrentHuman.maxHealth) *
-            200;
-        this.playerHealthBar.clear();
-        this.playerHealthBar.fillStyle(0xff0000, 1);
-        if (this.playerCurrentHuman.health >= 0) {
-            this.playerHealthBar.fillRect(0, 0, newWidth, 20);
+    reducePlayerHealth(damage) {
+        // Reduce player health
+        this.playerCurrentHuman.health -= damage;
+
+        // Check if health is less than or equal to 0
+        if (this.playerCurrentHuman.health <= 0) {
+            // Set health to 0
+            this.playerCurrentHuman.health = 0;
+
+            // Remove the current player image
+            this.playerImg.destroy();
+
+            // Add the defeated player image
+            this.playerImg = this.add.image(
+                800,
+                480,
+                this.playerCurrentHuman.defeatImage.name
+            );
+
+            // Transition the defeated player image
+            this.tweens.add({
+                targets: this.playerImg,
+                x: 250,
+                duration: 500,
+                ease: "Power2",
+                delay: 0,
+                onComplete: () => {
+                    // Create and show the switch human menu
+                    this.createSwitchHumanMenu();
+                },
+            });
         }
+
+        // Update player health bar display
+        this.updatePlayerHealth();
+    }
+
+    createSwitchHumanMenu() {
+        // Create a container for the switch human menu with 0.5 opacity
+        this.switchHumanMenuContainer = this.add.container(0, 0);
+        // Set opacity to 0.5
+
+        // Background for the menu with 0.5 opacity
+        const background = this.add.rectangle(300, 450, 800, 800, 0x000000);
+        background.setAlpha(0.5); // Set opacity to 0.5
+        this.switchHumanMenuContainer.add(background);
+
+        // Add text for informing the player about the defeated human
+        this.defeatedText = this.add.text(
+            170,
+            25,
+            "YOUR HUMAN HAS BEEN DEFEATED",
+            {
+                font: "courier",
+                fontSize: "24px",
+                fontStyle: "strong",
+                fill: "#ff0000",
+                strokeThickness: 3,
+            }
+        );
+
+        this.defeatedText.setFontStyle("bold");
+        this.defeatedText.setFontSize("24px");
+
+        this.switchHumanMenuContainer.add(this.defeatedText);
+
+        // Iterate over the inventory to display options for switching humans
+        this.player.inventory.forEach((human, index) => {
+            // Calculate the y-coordinate for the current option
+            const yPos = 200 + index * 75;
+            // Create a text option for the human if their health is greater than 0
+            if (human.health > 0) {
+                const optionText = this.add.text(
+                    400,
+                    yPos,
+                    `${human.name} HP: ${human.health}`,
+                    {
+                        fill: "#ffffff", // Fixed color format
+                        fontSize: "20px",
+                    }
+                );
+                optionText.setInteractive();
+                optionText.setOrigin(0.5);
+                // Add click event to switch to the selected human
+                optionText.on("pointerdown", () => {
+                    this.playerCurrentHuman = human;
+
+                    // Destroy the defeatedText
+                    this.defeatedText.destroy();
+
+                    // Load new human image
+                    this.loadHumanImage(human);
+
+                    // Update player name text
+                    this.playerNameText.setText(human.name);
+
+                    // Update player health and health bar
+                    this.updatePlayerHealth();
+
+                    this.switchHumanMenuContainer.destroy();
+                    this.computerAttack();
+                });
+
+                this.switchHumanMenuContainer.add(optionText);
+            }
+        });
+
+        // Add the switch human menu container to the scene
+        this.add.existing(this.switchHumanMenuContainer);
     }
 
     loadHumanImage(human) {
@@ -577,6 +684,18 @@ export class Fight extends Phaser.Scene {
         });
 
         this.load.start();
+    }
+
+    updatePlayerHealth() {
+        const newWidth =
+            (this.playerCurrentHuman.health /
+                this.playerCurrentHuman.maxHealth) *
+            200;
+        this.playerHealthBar.clear();
+        this.playerHealthBar.fillStyle(0xff0000, 1);
+        if (this.playerCurrentHuman.health >= 0) {
+            this.playerHealthBar.fillRect(0, 0, newWidth, 20);
+        }
     }
 
     useItem() {
