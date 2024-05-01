@@ -5,14 +5,12 @@ import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
 import { createAnimations } from "../animations";
 
-
 export class Game extends Scene {
     constructor() {
         super("Game");
         this.player;
         this.human;
         this.playerPosition = { x: 300, y: 400 };
-        
     }
     preload() {
         this.load.image(
@@ -117,20 +115,6 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
-        // const weapon = (this.player.weapon = this.physics.add.sprite(-50, -50));
-        // weapon.setSize(25, 10);
-        // weapon.setActive(false).setVisible(false);
-        // this.player.weapon = this.add.group({
-        //     defaultKey: 'weapon', maxSize: 10,
-        //     createCallback: function hulkSmash(weapon) {
-        //         weapon.setName(`drawSword`)
-        //         console.log('created', weapon.name)
-        //     },
-        //     removeCallback: function hulkSleep(weapon) {
-        //         console.log('weapon go away??', weapon.name)
-        //     },
-
-        // })
 
         const player2 = (this.player2 = this.physics.add.sprite(
             350,
@@ -159,18 +143,20 @@ export class Game extends Scene {
         this.physics.add.collider(this.human, houseLayer2);
         this.physics.add.collider(this.human, treeLayer);
         this.physics.add.collider(this.human, moundsRocks);
-        this.physics.add.collider(this.human, fenceLayer), ()=>{console.log('hit the fence')};
+        this.physics.add.collider(this.human, fenceLayer),
+            () => {
+                console.log("hit the fence");
+            };
         this.physics.add.collider(this.human, crops);
         this.physics.add.collider(this.human, elevatedGroundLayer);
         this.physics.add.collider(this.human, bridgePosts);
 
         // set collisions between NPC and player + world
-        // this.physics.add.collider(this.player);
         this.physics.add.collider(this.human, this.player.weapon, () => {
             console.log("A HIT A HIT");
             this.player.weapon.setPosition(-50, -50);
 
-           //fadeout to fight scene
+            //fadeout to fight scene
             this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
                 if (progress === 1) {
                     //passes reference to fight scene and fixes blue border issue with fight scene
@@ -220,12 +206,9 @@ export class Game extends Scene {
         // create all player, NPC animations
         createAnimations(this.anims);
 
-        //player.anims.play("player-attack-right");
         player2.anims.play("player-hurt-right");
         human.anims.play("human-walk-right");
         this.cameras.main.shake(900, 0.0007);
-        //this.cameras.flash(300);
-        //this.cameras.fade(300);
 
         /////////////
         // Working NPC Code
@@ -246,7 +229,7 @@ export class Game extends Scene {
             enemy.setSize(12, 15);
             enemy.setPushable(false);
             enemy.setCollideWorldBounds(true);
-            // this.physics.add.existing(enemy)
+
             if (enemy.facing === "left") {
                 enemy.anims.play("human-walk-left");
             } else {
@@ -334,42 +317,31 @@ export class Game extends Scene {
             );
             this.physics.add.collider(enemy, this.player.weapon, () => {
                 console.log("A HIT A HIT");
-                
+
                 enemy.setVelocity(0, 0);
-                enemy.currentState = 'smacked'
-                //enemy.takeDamage()
+                enemy.currentState = "smacked";
                 enemy.killNPC();
 
                 //fadeout to fight scene
                 this.time.delayedCall(800, () => {
-                    this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
-                        if (progress === 1) {
-                            //passes reference to fight scene and fixes blue border issue with fight scene
-                            this.scene.launch("Fight", {
-                                playerPosition: this.playerPosition,
-                                player: this.player,
-                            });
+                    this.cameras.main.fadeOut(
+                        800,
+                        0,
+                        0,
+                        0,
+                        (camera, progress) => {
+                            if (progress === 1) {
+                                //passes reference to fight scene and fixes blue border issue with fight scene
+                                this.scene.launch("Fight", {
+                                    playerPosition: this.playerPosition,
+                                    player: this.player,
+                                });
+                            }
                         }
-                    });
-                })
-                
+                    );
+                });
             });
         }
-        // this.physics.add.overlap(player, this.spawns, this.onNPCZoneEnter, false, this);
-
-        // let npcGroup = this.physics.add.group({
-        //     key: 'humans',
-        //     maxSize: 12,
-        // })
-        // for (let z = 0; z < 12; z++){
-        //     let x = Math.RND.between(0, map.widthInPixels);
-        //     let y = Math.RND.between(0, map.heightInPixels);
-        //     let npc = npcGroup.get(x, y)
-
-        // }
-
-        // supposed to listen to the attack animations and wait for them to complete
-        //player.on(Phaser.Animations.Events.ANIMA + 'player-attack-right', () => console.log('did it!'), this)
         EventBus.emit("current-scene-ready", this);
     }
 
@@ -377,13 +349,12 @@ export class Game extends Scene {
         this.scene.start("GameOver");
     }
 
-    spawnNPCZones() {}
+    // Not currently used but an option
     onNPCZoneEnter() {
         // what happens when player enters NPC Zone
         // shake the world
-        //this.cameras.main.shake(300);
+
         this.cameras.main.flash(300);
-        // this.cameras.fade(300);
         let playerX = this.player.x;
         let playerY = this.player.y;
         this.zoneHuman = new humanSprite(
@@ -408,13 +379,9 @@ export class Game extends Scene {
         this.human.setVelocityY(0);
         this.player2.setVelocityX(0);
         this.player2.setVelocityY(0);
-        
-        
 
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
-
-        
     }
 }
