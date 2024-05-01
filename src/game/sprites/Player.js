@@ -5,7 +5,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, texture);
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.inventory = [humans[1]];
+        this.inventory = [humans[1], humans[0]];
     }
 
     addHumanToInventory(human) {

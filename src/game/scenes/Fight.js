@@ -1,6 +1,7 @@
 import humans from "../humans";
 import { Player } from "../sprites/Player.js";
 let hurtAnimationRan = false;
+let hurtAnimationPlayerRan = false;
 
 export class Fight extends Phaser.Scene {
     constructor() {
@@ -25,13 +26,28 @@ export class Fight extends Phaser.Scene {
     preload() {
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
-        if (this.enemy.health < 0) {
+        if (this.enemy.health <= 0) {
             this.enemy.health = this.enemy.maxHealth;
+            console.log(this.enemy.health);
         }
 
         console.log("preload enemy", this.enemy);
         console.log(import.meta.env.BASE_URL + this.enemy.mainImage);
+
+        console.log(
+            "player before assigning playerCurrenthHuman",
+            this.player.inventory[0]
+        );
         this.playerCurrentHuman = this.player.inventory[0];
+        if (this.playerCurrentHuman.health <= 0) {
+            this.playerCurrentHuman.health = this.playerCurrentHuman.maxHealth;
+            console.log(this.playerCurrentHuman.health);
+        }
+
+        if (this.enemy.health <= 0) {
+            this.enemy.health = this.enemy.maxHealth;
+            console.log(this.enemy.health);
+        }
         // Preload images
         this.load.image(
             "water_field_bg",
@@ -50,8 +66,16 @@ export class Fight extends Phaser.Scene {
             import.meta.env.BASE_URL + this.enemy.hurtImage.path
         );
         this.load.image(
-            this.player.inventory[0].name,
-            import.meta.env.BASE_URL + this.player.inventory[0]["mainImage"]
+            this.playerCurrentHuman.hurtImage.name,
+            import.meta.env.BASE_URL + this.playerCurrentHuman.hurtImage.path
+        );
+        this.load.image(
+            this.playerCurrentHuman.defeatImage.name,
+            import.meta.env.BASE_URL + this.playerCurrentHuman.defeatImage.path
+        );
+        this.load.image(
+            this.playerCurrentHuman.name,
+            import.meta.env.BASE_URL + this.playerCurrentHuman["mainImage"]
         );
     }
 
@@ -99,7 +123,7 @@ export class Fight extends Phaser.Scene {
         this.playerNameText = this.add.text(
             0,
             25,
-            this.player.inventory[0]["name"],
+            this.playerCurrentHuman["name"],
             {
                 font: "courier",
                 fontSize: "24px",
@@ -153,7 +177,7 @@ export class Fight extends Phaser.Scene {
             .image(
                 playerStartX,
                 playerStartY,
-                this.player.inventory[0]["name"],
+                this.playerCurrentHuman["name"],
                 0
             )
             .setFlipX(true);
@@ -184,12 +208,21 @@ export class Fight extends Phaser.Scene {
             this.returnToGameScene();
         });
 
-        this.createActionButton("Attack", 400, 660, () => this.attack());
-        this.createActionButton("Switch Human", 570, 660, () =>
-            this.switchHuman()
+        this.attackButton = this.createActionButton("Attack", 400, 660, () =>
+            this.attack()
         );
-        this.createActionButton("Item", 400, 735, () => this.useItem());
-        this.createActionButton("Run", 570, 735, () => this.run());
+        this.switchButton = this.createActionButton(
+            "Switch Human",
+            570,
+            660,
+            () => this.switchHuman()
+        );
+        this.itemButton = this.createActionButton("Item", 400, 735, () =>
+            this.useItem()
+        );
+        this.runButton = this.createActionButton("Run", 570, 735, () =>
+            this.run()
+        );
     }
 
     createActionButton(text, x, y, callback) {
@@ -233,6 +266,10 @@ export class Fight extends Phaser.Scene {
         this.switchButton.disableInteractive();
         this.itemButton.disableInteractive();
         this.runButton.disableInteractive();
+        this.attackButton.setBackgroundColor("#555555");
+        this.switchButton.setBackgroundColor("#555555");
+        this.itemButton.setBackgroundColor("#555555");
+        this.runButton.setBackgroundColor("#555555");
     }
 
     enableButtons() {
@@ -241,10 +278,28 @@ export class Fight extends Phaser.Scene {
         this.switchButton.setInteractive();
         this.itemButton.setInteractive();
         this.runButton.setInteractive();
+        this.attackButton.setBackgroundColor("#333333");
+        this.switchButton.setBackgroundColor("#333333");
+        this.itemButton.setBackgroundColor("#333333");
+        this.runButton.setBackgroundColor("#333333");
+    }
+    randomCompAttack() {
+        const attacks = [
+            this.enemy.attack1,
+            this.enemy.attack2,
+            this.enemy.special,
+        ];
+        const randomAttackIndex = Math.floor(Math.random() * 3);
+        console.log(attacks);
+        const selectedAttack = attacks[randomAttackIndex];
+        return selectedAttack;
     }
 
     computerAttack() {
         //computer attacks after player with 3 second delay
+        // Disable all action buttons
+        this.disableButtons();
+
         this.attackTween = this.tweens.add({
             targets: this.enemyImg,
             x: 340,
@@ -254,8 +309,31 @@ export class Fight extends Phaser.Scene {
             ease: "Linear",
             yoyo: true,
             repeat: 0,
-            onComplete: () => {},
+            onComplete: () => {
+                this.enableButtons();
+                let attack = this.randomCompAttack();
+                this.reducePlayerHealth(attack["damage"]);
+            },
         });
+    }
+
+    reducePlayerHealth(damage) {
+        console.log("enemy", this.enemy);
+        console.log("player", this.playerCurrentHuman.health);
+        // Reduce player health
+        this.playerCurrentHuman.health -= damage;
+
+        // Update player health bar display
+        const newWidth =
+            (this.playerCurrentHuman.health /
+                this.playerCurrentHuman.maxHealth) *
+            200;
+        this.playerHealthBar.clear();
+        this.playerHealthBar.fillStyle(0xff0000, 1);
+        if (this.playerCurrentHuman.health >= 0) {
+            this.playerHealthBar.fillRect(0, 0, newWidth, 20);
+        }
+        console.log("playerCurrentHuman", this.playerCurrentHuman.health);
     }
 
     createAttackMenu() {
@@ -293,17 +371,18 @@ export class Fight extends Phaser.Scene {
         //sets current attack to be able to apply damage
         attack1.on("pointerdown", () =>
             this.performAttack(
-                (this.currentPlayerAttack = this.player.inventory[0].attack1)
+                (this.currentPlayerAttack = this.playerCurrentHuman.attack1)
             )
         );
+
         attack2.on("pointerdown", () =>
             this.performAttack(
-                (this.currentPlayerAttack = this.player.inventory[0].attack2)
+                (this.currentPlayerAttack = this.playerCurrentHuman.attack2)
             )
         );
         special.on("pointerdown", () =>
             this.performAttack(
-                (this.currentPlayerAttack = this.player.inventory[0].special)
+                (this.currentPlayerAttack = this.playerCurrentHuman.special)
             )
         );
 
@@ -350,11 +429,14 @@ export class Fight extends Phaser.Scene {
                 const damage = this.currentPlayerAttack.damage;
                 console.log("damage before reduce health", damage);
                 this.reduceEnemyHealth(damage);
+                const halfHealth = this.enemy.maxHealth / 2;
+
                 if (
                     this.enemy.health > 0 &&
-                    this.enemy.health < 50 &&
+                    this.enemy.health < halfHealth &&
                     !hurtAnimationRan
                 ) {
+                    hurtAnimationRan = true;
                     // Remove the current enemy image
                     this.enemyImg.destroy();
                     // Add the defeated enemy image
@@ -388,6 +470,7 @@ export class Fight extends Phaser.Scene {
                         delay: 0,
                     });
                     setTimeout(() => {
+                        hurtAnimationRan = false;
                         this.returnToGameScene();
                     }, 2500);
                 } else {
@@ -402,10 +485,10 @@ export class Fight extends Phaser.Scene {
         console.log("damage after", damage);
         console.log("attack enemy", this.enemy);
         console.log("this damage", this.currentPlayerAttack.damage);
+        console.log("player attacks ,player", this.playerCurrentHuman.health);
         this.enemy.health -= damage;
 
         // Update enemy health bar display
-        console.log("both healths", this.enemy.health, this.enemy.maxHealth);
         const newWidth = (this.enemy.health / this.enemy.maxHealth) * 200;
         this.enemyHealthBar.clear();
         this.enemyHealthBar.fillStyle(0xff0000, 1);
@@ -415,7 +498,42 @@ export class Fight extends Phaser.Scene {
     }
 
     switchHuman() {
-        //switch out human here
+        // Check if the player has more than one human in the inventory
+        if (this.player.inventory.length > 1) {
+            // Create a container to hold the list of humans
+            const switchHumanContainer = this.add.container(223, 695);
+
+            // Background for the list
+            const background = this.add.rectangle(0, 0, 210, 150, 0x333333);
+            switchHumanContainer.add(background);
+
+            // Create text for each human in the inventory
+            this.player.inventory.forEach((human, index) => {
+                const humanText = this.add
+                    .text(0, index * 30 - 30, human.name, { fill: "#ffffff" })
+                    .setInteractive();
+
+                // Add click event to switch to the selected human
+                humanText.on("pointerdown", () => {
+                    this.playerCurrentHuman = human;
+                    // Destroy the list container
+                    switchHumanContainer.destroy();
+                    // Update the player's image to display the selected human
+                    this.playerImg.setTexture(human.name);
+                });
+
+                switchHumanContainer.add(humanText);
+            });
+
+            // Center the list container
+            // switchHumanContainer.setPosition(
+            //     400 - switchHumanContainer.width / 2,
+            //     400 - switchHumanContainer.height / 2
+            // );
+        } else {
+            // Inform the player if they have only one human in the inventory
+            console.log("You have only one human in your inventory.");
+        }
     }
 
     useItem() {
@@ -427,7 +545,10 @@ export class Fight extends Phaser.Scene {
         if (randomNum > 5) {
             this.returnToGameScene();
         } else {
+            this.disableButtons();
             console.log("miss");
+            this.computerAttack();
+            this.enableButtons();
         }
     }
 
