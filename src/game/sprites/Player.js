@@ -1,4 +1,12 @@
-import humans from "../humans";
+import {
+    Human,
+    Clown,
+    Scientist,
+    Firefighter,
+    Farmer,
+    NuckChorris,
+    humans,
+} from "../humans";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
@@ -6,11 +14,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.inventory = [
-            humans[1],
-            humans[0],
-            humans[2],
-            humans[3],
-            humans[4],
+            new Clown(),
+            new Scientist(),
+            new Firefighter(),
+            new Farmer(),
+            new NuckChorris(),
         ];
     }
 
@@ -33,5 +41,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     humanList() {
         return this.inventory;
+    }
+
+    savePlayerData() {
+        localStorage.setItem("playerData", JSON.stringify(this.inventory));
+    }
+
+    loadPlayerData() {
+        const data = localStorage.getItem("playerData");
+        return data ? JSON.parse(data) : null;
     }
 }

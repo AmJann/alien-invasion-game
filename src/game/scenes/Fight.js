@@ -1,7 +1,22 @@
-import humans from "../humans";
+import {
+    Human,
+    Clown,
+    Scientist,
+    Firefighter,
+    Farmer,
+    NuckChorris,
+} from "../humans";
 import { Player } from "../sprites/Player.js";
+// import { runRiot } from "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
+const humans = [
+    new Clown(),
+    new Scientist(),
+    new Firefighter(),
+    new Farmer(),
+    new NuckChorris(),
+];
 
 export class Fight extends Phaser.Scene {
     constructor() {
@@ -15,6 +30,7 @@ export class Fight extends Phaser.Scene {
         this.playerTurn = true;
         this.playerCurrentHuman = null;
         this.currentPlayerAttack = null;
+        this.music = null;
     }
 
     init(data) {
@@ -23,30 +39,63 @@ export class Fight extends Phaser.Scene {
         this.player = data.player;
     }
 
+    debug() {
+        console.log("hello");
+        console.log(this);
+    }
+
     preload() {
+        this.load.audio(
+            "runRiot",
+            "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
+        );
+
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
+
         if (this.enemy.health <= 0) {
             this.enemy.health = this.enemy.maxHealth;
-            console.log(this.enemy.health);
+            // console.log(this.enemy.health);
         }
 
-        console.log("preload enemy", this.enemy);
-        console.log(import.meta.env.BASE_URL + this.enemy.mainImage);
+        const classMapping = {
+            Clown: Clown,
+            Scientist: Scientist,
+            Firefighter: Firefighter,
+            Farmer: Farmer,
+            NuckChorris: NuckChorris,
+        };
 
-        console.log(
-            "player before assigning playerCurrenthHuman",
-            this.player.inventory[0]
-        );
+        // Retrieve player data from local storage
+        const playerData = this.player.loadPlayerData();
+
+        if (playerData) {
+            // Iterate over the saved inventory and recreate the humans
+            this.player.inventory = playerData.map((humanData) => {
+                // Use the mapping object to retrieve the class object based on the class name
+                const HumanClass = classMapping[humanData.name];
+                // Check if the class object exists in the mapping
+                if (HumanClass) {
+                    // Instantiate the class object
+                    return new HumanClass();
+                } else {
+                    // Handle case where class object is not found
+                    console.error(
+                        `Class object not found for class name: ${humanData.name}`
+                    );
+                    return null; // or handle differently based on your application's logic
+                }
+            });
+        }
         this.playerCurrentHuman = this.player.inventory[0];
         if (this.playerCurrentHuman.health <= 0) {
             this.playerCurrentHuman.health = this.playerCurrentHuman.maxHealth;
-            console.log(this.playerCurrentHuman.health);
+            // console.log(this.playerCurrentHuman.health);
         }
 
         if (this.enemy.health <= 0) {
             this.enemy.health = this.enemy.maxHealth;
-            console.log(this.enemy.health);
+            // console.log(this.enemy.health);
         }
         // Preload images
         this.load.image(
@@ -80,9 +129,13 @@ export class Fight extends Phaser.Scene {
     }
 
     create() {
-        console.log(this.player);
+        // console.log(this.player);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
+
+        this.music = this.sound.add("runRiot");
+        this.music.play();
+        this.music.setLoop(true);
 
         const playerNameHealthBackground = this.add.rectangle(
             280,
@@ -287,7 +340,7 @@ export class Fight extends Phaser.Scene {
             this.enemy.special,
         ];
         const randomAttackIndex = Math.floor(Math.random() * 3);
-        console.log(attacks);
+        // console.log(attacks);
         const selectedAttack = attacks[randomAttackIndex];
         return selectedAttack;
     }
@@ -315,8 +368,8 @@ export class Fight extends Phaser.Scene {
     }
 
     // reducePlayerHealth(damage) {
-    //     console.log("enemy", this.enemy);
-    //     console.log("player", this.playerCurrentHuman.health);
+    //     // console.log("enemy", this.enemy);
+    //     // console.log("player", this.playerCurrentHuman.health);
     //     // Reduce player health
     //     this.playerCurrentHuman.health -= damage;
 
@@ -330,7 +383,7 @@ export class Fight extends Phaser.Scene {
     //     if (this.playerCurrentHuman.health >= 0) {
     //         this.playerHealthBar.fillRect(0, 0, newWidth, 20);
     //     }
-    //     console.log("playerCurrentHuman", this.playerCurrentHuman.health);
+    //     // console.log("playerCurrentHuman", this.playerCurrentHuman.health);
     // }
 
     createAttackMenu() {
@@ -406,10 +459,12 @@ export class Fight extends Phaser.Scene {
 
     attack() {
         // Create and show the attack menu
+
         this.createAttackMenu();
     }
 
     performAttack() {
+        this.debug();
         this.playerImg.x = 250;
         //hide/destroy attack menu
         this.attackMenuContainer.destroy();
@@ -424,7 +479,7 @@ export class Fight extends Phaser.Scene {
             repeat: 0,
             onComplete: () => {
                 const damage = this.currentPlayerAttack.damage;
-                console.log("damage before reduce health", damage);
+                // console.log("damage before reduce health", damage);
                 this.reduceEnemyHealth(damage);
                 const halfHealth = this.enemy.maxHealth / 2;
 
@@ -475,14 +530,11 @@ export class Fight extends Phaser.Scene {
                 }
             },
         });
+        this.debug();
     }
 
     reduceEnemyHealth(damage) {
         // Reduce enemy health
-        console.log("damage after", damage);
-        console.log("attack enemy", this.enemy);
-        console.log("this damage", this.currentPlayerAttack.damage);
-        console.log("player attacks ,player", this.playerCurrentHuman.health);
         this.enemy.health -= damage;
 
         // Update enemy health bar display
@@ -561,7 +613,7 @@ export class Fight extends Phaser.Scene {
             });
         } else {
             // Inform the player if they have only one human in the inventory
-            console.log("You have only one human in your inventory.");
+            // console.log("You have only one human in your inventory.");
         }
     }
 
@@ -708,7 +760,7 @@ export class Fight extends Phaser.Scene {
             this.returnToGameScene();
         } else {
             this.disableButtons();
-            console.log("miss");
+            // console.log("miss");
             this.computerAttack();
             this.enableButtons();
         }
@@ -716,6 +768,7 @@ export class Fight extends Phaser.Scene {
 
     returnToGameScene() {
         // Fade out the camera
+        this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
                 // Retrieve player position from the data object
@@ -729,7 +782,7 @@ export class Fight extends Phaser.Scene {
                 } else {
                     console.error("Game scene or player not found.");
                 }
-
+                this.music.stop();
                 // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
