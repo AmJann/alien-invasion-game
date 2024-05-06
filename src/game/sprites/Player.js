@@ -68,7 +68,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     loadPlayerData() {
         const data = localStorage.getItem("playerData");
         return data ? JSON.parse(data) : null;
-
+    }
     drawWeapon(x, y, obj) {
         
 
