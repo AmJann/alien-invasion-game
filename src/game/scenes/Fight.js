@@ -566,13 +566,10 @@ export class Fight extends Phaser.Scene {
             );
             switchHumanContainer.add(background);
 
-            // Calculate the vertical spacing between each name
             const verticalSpacing = 30;
 
-            // Calculate the maximum number of names that can fit vertically within the container
             const maxNames = Math.floor(containerHeight / verticalSpacing);
 
-            // Iterate over the inventory, limiting the loop to the maximum number of names
             this.player.inventory.slice(0, maxNames).forEach((human, index) => {
                 // Calculate the y-coordinate for the current text element
                 const yPos =
@@ -589,21 +586,18 @@ export class Fight extends Phaser.Scene {
                     })
                     .setInteractive();
 
-                // Disable interaction if health is zero
                 if (isDisabled) {
                     humanText.disableInteractive();
                 }
-
-                // Add click event to switch to the selected human
                 humanText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
 
                     switchHumanContainer.destroy();
-                    // Load new human image
+
                     this.loadHumanImage(human);
 
                     this.playerNameText.setText(human.name);
-                    // Update player health and health bar
+
                     this.updatePlayerHealth();
 
                     this.computerAttack();
@@ -612,8 +606,7 @@ export class Fight extends Phaser.Scene {
                 switchHumanContainer.add(humanText);
             });
         } else {
-            // Inform the player if they have only one human in the inventory
-            // console.log("You have only one human in your inventory.");
+            console.log("You have only one human in your inventory.");
         }
     }
 
