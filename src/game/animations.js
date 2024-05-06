@@ -80,18 +80,18 @@ export function createAnimations(anims = Animations.anims) {
             prefix: "goblin_attack_",
             suffix: ".png",
         }),
-        repeat: 1,
+        repeat: 0,
         frameRate: 12,
     });
     anims.create({
         key: "player-attack-left",
         frames: anims.generateFrameNames("player", {
             start: 1,
-            end: 8,
+            end: 9,
             prefix: "goblin_attack_left_",
             suffix: ".png",
         }),
-        repeat: 1,
+        repeat: 0,
         frameRate: 12,
     });
 
