@@ -115,7 +115,7 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
-      
+
         const player2 = (this.player2 = this.physics.add.sprite(
             350,
             400,
@@ -152,7 +152,6 @@ export class Game extends Scene {
         this.physics.add.collider(this.human, bridgePosts);
 
         // set collisions between NPC and player + world
-
         this.physics.add.collider(this.human, this.player.weapon, () => {
             console.log("A HIT A HIT");
             this.player.weapon.setPosition(-50, -50);
@@ -204,7 +203,6 @@ export class Game extends Scene {
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true);
 
-
         // create all player, NPC animations
         createAnimations(this.anims);
 
@@ -238,7 +236,14 @@ export class Game extends Scene {
                 enemy.anims.play("human-walk-right");
             }
             enemy.body.onCollide = true;
-
+            if (
+                enemy.body.x <= 6 ||
+                enemy.body.x > 794 ||
+                enemy.body.y < 6 ||
+                enemy.body.x > 760
+            ) {
+                enemy.changeDirection();
+            }
             this.physics.add.collider(
                 enemy,
                 waterLayer,
@@ -310,8 +315,6 @@ export class Game extends Scene {
                 undefined,
                 this
             );
-
-
             this.physics.add.collider(enemy, this.player.weapon, () => {
                 console.log("A HIT A HIT");
 
@@ -339,7 +342,6 @@ export class Game extends Scene {
                 });
             });
         }
-
         EventBus.emit("current-scene-ready", this);
     }
 
@@ -347,14 +349,12 @@ export class Game extends Scene {
         this.scene.start("GameOver");
     }
 
-
     // Not currently used but an option
     onNPCZoneEnter() {
         // what happens when player enters NPC Zone
         // shake the world
 
         this.cameras.main.flash(300);
-
         let playerX = this.player.x;
         let playerY = this.player.y;
         this.zoneHuman = new humanSprite(
@@ -367,7 +367,6 @@ export class Game extends Scene {
         this.zoneHuman.body.setSize(22, 20);
         this.zoneHuman.setPushable(false);
     }
-
     // changeScene() {
     //     this.scene.start("GameOver");
     // }
