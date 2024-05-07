@@ -22,6 +22,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.weapon.setActive(true).setVisible(true);
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
         this.inventory = [
             new Clown(),
             new Scientist(),
