@@ -51,6 +51,7 @@ export class Game extends Scene {
             atlas: "humans",
             frame: "longhair_idle_1.png",
         });
+        this.load.audio('playerAttack',  import.meta.env.BASE_URL + 'assets/sound/17_orc_atk_sword_2.wav')
     }
 
     create() {
@@ -58,7 +59,7 @@ export class Game extends Scene {
             "gameTiles",
             import.meta.env.BASE_URL + "assets/gameTiles.png"
         );
-
+        this.sound.add('playerAttack')
         const map = this.make.tilemap({
             key: "alienMap",
             tileWidth: 16,
