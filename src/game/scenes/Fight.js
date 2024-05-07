@@ -772,6 +772,7 @@ export class Fight extends Phaser.Scene {
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
                     gameScene.player.setPosition(playerX, playerY);
+                    gameScene.player.currentState = 'walking'
                 } else {
                     console.error("Game scene or player not found.");
                 }
