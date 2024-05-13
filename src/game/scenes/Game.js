@@ -107,14 +107,7 @@ export class Game extends Scene {
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
 
-        const player2 = (this.player2 = this.physics.add.sprite(
-            350,
-            400,
-            "player",
-            "goblin_hurt_1.png"
-        ));
-        this.player2.body.setSize(12, 16);
-
+       
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -168,38 +161,48 @@ export class Game extends Scene {
         ///////////
         let farmerX = Math.RND.between(213,363)
         let farmerY = Math.RND.between(276, 363 )
-        const farmer = (this.farmer = new humanSprite(this, farmerX, farmerY, "humans",
+        this.farmer = new humanSprite(this, farmerX, farmerY, "humans",
             "base_idle_1.png"
-        ));
+        )
 
         let houseNPCX = Math.RND.between(196 ,318)
         let houseNPCY = Math.RND.between(117,131 )
-        const houseNPC = (this.houseNPC = new humanSprite(this, houseNPCX, houseNPCY, "humans",
+        this.houseNPC = new humanSprite(this, houseNPCX, houseNPCY, "humans",
             "base_idle_1.png"
-        ));
+        )
 
+        let fieldNPCX = Math.RND.between(110 ,360)
+        let fieldNPCY = Math.RND.between(450, 660 )
+        this.fieldNPC = new humanSprite(this, fieldNPCX, fieldNPCY, "humans",
+            "base_idle_1.png"
+        )
 
-        // for (var i = 0; i < 12; i++) {
-        //     var x = Math.RND.between(0, map.widthInPixels);
-        //     var y = Math.RND.between(0, map.heightInPixels);
-        //     // parameters are x, y, width, height
-        //     //this.spawns.create(x, y, 65, 65);
-        //     let enemy = (this.enemy = new humanSprite(
-        //         this,
-        //         x,
-        //         y,
-        //         "humans",
-        //         "base_idle_1.png"
-        //     ));
-            // enemy.setSize(12, 15);
-            // enemy.setPushable(false);
-            // enemy.setCollideWorldBounds(true);
+        let forestNPCX = Math.RND.between(650 ,795)
+        let forestNPCY = Math.RND.between(465, 650 )
+        this.forestNPC = new humanSprite(this, forestNPCX, forestNPCY, "humans",
+            "base_idle_1.png"
+        )
+        let lakeNPCX = Math.RND.between(510 ,758)
+        let lakeNPCY = Math.RND.between(340, 386 )
+        this.lakeNPC = new humanSprite(this, lakeNPCX, lakeNPCY, "humans",
+            "base_idle_1.png"
+        )
+        let roadNPCX = Math.RND.between(25 , 382)
+        let roadNPCY = Math.RND.between(395, 440)
+        this.roadNPC = new humanSprite(this, roadNPCX, roadNPCY, "humans",
+            "base_idle_1.png"
+        )
+        let northRoadNPCX = Math.RND.between(388 ,430)
+        let northRoadNPCY = Math.RND.between(130,  390)
+        this.northRoadNPC = new humanSprite(this, northRoadNPCX, northRoadNPCY, "humans",
+            "base_idle_1.png"
+        )
+        let southRoadNPCX = Math.RND.between(380 ,430)
+        let southRoadNPCY = Math.RND.between(380,715  )
+        this.southRoadNPC = new humanSprite(this, southRoadNPCX, southRoadNPCY, "humans",
+            "base_idle_1.png"
+        )
 
-            // if (enemy.facing === "left") {
-            //     enemy.anims.play("human-walk-left");
-            // } else {
-            //     enemy.anims.play("human-walk-right");
-            // }}
 
         EventBus.emit("current-scene-ready", this);
     }
