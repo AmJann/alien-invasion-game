@@ -9,6 +9,9 @@ export class humanSprite extends Physics.Arcade.Sprite {
         this.direction = 1;
         this.facing = "right";
         this.currentState = 'walking';
+        this.projectile = this.scene.physics.add.sprite(-50, -50);
+        this.projectile.setSize(8, 8);
+        this.projectile.setActive(true).setVisible(true);
 
         //this.setScale(2);
         scene.physics.add.existing(this);
