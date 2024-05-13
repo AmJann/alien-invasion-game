@@ -882,20 +882,18 @@ export class Fight extends Phaser.Scene {
     }
 
     showMessage(message) {
-        // Create text object
         const text = this.add
             .text(400, 100, message, { fontSize: "32px", fill: "#000000" })
             .setOrigin(0.5)
-            .setDepth(1000); // Ensure it's above everything else
-        // Fade out after a delay
+            .setDepth(1000);
         this.tweens.add({
             targets: text,
             alpha: { from: 1, to: 0 },
             duration: 1000,
             ease: "Linear",
-            delay: 2000, // Delay before fading out
+            delay: 2000,
             onComplete: () => {
-                text.destroy(); // Clean up after fading out
+                text.destroy();
             },
         });
     }
@@ -966,14 +964,18 @@ export class Fight extends Phaser.Scene {
     }
 
     run() {
+        this.disableButtons();
         let randomNum = Math.floor(Math.random() * 11);
         if (randomNum > 5) {
-            this.returnToGameScene();
+            this.showMessage("You fled ...");
+            setTimeout(() => {
+                this.returnToGameScene();
+            }, 2500);
         } else {
-            this.disableButtons();
-            // console.log("miss");
-            this.computerAttack();
-            this.enableButtons();
+            this.showMessage("Failed to escape");
+            setTimeout(() => {
+                this.computerAttack();
+            }, 2500);
         }
     }
 
@@ -990,7 +992,7 @@ export class Fight extends Phaser.Scene {
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
                     gameScene.player.setPosition(playerX, playerY);
-                    gameScene.player.currentState = 'walking'
+                    gameScene.player.currentState = "walking";
                 } else {
                     console.error("Game scene or player not found.");
                 }
