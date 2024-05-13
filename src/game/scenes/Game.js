@@ -115,11 +115,7 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 3e3c97179a9d4de1a766ea96b9eb5e7dc7ec23f9
         const player2 = (this.player2 = this.physics.add.sprite(
             350,
             400,
@@ -208,10 +204,6 @@ export class Game extends Scene {
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3e3c97179a9d4de1a766ea96b9eb5e7dc7ec23f9
         // create all player, NPC animations
         createAnimations(this.anims);
 
@@ -318,10 +310,6 @@ export class Game extends Scene {
                 this
             );
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3e3c97179a9d4de1a766ea96b9eb5e7dc7ec23f9
             this.physics.add.collider(enemy, this.player.weapon, () => {
                 console.log("A HIT A HIT");
 
@@ -357,10 +345,6 @@ export class Game extends Scene {
         this.scene.start("GameOver");
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3e3c97179a9d4de1a766ea96b9eb5e7dc7ec23f9
     // Not currently used but an option
     onNPCZoneEnter() {
         // what happens when player enters NPC Zone

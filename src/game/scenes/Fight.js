@@ -50,13 +50,13 @@ export class Fight extends Phaser.Scene {
         this.load.audio(
             "runRiot",
             import.meta.env.BASE_URL +
-                "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
+                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
         );
 
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
 
-        if (this.enemy.health <= 0) {
+        if (this.enemy.health < this.enemy.maxHealth) {
             this.enemy.health = this.enemy.maxHealth;
             // console.log(this.enemy.health);
         }
