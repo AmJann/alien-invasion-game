@@ -137,7 +137,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // player attack right
-        if (this.cursors.space.isDown) {
+        if (this.cursors.space.isDown && this.currentState != 'fightScene') {
             this.currentState = "attacking";
             this.swingWeapon(this.currentDirection);
             this.scene.time.delayedCall(350, () => {
