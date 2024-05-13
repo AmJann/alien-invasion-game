@@ -66,14 +66,14 @@ export class Game extends Scene {
         });
         this.sys.animatedTiles.init(map);
 
-        const tileset = map.addTilesetImage("gameTiles", "gameTiles");
+        const tileset = this.tileset = map.addTilesetImage("gameTiles", "gameTiles");
         //const groundLayer =
         map.createLayer("groundLayer", tileset, 0, 0);
-        const waterLayer = map.createLayer("waterLayer", tileset, 0, 0);
+        const waterLayer = this.waterLayer = map.createLayer("waterLayer", tileset, 0, 0);
         //const groundEdgesLayer =
         map.createLayer("groundEdgesLayer", tileset, 0, 0);
-        const moundsRocks = map.createLayer("moundsRocks", tileset, 0, 0);
-        const elevatedGroundLayer = map.createLayer(
+        const moundsRocks = this.moundsRocks = map.createLayer("moundsRocks", tileset, 0, 0);
+        const elevatedGroundLayer = this.elevateGroundLayer = map.createLayer(
             "elevatedGroundLayer",
             tileset,
             0,
@@ -81,25 +81,17 @@ export class Game extends Scene {
         );
         // const bridgeLadder =
         map.createLayer("bridgeLadder", tileset, 0, 0);
-        const bridgePosts = map.createLayer("bridgePosts", tileset, 0, 0);
-        const crops = map.createLayer("crops", tileset, 0, 0);
-        const houseLayer1 = map.createLayer("houseLayer1", tileset, 0, 0);
-        const houseLayer2 = map.createLayer("houseLayer2", tileset, 0, 0);
-        const treeLayer = map.createLayer("treeLayer", tileset, 0, 0);
-        const fenceLayer = map.createLayer("fenceLayer", tileset, 0, 0);
+        const bridgePosts = this.bridgePosts = map.createLayer("bridgePosts", tileset, 0, 0);
+        const crops = this.crops =  map.createLayer("crops", tileset, 0, 0);
+        const houseLayer1 = this.houseLayer1 = map.createLayer("houseLayer1", tileset, 0, 0);
+        const houseLayer2 = this.houseLayer2 = map.createLayer("houseLayer2", tileset, 0, 0);
+        const treeLayer = this.treeLayer = map.createLayer("treeLayer", tileset, 0, 0);
+        const fenceLayer = this.fenceLayer = map.createLayer("fenceLayer", tileset, 0, 0);
         //const flowers =
         map.createLayer("flowers", tileset, 0, 0);
 
         this.animatedTiles.init(map);
-        const human = (this.human = this.physics.add.sprite(
-            400,
-            400,
-            "humans",
-            "base_idle_1.png"
-        ));
-
-        this.human.body.setSize(22, 20);
-        human.setPushable(false);
+        
         //adds player with physics
 
         const player = (this.player = new Player(
@@ -116,13 +108,7 @@ export class Game extends Scene {
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
       
-        const player2 = (this.player2 = this.physics.add.sprite(
-            350,
-            400,
-            "player",
-            "goblin_hurt_1.png"
-        ));
-        this.player2.body.setSize(12, 16);
+        
 
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -138,46 +124,8 @@ export class Game extends Scene {
         this.physics.add.collider(this.player, elevatedGroundLayer);
         this.physics.add.collider(this.player, bridgePosts);
 
-        this.physics.add.collider(this.human, waterLayer);
-        this.physics.add.collider(this.human, houseLayer1);
-        this.physics.add.collider(this.human, houseLayer2);
-        this.physics.add.collider(this.human, treeLayer);
-        this.physics.add.collider(this.human, moundsRocks);
-        this.physics.add.collider(this.human, fenceLayer),
-            () => {
-                console.log("hit the fence");
-            };
-        this.physics.add.collider(this.human, crops);
-        this.physics.add.collider(this.human, elevatedGroundLayer);
-        this.physics.add.collider(this.human, bridgePosts);
-
-        // set collisions between NPC and player + world
-
-        this.physics.add.collider(this.human, this.player.weapon, () => {
-            console.log("A HIT A HIT");
-            this.player.weapon.setPosition(-50, -50);
-
-            //fadeout to fight scene
-            this.cameras.main.fadeOut(800, 0, 0, 0, (camera, progress) => {
-                if (progress === 1) {
-                    //passes reference to fight scene and fixes blue border issue with fight scene
-                    this.scene.launch("Fight", {
-                        playerPosition: this.playerPosition,
-                        player: this.player,
-                    });
-                }
-            });
-        });
-
-        this.physics.add.collider(this.human, waterLayer);
-        this.physics.add.collider(this.human, houseLayer1);
-        this.physics.add.collider(this.human, houseLayer2);
-        this.physics.add.collider(this.human, treeLayer);
-        this.physics.add.collider(this.human, moundsRocks);
-        this.physics.add.collider(this.human, fenceLayer);
-        this.physics.add.collider(this.human, crops);
-        this.physics.add.collider(this.human, elevatedGroundLayer);
-        this.physics.add.collider(this.human, bridgePosts);
+        
+       
 
         //sets collisions by tile id in layers
         waterLayer.setCollisionBetween(1, 3000);
@@ -208,8 +156,7 @@ export class Game extends Scene {
         // create all player, NPC animations
         createAnimations(this.anims);
 
-        player2.anims.play("player-hurt-right");
-        human.anims.play("human-walk-right");
+       
         this.cameras.main.shake(900, 0.0007);
 
         /////////////
@@ -239,106 +186,7 @@ export class Game extends Scene {
             }
             enemy.body.onCollide = true;
 
-            this.physics.add.collider(
-                enemy,
-                waterLayer,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                houseLayer1,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                houseLayer2,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                treeLayer,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                moundsRocks,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                fenceLayer,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                crops,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                elevatedGroundLayer,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-            this.physics.add.collider(
-                enemy,
-                bridgePosts,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-
-            this.physics.add.collider(
-                enemy,
-                this.player,
-                enemy.handleCollision,
-                undefined,
-                this
-            );
-
-
-            this.physics.add.collider(enemy, this.player.weapon, () => {
-                console.log("A HIT A HIT");
-                
-                enemy.setVelocity(0, 0);
-                enemy.currentState = "smacked";
-                enemy.killNPC();
-                
-                //fadeout to fight scene
-                this.time.delayedCall(800, () => {
-                    this.player.currentState = 'fightScene'
-                    this.cameras.main.fadeOut(
-                        800,
-                        0,
-                        0,
-                        0,
-                        (camera, progress) => {
-                            if (progress === 1) {
-                                //passes reference to fight scene and fixes blue border issue with fight scene
-                                this.scene.launch("Fight", {
-                                    playerPosition: this.playerPosition,
-                                    player: this.player,
-                                });
-                            }
-                        }
-                    );
-                });
-            });
+            
         }
 
         EventBus.emit("current-scene-ready", this);
@@ -377,10 +225,7 @@ export class Game extends Scene {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
         // keeps players and NPCs from moving when they collide
-        this.human.setVelocityX(0);
-        this.human.setVelocityY(0);
-        this.player2.setVelocityX(0);
-        this.player2.setVelocityY(0);
+       
 
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");

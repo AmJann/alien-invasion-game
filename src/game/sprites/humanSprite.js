@@ -27,6 +27,104 @@ export class humanSprite extends Physics.Arcade.Sprite {
             this
         );
         //scene.physics.world.on('collision', this.handleCollision, this);
+        
+        scene.physics.add.collider(
+            this,
+            scene.waterLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.houseLayer1,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.houseLayer2,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.treeLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.moundsRocks,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.fenceLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.scenecrops,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.elevatedGroundLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.bridgePosts,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.player,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(this, scene.player.weapon, () => {
+            console.log("A HIT A HIT");
+            
+            this.setVelocity(0, 0);
+            this.currentState = "smacked";
+            this.killNPC();
+            
+            //fadeout to fight scene
+            scene.time.delayedCall(800, () => {
+                scene.player.currentState = 'fightScene'
+                scene.cameras.main.fadeOut(
+                    800,
+                    0,
+                    0,
+                    0,
+                    (camera, progress) => {
+                        if (progress === 1) {
+                            //passes reference to fight scene and fixes blue border issue with fight scene
+                            scene.launch("Fight", {
+                                playerPosition: scene.playerPosition,
+                                player: scene.player,
+                            });
+                        }
+                    }
+                );
+            });
+        });
     }
     destroy(fromScene) {
         this.moveEvent.destroy();
