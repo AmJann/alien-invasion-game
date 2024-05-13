@@ -107,8 +107,14 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
-      
-        
+
+        const player2 = (this.player2 = this.physics.add.sprite(
+            350,
+            400,
+            "player",
+            "goblin_hurt_1.png"
+        ));
+        this.player2.body.setSize(12, 16);
 
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -151,7 +157,6 @@ export class Game extends Scene {
         this.cameras.main.roundPixels = true;
         // prevent player from walking off of the map
         player.setCollideWorldBounds(true);
-
 
         // create all player, NPC animations
         createAnimations(this.anims);
@@ -203,7 +208,6 @@ export class Game extends Scene {
     changeScene() {
         this.scene.start("GameOver");
     }
-
 
     // Not currently used but an option
     onNPCZoneEnter() {

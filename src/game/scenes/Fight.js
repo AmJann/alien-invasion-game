@@ -7,7 +7,6 @@ import {
     NuckChorris,
 } from "../humans";
 import { Player } from "../sprites/Player.js";
-// import { runRiot } from "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -31,6 +30,9 @@ export class Fight extends Phaser.Scene {
         this.playerCurrentHuman = null;
         this.currentPlayerAttack = null;
         this.music = null;
+        this.switchHumanContainer = null;
+        this.attackMenuContainer = null;
+        this.itemMenuContainer = null;
     }
 
     init(data) {
@@ -47,13 +49,14 @@ export class Fight extends Phaser.Scene {
     preload() {
         this.load.audio(
             "runRiot",
-            "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
+            import.meta.env.BASE_URL +
+                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
         );
 
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
 
-        if (this.enemy.health <= 0) {
+        if (this.enemy.health < this.enemy.maxHealth) {
             this.enemy.health = this.enemy.maxHealth;
             // console.log(this.enemy.health);
         }
@@ -129,7 +132,7 @@ export class Fight extends Phaser.Scene {
     }
 
     create() {
-        // console.log(this.player);
+        console.log(this.player);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
 
@@ -265,10 +268,10 @@ export class Fight extends Phaser.Scene {
             "Switch Human",
             570,
             660,
-            () => this.switchHuman()
+            () => this.switch()
         );
         this.itemButton = this.createActionButton("Item", 400, 735, () =>
-            this.useItem()
+            this.createItemMenu()
         );
         this.runButton = this.createActionButton("Run", 570, 735, () =>
             this.run()
@@ -459,8 +462,22 @@ export class Fight extends Phaser.Scene {
 
     attack() {
         // Create and show the attack menu
+        if (this.attackMenuContainer) {
+            this.attackMenuContainer.destroy();
+            this.attackMenuContainer = null;
+        } else {
+            this.createAttackMenu();
+        }
 
-        this.createAttackMenu();
+        if (this.switchHumanContainer) {
+            this.switchHumanContainer.destroy();
+            this.switchHumanContainer = null;
+        }
+
+        if (this.itemMenuContainer) {
+            this.itemMenuContainer.destroy();
+            this.itemMenuContainer = null;
+        }
     }
 
     performAttack() {
@@ -551,10 +568,10 @@ export class Fight extends Phaser.Scene {
         if (this.player.inventory.length > 1) {
             // Define the dimensions of the container
             const containerWidth = 220;
-            const containerHeight = 170;
+            const containerHeight = 150;
 
             // Create a container to hold the list of humans
-            const switchHumanContainer = this.add.container(223, 675);
+            this.switchHumanContainer = this.add.container(228, 694);
 
             // Background for the list
             const background = this.add.rectangle(
@@ -564,9 +581,9 @@ export class Fight extends Phaser.Scene {
                 containerHeight,
                 0x333333
             );
-            switchHumanContainer.add(background);
+            this.switchHumanContainer.add(background);
 
-            const verticalSpacing = 30;
+            const verticalSpacing = 27;
 
             const maxNames = Math.floor(containerHeight / verticalSpacing);
 
@@ -592,7 +609,7 @@ export class Fight extends Phaser.Scene {
                 humanText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
 
-                    switchHumanContainer.destroy();
+                    this.switchHumanContainer.destroy();
 
                     this.loadHumanImage(human);
 
@@ -603,10 +620,28 @@ export class Fight extends Phaser.Scene {
                     this.computerAttack();
                 });
 
-                switchHumanContainer.add(humanText);
+                this.switchHumanContainer.add(humanText);
             });
         } else {
             console.log("You have only one human in your inventory.");
+        }
+    }
+
+    switch() {
+        if (this.switchHumanContainer) {
+            this.switchHumanContainer.destroy();
+            this.switchHumanContainer = null;
+        } else {
+            this.switchHuman();
+        }
+        if (this.attackMenuContainer) {
+            this.attackMenuContainer.destroy();
+            this.attackMenuContainer = null;
+        }
+
+        if (this.itemMenuContainer) {
+            this.itemMenuContainer.destroy();
+            this.itemMenuContainer = null;
         }
     }
 
@@ -637,8 +672,18 @@ export class Fight extends Phaser.Scene {
                 ease: "Power2",
                 delay: 0,
                 onComplete: () => {
-                    // Create and show the switch human menu
-                    this.createSwitchHumanMenu();
+                    const remainingHumans = this.player.inventory.filter(
+                        (human) => human.health > 0
+                    );
+                    if (remainingHumans.length === 0) {
+                        this.showMessage("All your humans are defeated!");
+
+                        setTimeout(() => {
+                            this.returnToGameScene();
+                        }, 2000);
+                    } else {
+                        this.createSwitchHumanMenu();
+                    }
                 },
             });
         }
@@ -744,7 +789,180 @@ export class Fight extends Phaser.Scene {
     }
 
     useItem() {
-        // use item logic here
+        const captureProbability = this.calculateCaptureProbability();
+
+        const randomNum = Math.random();
+
+        if (randomNum < captureProbability) {
+            this.captureHuman(this.enemy);
+        } else {
+            this.flashGreenPulse();
+
+            setTimeout(() => {
+                this.showMessage("Failed to capture the human.");
+            }, 6500);
+
+            setTimeout(() => {
+                this.computerAttack();
+            }, 8000);
+        }
+        // this.itemMenuContainer.destroy();
+        this.disableButtons;
+    }
+
+    createItemMenu() {
+        if (this.switchHumanContainer) {
+            this.switchHumanContainer.destroy();
+            this.switchHumanContainer = null;
+        }
+
+        if (this.itemMenuContainer) {
+            this.itemMenuContainer.destroy();
+            this.itemMenuContainer = null;
+        } else {
+            this.itemMenuContainer = this.add.container(223, 695);
+            const menuBackground = this.add.rectangle(0, 0, 210, 150, 0x333333);
+            this.itemMenuContainer.add(menuBackground);
+
+            this.renderItemButtons();
+        }
+
+        if (this.attackMenuContainer) {
+            this.attackMenuContainer.destroy();
+            this.attackMenuContainer = null;
+        }
+    }
+
+    renderItemButtons() {
+        this.player.items.forEach((item, index) => {
+            const verticalSpacing = 30;
+            const yPos =
+                -100 / 2 + verticalSpacing / 2 + index * verticalSpacing;
+
+            console.log("item", item);
+            let text = item.name;
+            if (item.name === "HypnoRay") {
+                text = `${item.name}: ${item.charge}`;
+            }
+            const button = this.createItemOption(0, yPos, text, () =>
+                this.useItem(item)
+            );
+            this.itemMenuContainer.add(button);
+        });
+    }
+
+    createItemOption(x, y, text, callback) {
+        const button = this.add
+            .text(x, y, text, { fill: "#ffffff" })
+            .setInteractive()
+            .on("pointerdown", callback);
+
+        // Style the button
+        button.setPadding(15, 10, 15, 10);
+        button.setBackgroundColor("#333333");
+        button.setStroke("#ffffff", 1);
+
+        // Center the button's origin
+        button.setOrigin(0.5);
+
+        // Add hover effect
+        button.on("pointerover", () => button.setBackgroundColor("#555555"));
+        button.on("pointerout", () => button.setBackgroundColor("#333333"));
+
+        return button;
+    }
+
+    calculateCaptureProbability() {
+        const maxHealth = this.enemy.maxHealth;
+        const remainingHealth = this.enemy.health;
+        const captureProbability = 1 - remainingHealth / maxHealth;
+
+        const maxProbability = 0.8;
+        return Math.min(captureProbability, maxProbability);
+    }
+
+    showMessage(message) {
+        // Create text object
+        const text = this.add
+            .text(400, 100, message, { fontSize: "32px", fill: "#000000" })
+            .setOrigin(0.5)
+            .setDepth(1000); // Ensure it's above everything else
+        // Fade out after a delay
+        this.tweens.add({
+            targets: text,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: "Linear",
+            delay: 2000, // Delay before fading out
+            onComplete: () => {
+                text.destroy(); // Clean up after fading out
+            },
+        });
+    }
+
+    captureHuman() {
+        this.flashGreenPulse();
+
+        const item = this.player.items[0];
+        console.log("item", item);
+
+        if (item.name === "HypnoRay") {
+            if (item.charge >= 5) {
+                if (this.player.inventory.length < 5) {
+                    console.log("human captured");
+
+                    setTimeout(() => {
+                        this.enemyImg = this.add.image(
+                            550,
+                            290,
+                            this.enemy.name,
+                            0
+                        );
+                    }, 6000);
+
+                    item.captureHuman(this.enemy, this.player);
+                    setTimeout(() => {
+                        this.showMessage("Human captured successfully!");
+                    }, 6500);
+                    setTimeout(() => {
+                        this.returnToGameScene();
+                    }, 10000);
+                } else {
+                    setTimeout(() => {
+                        this.showMessage("You already have 5 humans");
+                    }, 6500);
+                    setTimeout(() => {
+                        this.returnToGameScene();
+                    }, 10000);
+                }
+            } else {
+                this.showMessage("Hypno Ray is out of charges!!");
+            }
+        } else {
+            setTimeout(() => {
+                this.showMessage("Failed to capture the human.");
+            }, 6500);
+
+            this.computerAttack();
+        }
+    }
+
+    flashGreenPulse() {
+        const flash = this.add
+            .rectangle(400, 400, 800, 800, 0x00ff00)
+            .setAlpha(0)
+            .setDepth(1000); // Ensure it's above everything else
+        this.tweens.add({
+            targets: flash,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: "Linear",
+            repeat: 2,
+            yoyo: true,
+            onComplete: () => {
+                flash.destroy();
+            },
+        });
     }
 
     run() {
