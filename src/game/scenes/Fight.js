@@ -790,7 +790,7 @@ export class Fight extends Phaser.Scene {
 
     useItem() {
         const captureProbability = this.calculateCaptureProbability();
-
+        this.disableButtons();
         const randomNum = Math.random();
 
         if (randomNum < captureProbability) {
