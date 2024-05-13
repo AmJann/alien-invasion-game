@@ -9,7 +9,6 @@ export class Game extends Scene {
     constructor() {
         super("Game");
         this.player;
-        this.human;
         this.playerPosition = { x: 300, y: 400 };
     }
     preload() {
@@ -73,7 +72,7 @@ export class Game extends Scene {
         //const groundEdgesLayer =
         map.createLayer("groundEdgesLayer", tileset, 0, 0);
         const moundsRocks = this.moundsRocks = map.createLayer("moundsRocks", tileset, 0, 0);
-        const elevatedGroundLayer = this.elevateGroundLayer = map.createLayer(
+        const elevatedGroundLayer = this.elevatedGroundLayer = map.createLayer(
             "elevatedGroundLayer",
             tileset,
             0,
