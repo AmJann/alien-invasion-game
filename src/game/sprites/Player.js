@@ -7,12 +7,20 @@ import {
     NuckChorris,
     humans,
 } from "../humans";
+import { HypnoRay } from "./captureItem";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
-        
-        this.inventory = [humans[1]];
+
+        this.inventory = [
+            new Clown(),
+            new Scientist(),
+            // new Firefighter(),
+            // new Farmer(),
+            // new NuckChorris(),
+        ];
+        this.items = [new HypnoRay()];
         this.currentDirection = "right";
         this.currentState = "walking";
         this.cursors = this.scene.input.keyboard.createCursorKeys();
@@ -22,20 +30,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.weapon.setActive(true).setVisible(true);
         scene.add.existing(this);
         scene.physics.add.existing(this);
-
-        this.inventory = [
-            new Clown(),
-            new Scientist(),
-            new Firefighter(),
-            new Farmer(),
-            new NuckChorris(),
-        ];
-
     }
 
     addHumanToInventory(human) {
         if (this.inventory.length <= 5) {
             this.inventory.push(human);
+        } else {
+            console.log("You already have 5 humans");
         }
     }
 
@@ -60,7 +61,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return this.inventory;
     }
 
-
     savePlayerData() {
         localStorage.setItem("playerData", JSON.stringify(this.inventory));
     }
@@ -70,8 +70,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return data ? JSON.parse(data) : null;
     }
     drawWeapon(x, y, obj) {
-        
-
         obj.setPosition(x, y);
 
         //setTimeout(this.sheathWeapon, 250, obj)
