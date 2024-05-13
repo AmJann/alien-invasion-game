@@ -693,6 +693,7 @@ export class Fight extends Phaser.Scene {
     }
 
     createSwitchHumanMenu() {
+        this.disableButtons();
         // Create a container for the switch human menu with 0.5 opacity
         this.switchHumanMenuContainer = this.add.container(0, 0);
         // Set opacity to 0.5
@@ -721,7 +722,6 @@ export class Fight extends Phaser.Scene {
 
         this.switchHumanMenuContainer.add(this.defeatedText);
 
-        // Iterate over the inventory to display options for switching humans
         this.player.inventory.forEach((human, index) => {
             // Calculate the y-coordinate for the current option
             const yPos = 200 + index * 75;
@@ -738,20 +738,16 @@ export class Fight extends Phaser.Scene {
                 );
                 optionText.setInteractive();
                 optionText.setOrigin(0.5);
-                // Add click event to switch to the selected human
+
                 optionText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
 
-                    // Destroy the defeatedText
                     this.defeatedText.destroy();
 
-                    // Load new human image
                     this.loadHumanImage(human);
 
-                    // Update player name text
                     this.playerNameText.setText(human.name);
 
-                    // Update player health and health bar
                     this.updatePlayerHealth();
 
                     this.switchHumanMenuContainer.destroy();
@@ -762,7 +758,6 @@ export class Fight extends Phaser.Scene {
             }
         });
 
-        // Add the switch human menu container to the scene
         this.add.existing(this.switchHumanMenuContainer);
     }
 
