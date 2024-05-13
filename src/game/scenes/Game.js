@@ -162,32 +162,40 @@ export class Game extends Scene {
         /////////////
         // Working NPC Code
         ///////////
+        let farmerX = Math.RND.between(213,363)
+        let farmerY = Math.RND.between(276, 363 )
+        const farmer = (this.farmer = new humanSprite(this, farmerX, farmerY, "humans",
+            "base_idle_1.png"
+        ));
 
-        for (var i = 0; i < 12; i++) {
-            var x = Math.RND.between(0, map.widthInPixels);
-            var y = Math.RND.between(0, map.heightInPixels);
-            // parameters are x, y, width, height
-            //this.spawns.create(x, y, 65, 65);
-            let enemy = (this.enemy = new humanSprite(
-                this,
-                x,
-                y,
-                "humans",
-                "base_idle_1.png"
-            ));
-            enemy.setSize(12, 15);
-            enemy.setPushable(false);
-            enemy.setCollideWorldBounds(true);
+        let houseNPCX = Math.RND.between(196 ,318)
+        let houseNPCY = Math.RND.between(117,131 )
+        const houseNPC = (this.houseNPC = new humanSprite(this, houseNPCX, houseNPCY, "humans",
+            "base_idle_1.png"
+        ));
 
-            if (enemy.facing === "left") {
-                enemy.anims.play("human-walk-left");
-            } else {
-                enemy.anims.play("human-walk-right");
-            }
-            enemy.body.onCollide = true;
 
-            
-        }
+        // for (var i = 0; i < 12; i++) {
+        //     var x = Math.RND.between(0, map.widthInPixels);
+        //     var y = Math.RND.between(0, map.heightInPixels);
+        //     // parameters are x, y, width, height
+        //     //this.spawns.create(x, y, 65, 65);
+        //     let enemy = (this.enemy = new humanSprite(
+        //         this,
+        //         x,
+        //         y,
+        //         "humans",
+        //         "base_idle_1.png"
+        //     ));
+            // enemy.setSize(12, 15);
+            // enemy.setPushable(false);
+            // enemy.setCollideWorldBounds(true);
+
+            // if (enemy.facing === "left") {
+            //     enemy.anims.play("human-walk-left");
+            // } else {
+            //     enemy.anims.play("human-walk-right");
+            // }}
 
         EventBus.emit("current-scene-ready", this);
     }
@@ -225,7 +233,7 @@ export class Game extends Scene {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
         // keeps players and NPCs from moving when they collide
-       
+        console.log(this.player.x, this.player.y)
 
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");

@@ -21,6 +21,10 @@ export class humanSprite extends Physics.Arcade.Sprite {
             },
             loop: true,
         });
+        this.setSize(12, 15);
+        this.setPushable(false);
+        this.setCollideWorldBounds(true);
+        this.body.onCollide = true;
         scene.physics.world.on(
             Physics.Arcade.Events.COLLIDE,
             this.handleCollision,
@@ -116,7 +120,8 @@ export class humanSprite extends Physics.Arcade.Sprite {
                     (camera, progress) => {
                         if (progress === 1) {
                             //passes reference to fight scene and fixes blue border issue with fight scene
-                            scene.launch("Fight", {
+                            console.log(scene)
+                            scene.scene.launch("Fight", {
                                 playerPosition: scene.playerPosition,
                                 player: scene.player,
                             });
