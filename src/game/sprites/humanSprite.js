@@ -128,6 +128,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
                             scene.scene.launch("Fight", {
                                 playerPosition: scene.playerPosition,
                                 player: scene.player,
+                                npcPositions : scene.npcPositions
                             });
                         }
                     }
@@ -251,4 +252,5 @@ export class humanSprite extends Physics.Arcade.Sprite {
     updatePosition(scene) {
         scene.npcPositions[this.id] = {xPos: this.body.x, yPos: this.body.y}
     }
+    
 }

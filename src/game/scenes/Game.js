@@ -12,6 +12,7 @@ export class Game extends Scene {
         this.playerPosition = { x: 300, y: 400 };
         this.npcPositions = {}
         this.npcArray = []
+        this.createInitialNPCPositions = true
     }
     preload() {
         this.load.image(
@@ -161,53 +162,58 @@ export class Game extends Scene {
         /////////////
         // Working NPC Code
         ///////////
-        
+        if (this.createInitialNPCPositions) {
+            this.createInitialNPCPositions = false
+            this.npcPositions = {
+
+            }
+        }
         let farmerX = Math.RND.between(213,363)
         let farmerY = Math.RND.between(276, 363 )
-        this.farmer = new humanSprite(this, farmerX, farmerY, "humans",
+        this.farmer = new humanSprite(this, this.npcPositions['farmer'].xPos, this.npcPositions['farmer'].yPos, "humans",
             "base_idle_1.png", 'farmer'
         )
         
 
         let houseNPCX = Math.RND.between(196 ,318)
         let houseNPCY = Math.RND.between(117,131 )
-        this.houseNPC = new humanSprite(this, houseNPCX, houseNPCY, "humans",
+        this.houseNPC = new humanSprite(this, this.npcPositions['houseNPC'].xPos, this.npcPositions['houseNPC'].yPos, "humans",
             "base_idle_1.png", 'houseNPC'
         )
         
 
         let fieldNPCX = Math.RND.between(110 ,360)
         let fieldNPCY = Math.RND.between(450, 660 )
-        this.fieldNPC = new humanSprite(this, fieldNPCX, fieldNPCY, "humans",
+        this.fieldNPC = new humanSprite(this, this.npcPositions['fieldNPC'].xPos, this.npcPositions['fieldNPC'].yPos, "humans",
             "base_idle_1.png", 'fieldNPC'
         )
         
 
         let forestNPCX = Math.RND.between(650 ,795)
         let forestNPCY = Math.RND.between(465, 650 )
-        this.forestNPC = new humanSprite(this, forestNPCX, forestNPCY, "humans",
+        this.forestNPC = new humanSprite(this, this.npcPositions['forestNPC'].xPos, this.npcPositions['forestNPC'].yPos, "humans",
             "base_idle_1.png", 'forestNPC'
         )
         
 
         let lakeNPCX = Math.RND.between(510 ,758)
         let lakeNPCY = Math.RND.between(340, 386 )
-        this.lakeNPC = new humanSprite(this, lakeNPCX, lakeNPCY, "humans",
+        this.lakeNPC = new humanSprite(this, this.npcPositions['lakeNPC'].xPos, this.npcPositions['lakeNPC'].yPos, "humans",
             "base_idle_1.png", 'lakeNPC'
         )
         let roadNPCX = Math.RND.between(25 , 382)
         let roadNPCY = Math.RND.between(395, 440)
-        this.roadNPC = new humanSprite(this, roadNPCX, roadNPCY, "humans",
+        this.roadNPC = new humanSprite(this, this.npcPositions['roadNPC'].xPos, this.npcPositions['roadNPC'].yPos, "humans",
             "base_idle_1.png", 'roadNPC'
         )
         let northRoadNPCX = Math.RND.between(388 ,430)
         let northRoadNPCY = Math.RND.between(130,  390)
-        this.northRoadNPC = new humanSprite(this, northRoadNPCX, northRoadNPCY, "humans",
+        this.northRoadNPC = new humanSprite(this, this.npcPositions['northRoadNPC'].xPos, this.npcPositions['northRoadNPC'].yPos, "humans",
             "base_idle_1.png", 'northRoadNPC'
         )
         let southRoadNPCX = Math.RND.between(380 ,430)
         let southRoadNPCY = Math.RND.between(380,715  )
-        this.southRoadNPC = new humanSprite(this, southRoadNPCX, southRoadNPCY, "humans",
+        this.southRoadNPC = new humanSprite(this, this.npcPositions['southRoadNPC'].xPos, this.npcPositions['southRoadNPC'].yPos, "humans",
             "base_idle_1.png", 'southRoadNPC'
         )
         this.npcArray = [this.farmer, this.houseNPC, this.fieldNPC, this.forestNPC, this.lakeNPC, this.roadNPC, this.northRoadNPC, this.southRoadNPC]
@@ -247,12 +253,16 @@ export class Game extends Scene {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
        
-        // keeps players and NPCs from moving when they collide
+        // updates the position of every NPC for transition to/from fight scene
         this.npcArray.forEach((npc) => {
             npc.updatePosition(this)
             
         });
-        console.log(this.npcPositions)
+        if (this.flag) {
+            console.log(this.npcPositions)
+            this.flag = false
+        }
+        // console.log(this.npcPositions)
 
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");

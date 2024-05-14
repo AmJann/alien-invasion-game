@@ -39,6 +39,7 @@ export class Fight extends Phaser.Scene {
         // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
+        this.npcPositions = data.npcPositions
     }
 
     debug() {
@@ -985,12 +986,16 @@ export class Fight extends Phaser.Scene {
                 // Retrieve player position from the data object
                 const playerX = this.playerPosition.x;
                 const playerY = this.playerPosition.y;
-
+                
                 // Set player position in the Game scene
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
                     gameScene.player.setPosition(playerX, playerY);
                     gameScene.player.currentState = 'walking'
+                    console.log(this.npcPositions)
+                    gameScene.npcArray.forEach((npc) => {
+                        npc.setPosition(this.npcPositions[npc.id].xPos, this.npcPositions[npc.id].yPos)
+                    })
                 } else {
                     console.error("Game scene or player not found.");
                 }
@@ -998,6 +1003,7 @@ export class Fight extends Phaser.Scene {
                 // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
+                    npcPositions: this.npcPositions
                 });
             }
         });
