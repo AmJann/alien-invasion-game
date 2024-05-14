@@ -7,6 +7,7 @@ import {
     NuckChorris,
 } from "../humans";
 import { Player } from "../sprites/Player.js";
+import { HypnoRay } from "../sprites/captureItem.js";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -70,30 +71,45 @@ export class Fight extends Phaser.Scene {
         };
 
         // Retrieve player data from local storage
+
         const playerData = this.player.loadPlayerData();
+        console.log(playerData);
 
         if (playerData) {
-            // Iterate over the saved inventory and recreate the humans
-            this.player.inventory = playerData.map((humanData) => {
-                // Use the mapping object to retrieve the class object based on the class name
-                const HumanClass = classMapping[humanData.name];
-                // Check if the class object exists in the mapping
-                if (HumanClass) {
-                    // Instantiate the class object
-                    return new HumanClass();
-                } else {
-                    // Handle case where class object is not found
-                    console.error(
-                        `Class object not found for class name: ${humanData.name}`
-                    );
-                    return null; // or handle differently based on your application's logic
-                }
-            });
+            this.player.inventory = playerData;
+            console.log("Player inventory:", this.player.inventory);
+
+            this.playerCurrentHuman =
+                this.player.inventory.find((human) => human.health > 0) ||
+                this.player.inventory[0];
+            console.log("Player current human:", this.playerCurrentHuman);
+            e;
+            const hypnoRayItem = this.player.items.find(
+                (item) => item.name === "HypnoRay"
+            );
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = playerData.hypnoRayCharge || 0;
+            }
+            console.log("HypnoRay item:", hypnoRayItem);
         }
-        this.playerCurrentHuman = this.player.inventory[0];
+
+        for (const human of this.player.inventory) {
+            if (human.health > 0) {
+                this.playerCurrentHuman = human;
+                break;
+            }
+        }
         if (this.playerCurrentHuman.health <= 0) {
-            this.playerCurrentHuman.health = this.playerCurrentHuman.maxHealth;
-            // console.log(this.playerCurrentHuman.health);
+            const remainingHumans = this.player.inventory.filter(
+                (human) => human.health > 0
+            );
+            if (remainingHumans.length === 0) {
+                this.showMessage("Humans are defeated, you flee");
+
+                setTimeout(() => {
+                    this.returnToGameScene();
+                }, 4000);
+            }
         }
 
         if (this.enemy.health <= 0) {
@@ -117,22 +133,27 @@ export class Fight extends Phaser.Scene {
             this.enemy.hurtImage.name,
             import.meta.env.BASE_URL + this.enemy.hurtImage.path
         );
-        this.load.image(
-            this.playerCurrentHuman.hurtImage.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman.hurtImage.path
-        );
-        this.load.image(
-            this.playerCurrentHuman.defeatImage.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman.defeatImage.path
-        );
-        this.load.image(
-            this.playerCurrentHuman.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman["mainImage"]
-        );
+        this.player.inventory.forEach((human) => {
+            this.load.image(
+                human.name,
+                import.meta.env.BASE_URL + human.mainImage
+            );
+            this.load.image(
+                human.defeatImage.name,
+                import.meta.env.BASE_URL + human.defeatImage.path
+            );
+            this.load.image(
+                human.hurtImage.name,
+                import.meta.env.BASE_URL + human.hurtImage.path
+            );
+        });
+
+        console.log(this.playerCurrentHuman);
     }
 
     create() {
-        console.log(this.player);
+        console.log(this.playerCurrentHuman);
+        console.log(this.enemy);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
 
@@ -366,6 +387,7 @@ export class Fight extends Phaser.Scene {
                 this.enableButtons();
                 let attack = this.randomCompAttack();
                 this.reducePlayerHealth(attack["damage"]);
+                this.player.savePlayerData();
             },
         });
     }
@@ -608,6 +630,7 @@ export class Fight extends Phaser.Scene {
                 }
                 humanText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
+                    console.log("switch", this.playerCurrentHuman, human);
 
                     this.switchHumanContainer.destroy();
 
@@ -663,7 +686,7 @@ export class Fight extends Phaser.Scene {
                 480,
                 this.playerCurrentHuman.defeatImage.name
             );
-
+            console.log("defeat Image", this.playerCurrentHuman.defeatImage);
             // Transition the defeated player image
             this.tweens.add({
                 targets: this.playerImg,
@@ -798,10 +821,18 @@ export class Fight extends Phaser.Scene {
             }, 6500);
 
             setTimeout(() => {
+                const hypnoRayItem = this.player.items.find(
+                    (item) => item.name === "HypnoRay"
+                );
+                if (hypnoRayItem) {
+                    hypnoRayItem.charge -= 5;
+                }
                 this.computerAttack();
             }, 8000);
         }
-        // this.itemMenuContainer.destroy();
+        console.log(this);
+
+        this.itemMenuContainer.destroy();
         this.disableButtons;
     }
 
