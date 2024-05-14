@@ -7,6 +7,7 @@ import {
     NuckChorris,
 } from "../humans";
 import { Player } from "../sprites/Player.js";
+import { HypnoRay } from "../sprites/captureItem.js";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -71,30 +72,45 @@ export class Fight extends Phaser.Scene {
         };
 
         // Retrieve player data from local storage
+
         const playerData = this.player.loadPlayerData();
+        console.log(playerData);
 
         if (playerData) {
-            // Iterate over the saved inventory and recreate the humans
-            this.player.inventory = playerData.map((humanData) => {
-                // Use the mapping object to retrieve the class object based on the class name
-                const HumanClass = classMapping[humanData.name];
-                // Check if the class object exists in the mapping
-                if (HumanClass) {
-                    // Instantiate the class object
-                    return new HumanClass();
-                } else {
-                    // Handle case where class object is not found
-                    console.error(
-                        `Class object not found for class name: ${humanData.name}`
-                    );
-                    return null; // or handle differently based on your application's logic
-                }
-            });
+            this.player.inventory = playerData;
+            console.log("Player inventory:", this.player.inventory);
+
+            this.playerCurrentHuman =
+                this.player.inventory.find((human) => human.health > 0) ||
+                this.player.inventory[0];
+            console.log("Player current human:", this.playerCurrentHuman);
+            
+            const hypnoRayItem = this.player.items.find(
+                (item) => item.name === "HypnoRay"
+            );
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = playerData.hypnoRayCharge || 0;
+            }
+            console.log("HypnoRay item:", hypnoRayItem);
         }
-        this.playerCurrentHuman = this.player.inventory[0];
+
+        for (const human of this.player.inventory) {
+            if (human.health > 0) {
+                this.playerCurrentHuman = human;
+                break;
+            }
+        }
         if (this.playerCurrentHuman.health <= 0) {
-            this.playerCurrentHuman.health = this.playerCurrentHuman.maxHealth;
-            // console.log(this.playerCurrentHuman.health);
+            const remainingHumans = this.player.inventory.filter(
+                (human) => human.health > 0
+            );
+            if (remainingHumans.length === 0) {
+                this.showMessage("Humans are defeated, you flee");
+
+                setTimeout(() => {
+                    this.returnToGameScene();
+                }, 4000);
+            }
         }
 
         if (this.enemy.health <= 0) {
@@ -118,22 +134,27 @@ export class Fight extends Phaser.Scene {
             this.enemy.hurtImage.name,
             import.meta.env.BASE_URL + this.enemy.hurtImage.path
         );
-        this.load.image(
-            this.playerCurrentHuman.hurtImage.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman.hurtImage.path
-        );
-        this.load.image(
-            this.playerCurrentHuman.defeatImage.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman.defeatImage.path
-        );
-        this.load.image(
-            this.playerCurrentHuman.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman["mainImage"]
-        );
+        this.player.inventory.forEach((human) => {
+            this.load.image(
+                human.name,
+                import.meta.env.BASE_URL + human.mainImage
+            );
+            this.load.image(
+                human.defeatImage.name,
+                import.meta.env.BASE_URL + human.defeatImage.path
+            );
+            this.load.image(
+                human.hurtImage.name,
+                import.meta.env.BASE_URL + human.hurtImage.path
+            );
+        });
+
+        console.log(this.playerCurrentHuman);
     }
 
     create() {
-        console.log(this.player);
+        console.log(this.playerCurrentHuman);
+        console.log(this.enemy);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
 
@@ -367,6 +388,7 @@ export class Fight extends Phaser.Scene {
                 this.enableButtons();
                 let attack = this.randomCompAttack();
                 this.reducePlayerHealth(attack["damage"]);
+                this.player.savePlayerData();
             },
         });
     }
@@ -609,6 +631,7 @@ export class Fight extends Phaser.Scene {
                 }
                 humanText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
+                    console.log("switch", this.playerCurrentHuman, human);
 
                     this.switchHumanContainer.destroy();
 
@@ -664,7 +687,7 @@ export class Fight extends Phaser.Scene {
                 480,
                 this.playerCurrentHuman.defeatImage.name
             );
-
+            console.log("defeat Image", this.playerCurrentHuman.defeatImage);
             // Transition the defeated player image
             this.tweens.add({
                 targets: this.playerImg,
@@ -694,6 +717,7 @@ export class Fight extends Phaser.Scene {
     }
 
     createSwitchHumanMenu() {
+        this.disableButtons();
         // Create a container for the switch human menu with 0.5 opacity
         this.switchHumanMenuContainer = this.add.container(0, 0);
         // Set opacity to 0.5
@@ -722,7 +746,6 @@ export class Fight extends Phaser.Scene {
 
         this.switchHumanMenuContainer.add(this.defeatedText);
 
-        // Iterate over the inventory to display options for switching humans
         this.player.inventory.forEach((human, index) => {
             // Calculate the y-coordinate for the current option
             const yPos = 200 + index * 75;
@@ -739,20 +762,16 @@ export class Fight extends Phaser.Scene {
                 );
                 optionText.setInteractive();
                 optionText.setOrigin(0.5);
-                // Add click event to switch to the selected human
+
                 optionText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
 
-                    // Destroy the defeatedText
                     this.defeatedText.destroy();
 
-                    // Load new human image
                     this.loadHumanImage(human);
 
-                    // Update player name text
                     this.playerNameText.setText(human.name);
 
-                    // Update player health and health bar
                     this.updatePlayerHealth();
 
                     this.switchHumanMenuContainer.destroy();
@@ -763,7 +782,6 @@ export class Fight extends Phaser.Scene {
             }
         });
 
-        // Add the switch human menu container to the scene
         this.add.existing(this.switchHumanMenuContainer);
     }
 
@@ -791,7 +809,7 @@ export class Fight extends Phaser.Scene {
 
     useItem() {
         const captureProbability = this.calculateCaptureProbability();
-
+        this.disableButtons();
         const randomNum = Math.random();
 
         if (randomNum < captureProbability) {
@@ -804,10 +822,18 @@ export class Fight extends Phaser.Scene {
             }, 6500);
 
             setTimeout(() => {
+                const hypnoRayItem = this.player.items.find(
+                    (item) => item.name === "HypnoRay"
+                );
+                if (hypnoRayItem) {
+                    hypnoRayItem.charge -= 5;
+                }
                 this.computerAttack();
             }, 8000);
         }
-        // this.itemMenuContainer.destroy();
+        console.log(this);
+
+        this.itemMenuContainer.destroy();
         this.disableButtons;
     }
 
@@ -883,20 +909,18 @@ export class Fight extends Phaser.Scene {
     }
 
     showMessage(message) {
-        // Create text object
         const text = this.add
             .text(400, 100, message, { fontSize: "32px", fill: "#000000" })
             .setOrigin(0.5)
-            .setDepth(1000); // Ensure it's above everything else
-        // Fade out after a delay
+            .setDepth(1000);
         this.tweens.add({
             targets: text,
             alpha: { from: 1, to: 0 },
             duration: 1000,
             ease: "Linear",
-            delay: 2000, // Delay before fading out
+            delay: 2000,
             onComplete: () => {
-                text.destroy(); // Clean up after fading out
+                text.destroy();
             },
         });
     }
@@ -967,14 +991,18 @@ export class Fight extends Phaser.Scene {
     }
 
     run() {
+        this.disableButtons();
         let randomNum = Math.floor(Math.random() * 11);
         if (randomNum > 5) {
-            this.returnToGameScene();
+            this.showMessage("You fled ...");
+            setTimeout(() => {
+                this.returnToGameScene();
+            }, 2500);
         } else {
-            this.disableButtons();
-            // console.log("miss");
-            this.computerAttack();
-            this.enableButtons();
+            this.showMessage("Failed to escape");
+            setTimeout(() => {
+                this.computerAttack();
+            }, 2500);
         }
     }
 
@@ -991,11 +1019,7 @@ export class Fight extends Phaser.Scene {
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
                     gameScene.player.setPosition(playerX, playerY);
-                    gameScene.player.currentState = 'walking'
-                    console.log(this.npcPositions)
-                    gameScene.npcArray.forEach((npc) => {
-                        npc.setPosition(this.npcPositions[npc.id].xPos, this.npcPositions[npc.id].yPos)
-                    })
+                    gameScene.player.currentState = "walking";
                 } else {
                     console.error("Game scene or player not found.");
                 }
