@@ -1,12 +1,13 @@
 import { Physics, Math } from "phaser";
 
 export class humanSprite extends Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, frame) {
+    constructor(scene, x, y, texture, frame, id) {
         super(scene, x, y, texture, frame);
 
         scene.sys.updateList.add(this);
         scene.sys.displayList.add(this);
         this.direction = 1;
+        this.id = id
         this.facing = "right";
         this.currentState = 'walking';
         this.projectile = this.scene.physics.add.sprite(-50, -50);
@@ -246,5 +247,8 @@ export class humanSprite extends Physics.Arcade.Sprite {
         }
         
         this.setVelocity(xVel, yVel);
+    }
+    updatePosition(scene) {
+        scene.npcPositions[this.id] = {xPos: this.body.x, yPos: this.body.y}
     }
 }
