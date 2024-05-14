@@ -13,13 +13,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
 
-        this.inventory = [
-            new Clown(),
-            new Scientist(),
-            // new Firefighter(),
-            // new Farmer(),
-            // new NuckChorris(),
-        ];
+        this.inventory = [];
+
         this.items = [new HypnoRay()];
         this.currentDirection = "right";
         this.currentState = "walking";
@@ -62,13 +57,40 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     savePlayerData() {
-        localStorage.setItem("playerData", JSON.stringify(this.inventory));
+        const playerData = {
+            inventory: this.inventory,
+            hypnoRayCharge:
+                this.items.find((item) => item.name === "HypnoRay")?.charge ||
+                0,
+        };
+        localStorage.setItem("playerData", JSON.stringify(playerData));
     }
 
     loadPlayerData() {
-        const data = localStorage.getItem("playerData");
-        return data ? JSON.parse(data) : null;
+        console.log("Loading player data...");
+        const playerData = localStorage.getItem("playerData");
+        const hypnoRayItem = this.items.find(
+            (item) => item.name === "HypnoRay"
+        );
+        if (playerData) {
+            console.log("Player data from localStorage:", playerData);
+            const parsedData = JSON.parse(playerData);
+            this.inventory = parsedData.inventory || [];
+
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = parsedData.hypnoRayCharge || 0;
+            }
+        } else {
+            this.inventory = [new Clown(), new Scientist()];
+            const hypnoRayItem = this.items.find(
+                (item) => item.name === "HypnoRay"
+            );
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = 100;
+            }
+        }
     }
+
     drawWeapon(x, y, obj) {
         obj.setPosition(x, y);
 
@@ -137,7 +159,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // player attack right
-        if (this.cursors.space.isDown && this.currentState != 'fightScene') {
+        if (this.cursors.space.isDown && this.currentState != "fightScene") {
             this.currentState = "attacking";
             this.swingWeapon(this.currentDirection);
             this.scene.time.delayedCall(350, () => {
