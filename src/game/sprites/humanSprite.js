@@ -251,7 +251,9 @@ export class humanSprite extends Physics.Arcade.Sprite {
         this.setVelocity(xVel, yVel);
     }
     updatePosition(scene) {
-        scene.worldData.npcData[this.id] = {xPos: this.body.x, yPos: this.body.y, currentState: this.currentState}
+        scene.worldData.npcData[this.id].xPos =  this.x   
+        scene.worldData.npcData[this.id].yPos = this.y
+        scene.worldData.npcData[this.id].currentState = this.currentState
     }
     
 }
