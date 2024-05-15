@@ -124,7 +124,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
                     (camera, progress) => {
                         if (progress === 1) {
                             //passes reference to fight scene and fixes blue border issue with fight scene
-                            console.log(scene)
+                            
                             scene.scene.launch("Fight", {
                                 playerPosition: scene.playerPosition,
                                 player: scene.player,
@@ -145,6 +145,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
     killNPC() {
         
         this.currentState = 'smacked'
+        console.log(this.currentState)
         this.setVelocity(0, 0)
         
         if (this.facing == "right") {
@@ -250,7 +251,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
         this.setVelocity(xVel, yVel);
     }
     updatePosition(scene) {
-        scene.npcPositions[this.id] = {xPos: this.body.x, yPos: this.body.y}
+        scene.worldData.npcData[this.id] = {xPos: this.body.x, yPos: this.body.y, currentState: this.currentState}
     }
     
 }

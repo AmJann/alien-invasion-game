@@ -34,13 +34,14 @@ export class Fight extends Phaser.Scene {
         this.switchHumanContainer = null;
         this.attackMenuContainer = null;
         this.itemMenuContainer = null;
+        
     }
 
     init(data) {
         // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
-        this.npcPositions = data.npcPositions
+        this.worldData = data.worldData
     }
 
     debug() {
@@ -561,6 +562,7 @@ export class Fight extends Phaser.Scene {
                         ease: "Power2",
                         delay: 0,
                     });
+                    this.worldData.removeHumanNPC = true
                     setTimeout(() => {
                         hurtAnimationRan = false;
                         this.returnToGameScene();
@@ -935,7 +937,7 @@ export class Fight extends Phaser.Scene {
             if (item.charge >= 5) {
                 if (this.player.inventory.length < 5) {
                     console.log("human captured");
-
+                    this.worldData.removeHumanNPC = true
                     setTimeout(() => {
                         this.enemyImg = this.add.image(
                             550,
@@ -1008,6 +1010,7 @@ export class Fight extends Phaser.Scene {
 
     returnToGameScene() {
         // Fade out the camera
+        console.log(this.removeHumanNPC)
         this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
@@ -1027,7 +1030,8 @@ export class Fight extends Phaser.Scene {
                 // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
-                    npcPositions: this.npcPositions
+                    worldData: this.worldData,
+                    
                 });
             }
         });

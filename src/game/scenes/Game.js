@@ -10,9 +10,21 @@ export class Game extends Scene {
         super("Game");
         this.player;
         this.playerPosition = { x: 300, y: 400 };
-        this.npcPositions = {}
+        this.worldData = {
+            npcData: {
+                'farmer': [Math.RND.between(213, 363), Math.RND.between(276, 363)],
+                'houseNPC' : [Math.RND.between(196, 318), Math.RND.between(117, 131)],
+                'fieldNPC' : [Math.RND.between(110, 360), Math.RND.between(450, 660)],
+                'forestNPC' : [Math.RND.between(650, 795), Math.RND.between(465, 650)],
+                'lakeNPC' : [Math.RND.between(510, 758), Math.RND.between(340, 386)],
+                'roadNPC' : [Math.RND.between(25, 382), Math.RND.between(395, 440)],
+                'northRoadNPC' : [Math.RND.between(388, 430), Math.RND.between(130, 390)],
+                'southRoadNPC' : [Math.RND.between(380, 430), Math.RND.between(380, 715)],},
+            removeHumanNPC: false
+        }
         this.npcArray = []
         this.createInitialNPCPositions = true
+        
     }
     preload() {
         this.load.image(
@@ -67,7 +79,7 @@ export class Game extends Scene {
             tileHeight: 16,
         });
         this.sys.animatedTiles.init(map);
-
+        
         const tileset = this.tileset = map.addTilesetImage("gameTiles", "gameTiles");
         //const groundLayer =
         map.createLayer("groundLayer", tileset, 0, 0);
@@ -163,54 +175,74 @@ export class Game extends Scene {
         // Working NPC Code
         ///////////
         
-        console.log(this.npcPositions)
-        const initialNPCPositions = [
-            ['farmer' ,Math.RND.between(213, 363), Math.RND.between(276, 363)],
-            ['houseNPC' ,Math.RND.between(196, 318), Math.RND.between(117, 131)],
-            ['fieldNPC' ,Math.RND.between(110, 360), Math.RND.between(450, 660)],
-            ['forestNPC' ,Math.RND.between(650, 795), Math.RND.between(465, 650)],
-            ['lakeNPC' ,Math.RND.between(510, 758), Math.RND.between(340, 386)],
-            ['roadNPC' ,Math.RND.between(25, 382), Math.RND.between(395, 440)],
-            ['northRoadNPC' ,Math.RND.between(388, 430), Math.RND.between(130, 390)],
-            ['southRoadNPC' ,Math.RND.between(380, 430), Math.RND.between(380, 715)],
-        ]
-        if (this.createInitialNPCPositions) {
+        // starting NPC positions
+        // const initialNPCPositions = {
+        //     'farmer': [Math.RND.between(213, 363), Math.RND.between(276, 363)],
+        //     'houseNPC' : [Math.RND.between(196, 318), Math.RND.between(117, 131)],
+        //     'fieldNPC' : [Math.RND.between(110, 360), Math.RND.between(450, 660)],
+        //     'forestNPC' : [Math.RND.between(650, 795), Math.RND.between(465, 650)],
+        //     'lakeNPC' : [Math.RND.between(510, 758), Math.RND.between(340, 386)],
+        //     'roadNPC' : [Math.RND.between(25, 382), Math.RND.between(395, 440)],
+        //     'northRoadNPC' : [Math.RND.between(388, 430), Math.RND.between(130, 390)],
+        //     'southRoadNPC' : [Math.RND.between(380, 430), Math.RND.between(380, 715)],
+        // }
+        // initializing 
+        // const npcSprites = {
+        //     'farmer': this.farmer = new humanSprite(this, this.worldData['farmer'].xPos, this.worldData['farmer'].yPos, "humans",
+        //          "base_idle_1.png", 'farmer'),
+        //     'houseNPC':this.houseNPC = new humanSprite(this, this.worldData['houseNPC'].xPos, this.worldData['houseNPC'].yPos, "humans",
+        //              "base_idle_1.png", 'houseNPC'
+        //          ),
+        //     'fieldNPC': this.fieldNPC = new humanSprite(this, this.worldData['fieldNPC'].xPos, this.worldData['fieldNPC'].yPos, "humans",
+        //             "base_idle_1.png", 'fieldNPC'
+        //         ),
+        //     'forestNPC':this.forestNPC = new humanSprite(this, this.worldData['forestNPC'].xPos, this.worldData['forestNPC'].yPos, "humans",
+        //             "base_idle_1.png", 'forestNPC'
+        //         ),
+        //     'lakeNPC': this.lakeNPC = new humanSprite(this, this.worldData['lakeNPC'].xPos, this.worldData['lakeNPC'].yPos, "humans",
+        //             "base_idle_1.png", 'lakeNPC'
+        //         ),
+        //     'roadNPC':this.roadNPC = new humanSprite(this, this.worldData['roadNPC'].xPos, this.worldData['roadNPC'].yPos, "humans",
+        //             "base_idle_1.png", 'roadNPC'
+        //         ),
+        //     'northRoadNPC':this.northRoadNPC = new humanSprite(this, this.worldData['northRoadNPC'].xPos, this.worldData['northRoadNPC'].yPos, "humans",
+        //             "base_idle_1.png", 'northRoadNPC'
+        //         ),
+        //     'southRoadNPC': this.southRoadNPC = new humanSprite(this, this.worldData['southRoadNPC'].xPos, this.worldData['southRoadNPC'].yPos, "humans",
+        //             "base_idle_1.png", 'southRoadNPC'
+        //         ),
+        // }
+        const npcSprites = {
+            'farmer': this.farmer = null,
+            'houseNPC':this.houseNPC = null,
+            'fieldNPC': this.fieldNPC = null,
+            'forestNPC':this.forestNPC = null,
+            'lakeNPC': this.lakeNPC = null,
+            'roadNPC':this.roadNPC = null,
+            'northRoadNPC':this.northRoadNPC = null,
+            'southRoadNPC': this.southRoadNPC = null,
+        }
+        
+        this.npcArray = []
+         // create NPCs once on startup
+         if (this.createInitialNPCPositions) {
             this.createInitialNPCPositions = false
             
-            for (let index = 0; index < initialNPCPositions.length; index++){
+            for (let key in npcSprites){
                 
-                this.npcPositions[initialNPCPositions[index][0]] = {xPos :initialNPCPositions[index][1], yPos:initialNPCPositions[index][2]}
-                
+                this.worldData.npcData[key] = {xPos :this.worldData.npcData[key][0], yPos:this.worldData.npcData[key][1], currentState: 'walking', active: 'active'}
+                this.npcArray.push(
+                    npcSprites[key] = new humanSprite(this, this.worldData.npcData[key].xPos, this.worldData.npcData[key].yPos, "humans",
+                                "base_idle_1.png", key
+                            ),
+                )
+
             }
-            console.log(this.npcPositions)
+            console.log(this.npcArray)
         }
-        this.npcArray = [
-            this.farmer = new humanSprite(this, this.npcPositions['farmer'].xPos, this.npcPositions['farmer'].yPos, "humans",
-            "base_idle_1.png", 'farmer'
-            ),
-            this.houseNPC = new humanSprite(this, this.npcPositions['houseNPC'].xPos, this.npcPositions['houseNPC'].yPos, "humans",
-                "base_idle_1.png", 'houseNPC'
-            ),
-            this.fieldNPC = new humanSprite(this, this.npcPositions['fieldNPC'].xPos, this.npcPositions['fieldNPC'].yPos, "humans",
-                "base_idle_1.png", 'fieldNPC'
-            ),
-            this.forestNPC = new humanSprite(this, this.npcPositions['forestNPC'].xPos, this.npcPositions['forestNPC'].yPos, "humans",
-                "base_idle_1.png", 'forestNPC'
-            ),
-            this.lakeNPC = new humanSprite(this, this.npcPositions['lakeNPC'].xPos, this.npcPositions['lakeNPC'].yPos, "humans",
-                "base_idle_1.png", 'lakeNPC'
-            ),
-            this.roadNPC = new humanSprite(this, this.npcPositions['roadNPC'].xPos, this.npcPositions['roadNPC'].yPos, "humans",
-                "base_idle_1.png", 'roadNPC'
-            ),
-            this.northRoadNPC = new humanSprite(this, this.npcPositions['northRoadNPC'].xPos, this.npcPositions['northRoadNPC'].yPos, "humans",
-                "base_idle_1.png", 'northRoadNPC'
-            ),
-            this.southRoadNPC = new humanSprite(this, this.npcPositions['southRoadNPC'].xPos, this.npcPositions['southRoadNPC'].yPos, "humans",
-                "base_idle_1.png", 'southRoadNPC'
-            ),
-        ]
         
+       
+       
 
         EventBus.emit("current-scene-ready", this);
     }
@@ -219,24 +251,8 @@ export class Game extends Scene {
         this.scene.start("GameOver");
     }
 
-    // Not currently used but an option
-    onNPCZoneEnter() {
-        // what happens when player enters NPC Zone
-        // shake the world
-
-        this.cameras.main.flash(300);
-
-        let playerX = this.player.x;
-        let playerY = this.player.y;
-        this.zoneHuman = new humanSprite(
-            this,
-            playerX + 25,
-            playerY,
-            "humans",
-            "base_idle_1.png"
-        );
-        this.zoneHuman.body.setSize(22, 20);
-        this.zoneHuman.setPushable(false);
+    filterNPCs() {
+        
     }
 
     // changeScene() {
@@ -246,14 +262,32 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-       
+        
+        
         // updates the position of every NPC for transition to/from fight scene
         this.npcArray.forEach((npc) => {
-            npc.updatePosition(this)
+            if (npc.currentState === 'smacked' && this.worldData.removeHumanNPC) {
+                let temp = npc
+                npc.x = -100
+                npc.y = -100
+                npc.active = false
+                npc.visible = false
+                let removeIndex = this.npcArray.indexOf(temp)
+                this.npcArray.splice(removeIndex, 1)
+                
+                this.worldData.removeHumanNPC = false
+                console.log(temp)
+                npc.destroy()
+                
+            } else {
+                npc.updatePosition(this)
+            }
+            
+            
             
         });
         if (this.flag) {
-            console.log(this.npcPositions)
+            console.log(this.worldData)
             this.flag = false
         }
         // console.log(this.npcPositions)
