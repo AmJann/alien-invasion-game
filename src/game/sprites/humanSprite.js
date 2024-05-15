@@ -125,10 +125,11 @@ export class humanSprite extends Physics.Arcade.Sprite {
                         if (progress === 1) {
                             //passes reference to fight scene and fixes blue border issue with fight scene
                             
-                            scene.scene.launch("Fight", {
+                            scene.scene.start("Fight", {
                                 playerPosition: scene.playerPosition,
                                 player: scene.player,
-                                npcPositions : scene.npcPositions
+                                worldData: scene.worldData,
+                                npcObjects: scene.npcObjects
                             });
                         }
                     }
@@ -251,9 +252,9 @@ export class humanSprite extends Physics.Arcade.Sprite {
         this.setVelocity(xVel, yVel);
     }
     updatePosition(scene) {
-        scene.worldData.npcData[this.id].xPos =  this.x   
-        scene.worldData.npcData[this.id].yPos = this.y
-        scene.worldData.npcData[this.id].currentState = this.currentState
+        scene.worldData[this.id].xPos =  this.x   
+        scene.worldData[this.id].yPos = this.y
+        scene.worldData[this.id].currentState = this.currentState
     }
     
 }

@@ -41,7 +41,8 @@ export class Fight extends Phaser.Scene {
         // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
-        this.worldData = data.worldData
+        this.worldData = data.worldData;
+        this.npcObjects = data.npcObjects;
     }
 
     debug() {
@@ -938,6 +939,7 @@ export class Fight extends Phaser.Scene {
                 if (this.player.inventory.length < 5) {
                     console.log("human captured");
                     this.worldData.removeHumanNPC = true
+                    
                     setTimeout(() => {
                         this.enemyImg = this.add.image(
                             550,
@@ -1010,7 +1012,7 @@ export class Fight extends Phaser.Scene {
 
     returnToGameScene() {
         // Fade out the camera
-        console.log(this.removeHumanNPC)
+        console.log(this.worldData.removeHumanNPC)
         this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
@@ -1026,11 +1028,16 @@ export class Fight extends Phaser.Scene {
                 } else {
                     console.error("Game scene or player not found.");
                 }
+                // for (let npc in this.npcObjects) {
+                //     let currentNPC = gameScene.registry.get(npc)
+                //     currentNPC.setPosition(npc.xPos, npc.yPos)
+                // }
                 this.music.stop();
                 // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
                     worldData: this.worldData,
+                    npcObjects: this.npcObjects,
                     
                 });
             }

@@ -10,44 +10,44 @@ export class Game extends Scene {
         super("Game");
         this.player;
         this.playerPosition = { x: 300, y: 400 };
+        this.npcStartPositions = {
+            farmer: [
+                Math.RND.between(213, 363),
+                Math.RND.between(276, 363),
+            ],
+            houseNPC: [
+                Math.RND.between(196, 318),
+                Math.RND.between(117, 131),
+            ],
+            fieldNPC: [
+                Math.RND.between(110, 360),
+                Math.RND.between(450, 660),
+            ],
+            forestNPC: [
+                Math.RND.between(650, 795),
+                Math.RND.between(465, 650),
+            ],
+            lakeNPC: [
+                Math.RND.between(510, 758),
+                Math.RND.between(340, 386),
+            ],
+            roadNPC: [
+                Math.RND.between(25, 382),
+                Math.RND.between(395, 440),
+            ],
+            northRoadNPC: [
+                Math.RND.between(388, 430),
+                Math.RND.between(130, 390),
+            ],
+            southRoadNPC: [
+                Math.RND.between(380, 430),
+                Math.RND.between(380, 715),
+            ],
+        },
         this.worldData = {
-            npcData: {
-                farmer: [
-                    Math.RND.between(213, 363),
-                    Math.RND.between(276, 363),
-                ],
-                houseNPC: [
-                    Math.RND.between(196, 318),
-                    Math.RND.between(117, 131),
-                ],
-                fieldNPC: [
-                    Math.RND.between(110, 360),
-                    Math.RND.between(450, 660),
-                ],
-                forestNPC: [
-                    Math.RND.between(650, 795),
-                    Math.RND.between(465, 650),
-                ],
-                lakeNPC: [
-                    Math.RND.between(510, 758),
-                    Math.RND.between(340, 386),
-                ],
-                roadNPC: [
-                    Math.RND.between(25, 382),
-                    Math.RND.between(395, 440),
-                ],
-                northRoadNPC: [
-                    Math.RND.between(388, 430),
-                    Math.RND.between(130, 390),
-                ],
-                southRoadNPC: [
-                    Math.RND.between(380, 430),
-                    Math.RND.between(380, 715),
-                ],
-            },
-            removeHumanNPC: false,
+                removeHumanNPC: false,
         };
-        this.npcArray = [];
+        this.npcObjects = {};
         this.createInitialNPCPositions = true;
         //////////////////////
         // debugging variables
@@ -250,38 +250,43 @@ export class Game extends Scene {
         if (this.createInitialNPCPositions) {
             this.createInitialNPCPositions = false;
             for (let key in npcSprites) {
-                this.worldData.npcData[key] = {
-                    xPos: this.worldData.npcData[key][0],
-                    yPos: this.worldData.npcData[key][1],
+                this.worldData[key] = {
+                    xPos: this.npcStartPositions[key][0],
+                    yPos: this.npcStartPositions[key][1],
                     currentState: "walking",
                     active: "active",
                 };
-                this.npcArray.push(
+                
+                this.npcObjects[key] =
                     (npcSprites[key] = new humanSprite(
                         this,
-                        this.worldData.npcData[key].xPos,
-                        this.worldData.npcData[key].yPos,
+                        this.npcStartPositions[key][0],
+                        this.npcStartPositions[key][1],
                         "humans",
                         "base_idle_1.png",
                         key
-                    ))
-                );
+                    ));
+                
             }
         } else {
+            this.npcObjects = {}
             for (let key in npcSprites) {
-                if (this.worldData.npcData[key].active === "active") {
-                    this.npcArray.push(
-                        (npcSprites[key] = new humanSprite(
-                            this,
-                            this.worldData.npcData[key].xPos,
-                            this.worldData.npcData[key].yPos,
-                            "humans",
-                            "base_idle_1.png",
-                            key
-                        ))
-                    );
+                if (this.worldData[key].currentState === 'walking' || this.worldData.removeHumanNPC == false){
+                this.npcObjects[key] =
+                    (npcSprites[key] = new humanSprite(
+                        this,
+                        this.worldData[key].xPos,
+                        this.worldData[key].yPos,
+                        "humans",
+                        "base_idle_1.png",
+                        key
+                        ));
+                } else {
+                    this.worldData.removeHumanNPC == false
                 }
+                
             }
+           
         }
 
         EventBus.emit("current-scene-ready", this);
@@ -302,33 +307,18 @@ export class Game extends Scene {
         this.playerPosition = { x: this.player.x, y: this.player.y };
 
         // updates the position of every NPC for transition to/from fight scene
-        this.npcArray.forEach((npc) => {
-            if (
-                npc.currentState === "smacked" &&
-                this.worldData.removeHumanNPC
-            ) {
-                let temp = npc;
-                npc.x = -100;
-                npc.y = -100;
-                npc.active = false;
-                npc.visible = false;
-                let removeIndex = this.npcArray.indexOf(temp);
-                this.npcArray.splice(removeIndex, 1);
-
-                this.worldData.removeHumanNPC = false;
-
-                npc.destroy();
-            } else {
-                npc.updatePosition(this);
-            }
-        });
-        if (this.counter < 2) {
-            this.flag = false;
-            this.counter++;
-            console.log(this.worldData, this);
+        for (let npc in this.npcObjects) {
+            
+            
+                this.npcObjects[npc].updatePosition(this);
+            
         }
-        // console.log(this.npcPositions)
-
+        // if (this.counter < 2) {
+        //     this.flag = false;
+        //     this.counter++;
+        //     console.log(this.worldData, this);
+        // }
+        
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
