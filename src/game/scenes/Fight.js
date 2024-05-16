@@ -34,12 +34,15 @@ export class Fight extends Phaser.Scene {
         this.switchHumanContainer = null;
         this.attackMenuContainer = null;
         this.itemMenuContainer = null;
+        
     }
 
     init(data) {
         // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
+        this.worldData = data.worldData;
+        this.npcObjects = data.npcObjects;
     }
 
     debug() {
@@ -560,6 +563,7 @@ export class Fight extends Phaser.Scene {
                         ease: "Power2",
                         delay: 0,
                     });
+                    this.worldData.removeHumanNPC = true
                     setTimeout(() => {
                         hurtAnimationRan = false;
                         this.returnToGameScene();
@@ -934,7 +938,8 @@ export class Fight extends Phaser.Scene {
             if (item.charge >= 5) {
                 if (this.player.inventory.length < 5) {
                     console.log("human captured");
-
+                    this.worldData.removeHumanNPC = true
+                    
                     setTimeout(() => {
                         this.enemyImg = this.add.image(
                             550,
@@ -1007,13 +1012,14 @@ export class Fight extends Phaser.Scene {
 
     returnToGameScene() {
         // Fade out the camera
+        console.log(this.worldData.removeHumanNPC)
         this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
                 // Retrieve player position from the data object
                 const playerX = this.playerPosition.x;
                 const playerY = this.playerPosition.y;
-
+                
                 // Set player position in the Game scene
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
@@ -1022,10 +1028,17 @@ export class Fight extends Phaser.Scene {
                 } else {
                     console.error("Game scene or player not found.");
                 }
+                // for (let npc in this.npcObjects) {
+                //     let currentNPC = gameScene.registry.get(npc)
+                //     currentNPC.setPosition(npc.xPos, npc.yPos)
+                // }
                 this.music.stop();
                 // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
+                    worldData: this.worldData,
+                    npcObjects: this.npcObjects,
+                    
                 });
             }
         });
