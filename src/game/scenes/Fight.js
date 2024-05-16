@@ -83,7 +83,7 @@ export class Fight extends Phaser.Scene {
                 this.player.inventory.find((human) => human.health > 0) ||
                 this.player.inventory[0];
             console.log("Player current human:", this.playerCurrentHuman);
-            e;
+            
             const hypnoRayItem = this.player.items.find(
                 (item) => item.name === "HypnoRay"
             );
