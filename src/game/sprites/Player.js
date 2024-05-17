@@ -20,6 +20,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.currentState = "walking";
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.speed = 150;
+        // this.weapon is an invisible sprite used to trigger collision events
         this.weapon = this.scene.physics.add.sprite(-50, -50);
         this.weapon.setSize(30, 15);
         this.weapon.setActive(true).setVisible(true);
