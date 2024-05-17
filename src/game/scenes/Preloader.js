@@ -26,10 +26,18 @@ export class Preloader extends Scene {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath("assets");
 
-        this.load.image('logo', 'logo.png');
-        this.load.image('star', 'star.png');
-        this.load.atlas('player', '/characters/alien/goblin_phaser3.png', '/characters/alien/goblin_phaser3.json')
-        this.load.atlas('humans','/characters/human/humans_phaser3.png', '/characters/human/humans_phaser3.json')
+        this.load.image("logo", "logo.png");
+        this.load.image("star", "star.png");
+        this.load.atlas(
+            "player",
+            "/characters/alien/goblin_phaser3.png",
+            "/characters/alien/goblin_phaser3.json"
+        );
+        this.load.atlas(
+            "humans",
+            "/characters/human/humans_phaser3.png",
+            "/characters/human/humans_phaser3.json"
+        );
     }
 
     create() {
@@ -37,6 +45,6 @@ export class Preloader extends Scene {
         //  For example, you can define global animations here, so we can use them in other scenes.
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start("Game");
+        this.scene.start("Opening");
     }
 }

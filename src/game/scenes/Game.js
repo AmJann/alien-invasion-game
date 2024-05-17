@@ -312,14 +312,14 @@ export class Game extends Scene {
 
             this.physics.add.collider(enemy, this.player.weapon, () => {
                 console.log("A HIT A HIT");
-                
+
                 enemy.setVelocity(0, 0);
                 enemy.currentState = "smacked";
                 enemy.killNPC();
-                
+
                 //fadeout to fight scene
                 this.time.delayedCall(800, () => {
-                    this.player.currentState = 'fightScene'
+                    this.player.currentState = "fightScene";
                     this.cameras.main.fadeOut(
                         800,
                         0,
