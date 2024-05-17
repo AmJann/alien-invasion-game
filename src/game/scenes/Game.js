@@ -177,10 +177,7 @@ export class Game extends Scene {
 
         this.animatedTiles.init(map);
         createAnimations(this.anims);
-        let shroomCoords = Object.values(this.npcStartPositions)
-        const shroomLocationIndex = Math.RND.between(0, shroomCoords.length - 1)
-        this.shroom = new powerUpSprite(this, shroomCoords[shroomLocationIndex][0], shroomCoords[shroomLocationIndex][1], 'powerup', 'tile000.png'  )
-        this.shroom.anims.play("shroom-powerup")
+        
 
         //adds player with physics
 
@@ -197,6 +194,12 @@ export class Game extends Scene {
         //sets size of collision box for player
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
+
+        // create powerup
+        let shroomCoords = Object.values(this.npcStartPositions)
+        const shroomLocationIndex = Math.RND.between(0, shroomCoords.length - 1)
+        const powerUp = (this.shroom = new powerUpSprite(this, shroomCoords[shroomLocationIndex][0], shroomCoords[shroomLocationIndex][1], 'powerup', 'tile000.png'  ))
+        powerUp.anims.play("shroom-powerup")
 
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
