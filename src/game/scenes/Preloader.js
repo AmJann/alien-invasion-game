@@ -38,6 +38,11 @@ export class Preloader extends Scene {
             "/characters/human/humans_phaser3.png",
             "/characters/human/humans_phaser3.json"
         );
+        this.load.atlas(
+            "powerup",
+            "/objects/mushroom_powerup.png",
+            "/objects/mushroom_powerup.json"
+        );
     }
 
     create() {

@@ -1,14 +1,18 @@
 import { Physics, Math } from "phaser";
 
 export class humanSprite extends Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, frame) {
+    constructor(scene, x, y, texture, frame, id) {
         super(scene, x, y, texture, frame);
 
         scene.sys.updateList.add(this);
         scene.sys.displayList.add(this);
         this.direction = 1;
+        this.id = id
         this.facing = "right";
         this.currentState = 'walking';
+        this.projectile = this.scene.physics.add.sprite(-50, -50);
+        this.projectile.setSize(8, 8);
+        this.projectile.setActive(true).setVisible(true);
 
         //this.setScale(2);
         scene.physics.add.existing(this);
@@ -21,12 +25,117 @@ export class humanSprite extends Physics.Arcade.Sprite {
             },
             loop: true,
         });
+        this.setSize(12, 15);
+        this.setPushable(false);
+        this.setCollideWorldBounds(true);
+        this.body.onCollide = true;
         scene.physics.world.on(
             Physics.Arcade.Events.COLLIDE,
             this.handleCollision,
             this
         );
         //scene.physics.world.on('collision', this.handleCollision, this);
+        
+        scene.physics.add.collider(
+            this,
+            scene.waterLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.houseLayer1,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.houseLayer2,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.treeLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.moundsRocks,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.fenceLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.scenecrops,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.elevatedGroundLayer,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.bridgePosts,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(
+            this,
+            scene.player,
+            this.handleCollision,
+            undefined,
+            scene
+        );
+        scene.physics.add.collider(this, scene.player.weapon, () => {
+            console.log("A HIT A HIT");
+            
+            this.setVelocity(0, 0);
+            this.currentState = "smacked";
+            this.killNPC();
+            
+            //fadeout to fight scene
+            scene.time.delayedCall(800, () => {
+                scene.player.currentState = 'fightScene'
+                scene.cameras.main.fadeOut(
+                    800,
+                    0,
+                    0,
+                    0,
+                    (camera, progress) => {
+                        if (progress === 1) {
+                            //passes reference to fight scene and fixes blue border issue with fight scene
+                            
+                            scene.scene.start("Fight", {
+                                playerPosition: scene.playerPosition,
+                                player: scene.player,
+                                worldData: scene.worldData,
+                                npcObjects: scene.npcObjects
+                            });
+                        }
+                    }
+                );
+            });
+        });
     }
     destroy(fromScene) {
         this.moveEvent.destroy();
@@ -37,6 +146,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
     killNPC() {
         
         this.currentState = 'smacked'
+        console.log(this.currentState)
         this.setVelocity(0, 0)
         
         if (this.facing == "right") {
@@ -141,4 +251,10 @@ export class humanSprite extends Physics.Arcade.Sprite {
         
         this.setVelocity(xVel, yVel);
     }
+    updatePosition(scene) {
+        scene.worldData[this.id].xPos =  this.x   
+        scene.worldData[this.id].yPos = this.y
+        scene.worldData[this.id].currentState = this.currentState
+    }
+    
 }
