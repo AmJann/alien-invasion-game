@@ -1,94 +1,94 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from "react";
+import Phaser from "phaser";
+import { PhaserGame } from "./game/PhaserGame";
 
-import Phaser from 'phaser';
-import { PhaserGame } from './game/PhaserGame';
-
-function App ()
-{
-    // The sprite can only be moved in the MainMenu Scene
+function App() {
     const [canMoveSprite, setCanMoveSprite] = useState(true);
-    
-    //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
-    const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
+    const [showInventory, setShowInventory] = useState(false);
+    const [inventory, setInventory] = useState([]);
 
-    const changeScene = () => {
+    useEffect(() => {
+        const handleResize = () => {
+            const gameCanvas = document.getElementById("game");
+            const inventoryMenu = document.getElementById("inventory-menu");
+            if (gameCanvas && inventoryMenu) {
+                const gameCanvasRect = gameCanvas.getBoundingClientRect();
+                inventoryMenu.style.left = `${gameCanvasRect.left}px`;
+                inventoryMenu.style.top = `${gameCanvasRect.top}px`;
+            }
+        };
 
-        const scene = phaserRef.current.scene;
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
-        if (scene)
-        {
-            scene.changeScene();
+    const toggleInventory = () => {
+        setShowInventory(!showInventory);
+    };
+
+    const removeHumanFromInventory = (humanId) => {
+        const updatedInventory = inventory.filter(
+            (human) => human.id !== humanId
+        );
+        setInventory(updatedInventory);
+        localStorage.setItem(
+            "playerData",
+            JSON.stringify({ inventory: updatedInventory })
+        );
+    };
+
+    useEffect(() => {
+        const playerData = JSON.parse(localStorage.getItem("playerData"));
+        if (playerData && playerData.inventory) {
+            setInventory(playerData.inventory);
+        } else {
+            setInventory([]);
         }
-    }
+    }, [showInventory]);
 
-    const moveSprite = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene && scene.scene.key === 'MainMenu')
-        {
-            // Get the update logo position
-            scene.moveLogo(({ x, y }) => {
-
-                setSpritePosition({ x, y });
-
-            });
-        }
-    }
-
-    const addSprite = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene)
-        {
-            // Add more stars
-            const x = Phaser.Math.Between(64, scene.scale.width - 64);
-            const y = Phaser.Math.Between(64, scene.scale.height - 64);
-
-            //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-            const star = scene.add.sprite(x, y, 'star');
-
-            //  ... which you can then act upon. Here we create a Phaser Tween to fade the star sprite in and out.
-            //  You could, of course, do this from within the Phaser Scene code, but this is just an example
-            //  showing that Phaser objects and systems can be acted upon from outside of Phaser itself.
-            scene.add.tween({
-                targets: star,
-                duration: 500 + Math.random() * 1000,
-                alpha: 0,
-                yoyo: true,
-                repeat: -1
-            });
-        }
-    }
-
-    // Event emitted from the PhaserGame component
     const currentScene = (scene) => {
-
-        setCanMoveSprite(scene.scene.key !== 'MainMenu');
-        
-    }
+        setCanMoveSprite(scene.scene.key !== "MainMenu");
+    };
 
     return (
         <div id="app">
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-            <div>
-                <div>
-                    <button className="button" onClick={changeScene}>Change Scene</button>
+            <PhaserGame
+                id="game"
+                ref={phaserRef}
+                currentActiveScene={currentScene}
+            />
+            {showInventory && (
+                <div id="inventory-menu" style={{ position: "absolute" }}>
+                    <h2>Inventory</h2>
+                    <ul>
+                        {inventory.map((human) => (
+                            <div
+                                key={human.id}
+                                className="human-button-container"
+                            >
+                                <li>{human.name}</li>
+                                <button
+                                    className="button remove-button"
+                                    onClick={() =>
+                                        removeHumanFromInventory(human.id)
+                                    }
+                                >
+                                    Release
+                                </button>
+                            </div>
+                        ))}
+                    </ul>
                 </div>
-                <div>
-                    <button disabled={canMoveSprite} className="button" onClick={moveSprite}>Toggle Movement</button>
-                </div>
-                <div className="spritePosition">Sprite Position:
-                    <pre>{`{\n  x: ${spritePosition.x}\n  y: ${spritePosition.y}\n}`}</pre>
-                </div>
-                <div>
-                    <button className="button" onClick={addSprite}>Add New Sprite</button>
-                </div>
+            )}
+            <div className="manage-humans">
+                <button className="button" onClick={toggleInventory}>
+                    Manage Humans
+                </button>
             </div>
         </div>
-    )
+    );
 }
 
-export default App
+export default App;

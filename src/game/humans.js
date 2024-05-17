@@ -1,3 +1,5 @@
+let humanIdCounter = 0;
+
 class Human {
     constructor(
         name,
@@ -10,6 +12,7 @@ class Human {
         hurtImage,
         defeatImage
     ) {
+        this.id = humanIdCounter++;
         this.name = name;
         this.health = health;
         this.maxHealth = maxHealth;

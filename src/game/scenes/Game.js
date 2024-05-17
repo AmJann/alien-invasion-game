@@ -11,31 +11,13 @@ export class Game extends Scene {
         super("Game");
         this.player;
         this.playerPosition = { x: 300, y: 400 };
-        this.npcStartPositions = {
-            farmer: [
-                Math.RND.between(213, 363),
-                Math.RND.between(276, 363),
-            ],
-            houseNPC: [
-                Math.RND.between(196, 318),
-                Math.RND.between(117, 131),
-            ],
-            fieldNPC: [
-                Math.RND.between(110, 360),
-                Math.RND.between(450, 660),
-            ],
-            forestNPC: [
-                Math.RND.between(650, 795),
-                Math.RND.between(465, 650),
-            ],
-            lakeNPC: [
-                Math.RND.between(510, 758),
-                Math.RND.between(340, 386),
-            ],
-            roadNPC: [
-                Math.RND.between(25, 382),
-                Math.RND.between(395, 440),
-            ],
+        (this.npcStartPositions = {
+            farmer: [Math.RND.between(213, 363), Math.RND.between(276, 363)],
+            houseNPC: [Math.RND.between(196, 318), Math.RND.between(117, 131)],
+            fieldNPC: [Math.RND.between(110, 360), Math.RND.between(450, 660)],
+            forestNPC: [Math.RND.between(650, 795), Math.RND.between(465, 650)],
+            lakeNPC: [Math.RND.between(510, 758), Math.RND.between(340, 386)],
+            roadNPC: [Math.RND.between(25, 382), Math.RND.between(395, 440)],
             northRoadNPC: [
                 Math.RND.between(388, 430),
                 Math.RND.between(130, 390),
@@ -44,10 +26,10 @@ export class Game extends Scene {
                 Math.RND.between(380, 430),
                 Math.RND.between(380, 715),
             ],
-        },
-        this.worldData = {
+        }),
+            (this.worldData = {
                 removeHumanNPC: false,
-        };
+            });
         this.npcObjects = {};
         this.createInitialNPCPositions = true;
         //////////////////////
@@ -177,7 +159,6 @@ export class Game extends Scene {
 
         this.animatedTiles.init(map);
         createAnimations(this.anims);
-        
 
         //adds player with physics
 
@@ -196,10 +177,19 @@ export class Game extends Scene {
         this.player.setPushable(false);
 
         // create powerup
-        let shroomCoords = Object.values(this.npcStartPositions)
-        const shroomLocationIndex = Math.RND.between(0, shroomCoords.length - 1)
-        const powerUp = (this.shroom = new powerUpSprite(this, shroomCoords[shroomLocationIndex][0], shroomCoords[shroomLocationIndex][1], 'powerup', 'tile000.png'  ))
-        powerUp.anims.play("shroom-powerup")
+        let shroomCoords = Object.values(this.npcStartPositions);
+        const shroomLocationIndex = Math.RND.between(
+            0,
+            shroomCoords.length - 1
+        );
+        const powerUp = (this.shroom = new powerUpSprite(
+            this,
+            shroomCoords[shroomLocationIndex][0],
+            shroomCoords[shroomLocationIndex][1],
+            "powerup",
+            "tile000.png"
+        ));
+        powerUp.anims.play("shroom-powerup");
 
         //creates keys for movement to be used in update funcion further down
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -241,8 +231,7 @@ export class Game extends Scene {
         player.setCollideWorldBounds(true);
 
         // create all player, NPC animations
-        
-        
+
         this.cameras.main.shake(900, 0.0007);
 
         /////////////
@@ -269,37 +258,35 @@ export class Game extends Scene {
                     currentState: "walking",
                     active: "active",
                 };
-                
-                this.npcObjects[key] =
-                    (npcSprites[key] = new humanSprite(
-                        this,
-                        this.npcStartPositions[key][0],
-                        this.npcStartPositions[key][1],
-                        "humans",
-                        "base_idle_1.png",
-                        key
-                    ));
-                
+
+                this.npcObjects[key] = npcSprites[key] = new humanSprite(
+                    this,
+                    this.npcStartPositions[key][0],
+                    this.npcStartPositions[key][1],
+                    "humans",
+                    "base_idle_1.png",
+                    key
+                );
             }
         } else {
-            this.npcObjects = {}
+            this.npcObjects = {};
             for (let key in npcSprites) {
-                if (this.worldData[key].currentState === 'walking' || this.worldData.removeHumanNPC == false){
-                this.npcObjects[key] =
-                    (npcSprites[key] = new humanSprite(
+                if (
+                    this.worldData[key].currentState === "walking" ||
+                    this.worldData.removeHumanNPC == false
+                ) {
+                    this.npcObjects[key] = npcSprites[key] = new humanSprite(
                         this,
                         this.worldData[key].xPos,
                         this.worldData[key].yPos,
                         "humans",
                         "base_idle_1.png",
                         key
-                        ));
+                    );
                 } else {
-                    this.worldData.removeHumanNPC == false
+                    this.worldData.removeHumanNPC == false;
                 }
-                
             }
-           
         }
 
         EventBus.emit("current-scene-ready", this);
@@ -321,17 +308,14 @@ export class Game extends Scene {
 
         // updates the position of every NPC for transition to/from fight scene
         for (let npc in this.npcObjects) {
-            
-            
-                this.npcObjects[npc].updatePosition(this);
-            
+            this.npcObjects[npc].updatePosition(this);
         }
         // if (this.counter < 2) {
         //     this.flag = false;
         //     this.counter++;
         //     console.log(this.worldData, this);
         // }
-        
+
         // this.time.delayedCall(25000, () => {
         //     this.scene.start("Fight");
         // });
