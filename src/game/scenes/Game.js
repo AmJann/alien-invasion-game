@@ -3,6 +3,7 @@ import { Scene, Math } from "phaser";
 import AnimatedTiles from "phaser-animated-tiles-phaser3.5/dist/AnimatedTiles.min.js";
 import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
+import { powerUpSprite } from "../sprites/powerUpSprite";
 import { createAnimations } from "../animations";
 
 export class Game extends Scene {
@@ -71,28 +72,32 @@ export class Game extends Scene {
             "animatedTiles"
         );
 
-        this.load.spritesheet(
-            "player",
-            import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
-            { frameWidth: 16, frameHeight: 16 }
-        );
-        this.load.spritesheet(
-            "humans",
-            import.meta.env.BASE_URL + " assets/humans_phaser3.png",
-            { frameWidth: 16, frameHeight: 16 }
-        );
-        this.textures.addSpriteSheetFromAtlas("npc", {
-            frameWidth: 16,
-            frameHeight: 16,
-            atlas: "humans",
-            frame: "base_idle_1.png",
-        });
-        this.textures.addSpriteSheetFromAtlas("npc_longhair", {
-            frameWidth: 16,
-            frameHeight: 16,
-            atlas: "humans",
-            frame: "longhair_idle_1.png",
-        });
+        // this.load.spritesheet(
+        //     "player",
+        //     import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
+        //     { frameWidth: 16, frameHeight: 16 }
+        // );
+        // this.load.spritesheet(
+        //     "humans",
+        //     import.meta.env.BASE_URL + " assets/humans_phaser3.png",
+        //     { frameWidth: 16, frameHeight: 16 }
+        // );
+        // this.load.spritesheet(
+        //     'powerup',
+        //     import.meta.env.BASE_URL + 'assets/'
+        // )
+        // this.textures.addSpriteSheetFromAtlas("npc", {
+        //     frameWidth: 16,
+        //     frameHeight: 16,
+        //     atlas: "humans",
+        //     frame: "base_idle_1.png",
+        // });
+        // this.textures.addSpriteSheetFromAtlas("npc_longhair", {
+        //     frameWidth: 16,
+        //     frameHeight: 16,
+        //     atlas: "humans",
+        //     frame: "longhair_idle_1.png",
+        // });
     }
 
     create() {
@@ -171,6 +176,11 @@ export class Game extends Scene {
         map.createLayer("flowers", tileset, 0, 0);
 
         this.animatedTiles.init(map);
+        createAnimations(this.anims);
+        let shroomCoords = Object.values(this.npcStartPositions)
+        const shroomLocationIndex = Math.RND.between(0, shroomCoords.length - 1)
+        this.shroom = new powerUpSprite(this, shroomCoords[shroomLocationIndex][0], shroomCoords[shroomLocationIndex][1], 'powerup', 'tile000.png'  )
+        this.shroom.anims.play("shroom-powerup")
 
         //adds player with physics
 
@@ -228,8 +238,8 @@ export class Game extends Scene {
         player.setCollideWorldBounds(true);
 
         // create all player, NPC animations
-        createAnimations(this.anims);
-
+        
+        
         this.cameras.main.shake(900, 0.0007);
 
         /////////////

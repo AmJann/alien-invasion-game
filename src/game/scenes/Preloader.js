@@ -29,7 +29,8 @@ export class Preloader extends Scene {
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
         this.load.atlas('player', '/characters/alien/goblin_phaser3.png', '/characters/alien/goblin_phaser3.json')
-        this.load.atlas('humans','/characters/human/humans_phaser3.png', '/characters/human/humans_phaser3.json')
+        this.load.atlas('humans', '/characters/human/humans_phaser3.png', '/characters/human/humans_phaser3.json')
+        this.load.atlas('powerup', '/objects/mushroom_powerup.png', '/objects/mushroom_powerup.json' )
     }
 
     create() {
