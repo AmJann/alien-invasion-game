@@ -6,14 +6,14 @@ export class Opening extends Phaser.Scene {
         this.earthImg = null;
         this.messages = [
             "You: What a beautiful planet, I should take it over!",
-            "Gargoth: Hey,HEY! That's my planet I am already in the process of conquering it",
+            "Gargoth: Hey,HEY! That's my planet I am already in the process of conquering it!",
             "You: Oh? but you have not conquered it yet?",
-            "GarGoth: Don't even think about it!",
-            "I'm not thinking about it, I've decided!",
-            "You know what fine, I'll let you conquer that planet but only if you defeat me. I'll even give you time to capture some humans for battle",
-            "I got this",
-            "but if you lose you can't return...",
-            "I never lose",
+            "Gargoth: Don't even think about it!",
+            "You: I'm not thinking about it, I've decided!",
+            "Gargoth: You know what fine, I'll let you conquer that planet but only if you defeat me. I'll even give you time to capture some humans for battle.",
+            "You: I got this.",
+            "Gargoth: but if you lose you can't return...",
+            "I never lose.",
             "Neither do I ...",
         ];
         this.currentMessageIndex = 0;
@@ -111,7 +111,7 @@ export class Opening extends Phaser.Scene {
 
         skipButton.setInteractive();
         skipButton.on("pointerdown", () => {
-            this.scene.start("Game"); // Transition to the Game scene
+            this.scene.start("Game");
         });
     }
 
@@ -174,6 +174,7 @@ export class Opening extends Phaser.Scene {
             const destroyImagesDelay = 3000;
             const textFadeDelay = 3500;
             const textDestroyDelay = 4500;
+            const startNextSceneDelay = 5700;
 
             this.tweens.add({
                 targets: this.playerImg,
@@ -249,6 +250,10 @@ export class Opening extends Phaser.Scene {
             setTimeout(() => {
                 this.textBox.destroy();
             }, textDestroyDelay);
+
+            setTimeout(() => {
+                this.scene.start("Game");
+            }, startNextSceneDelay);
         }
     }
 
@@ -267,31 +272,31 @@ export class Opening extends Phaser.Scene {
         }
     }
 
-    endScene() {
-        this.tweens.add({
-            targets: this.playerImg,
-            y: "-=50", // Move up by 50 pixels
-            duration: 500, // Duration of the upward movement
-            yoyo: true, // Yoyo effect, moves back to the original position
-            repeat: 0, // Repeat 0 times (plays only once)
-        });
+    // endScene() {
+    //     this.tweens.add({
+    //         targets: this.playerImg,
+    //         y: "-=50", // Move up by 50 pixels
+    //         duration: 500, // Duration of the upward movement
+    //         yoyo: true, // Yoyo effect, moves back to the original position
+    //         repeat: 0, // Repeat 0 times (plays only once)
+    //     });
 
-        // Bounce animation for enemy alien
-        this.tweens.add({
-            targets: this.enemyImg,
-            y: "-=50", // Move up by 50 pixels
-            duration: 500, // Duration of the upward movement
-            yoyo: true, // Yoyo effect, moves back to the original position
-            repeat: 0, // Repeat 0 times (plays only once)
-        });
+    //     // Bounce animation for enemy alien
+    //     this.tweens.add({
+    //         targets: this.enemyImg,
+    //         y: "-=50", // Move up by 50 pixels
+    //         duration: 500, // Duration of the upward movement
+    //         yoyo: true, // Yoyo effect, moves back to the original position
+    //         repeat: 0, // Repeat 0 times (plays only once)
+    //     });
 
-        // Bounce animation for earth
-        this.tweens.add({
-            targets: this.earthImg,
-            y: "-=50", // Move up by 50 pixels
-            duration: 500, // Duration of the upward movement
-            yoyo: true, // Yoyo effect, moves back to the original position
-            repeat: 0, // Repeat 0 times (plays only once)
-        });
-    }
+    //     // Bounce animation for earth
+    //     this.tweens.add({
+    //         targets: this.earthImg,
+    //         y: "-=50", // Move up by 50 pixels
+    //         duration: 500, // Duration of the upward movement
+    //         yoyo: true, // Yoyo effect, moves back to the original position
+    //         repeat: 0, // Repeat 0 times (plays only once)
+    //     });
+    // }
 }

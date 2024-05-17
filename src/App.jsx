@@ -10,19 +10,12 @@ function App() {
 
     useEffect(() => {
         const handleResize = () => {
-            console.log("Resizing...");
             const gameCanvas = document.getElementById("game");
             const inventoryMenu = document.getElementById("inventory-menu");
             if (gameCanvas && inventoryMenu) {
                 const gameCanvasRect = gameCanvas.getBoundingClientRect();
-                console.log("Game canvas rect:", gameCanvasRect);
                 inventoryMenu.style.left = `${gameCanvasRect.left}px`;
                 inventoryMenu.style.top = `${gameCanvasRect.top}px`;
-                console.log(
-                    "Inventory menu position:",
-                    inventoryMenu.style.left,
-                    inventoryMenu.style.top
-                );
             }
         };
 
@@ -36,14 +29,10 @@ function App() {
     };
 
     const removeHumanFromInventory = (humanId) => {
-        setInventory(inventory.filter((human) => human.id !== humanId));
-        localStorage.removeItem(
-            inventory.findIndex((human) => human.id === humanId)
-        );
-
         const updatedInventory = inventory.filter(
             (human) => human.id !== humanId
         );
+        setInventory(updatedInventory);
         localStorage.setItem(
             "playerData",
             JSON.stringify({ inventory: updatedInventory })
@@ -52,8 +41,11 @@ function App() {
 
     useEffect(() => {
         const playerData = JSON.parse(localStorage.getItem("playerData"));
-
-        setInventory(playerData.inventory);
+        if (playerData && playerData.inventory) {
+            setInventory(playerData.inventory);
+        } else {
+            setInventory([]);
+        }
     }, [showInventory]);
 
     const currentScene = (scene) => {
@@ -72,9 +64,11 @@ function App() {
                     <h2>Inventory</h2>
                     <ul>
                         {inventory.map((human) => (
-                            <div className="human-button-container">
-                                <li key={human.id}>{human.name}</li>
-
+                            <div
+                                key={human.id}
+                                className="human-button-container"
+                            >
+                                <li>{human.name}</li>
                                 <button
                                     className="button remove-button"
                                     onClick={() =>
