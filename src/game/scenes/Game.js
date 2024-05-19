@@ -54,29 +54,32 @@ export class Game extends Scene {
             "animatedTiles"
         );
 
-        this.load.spritesheet(
-            "player",
-            import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
-            { frameWidth: 16, frameHeight: 16 }
-        );
-        this.load.spritesheet(
-            "humans",
-            import.meta.env.BASE_URL + " assets/humans_phaser3.png",
-            { frameWidth: 16, frameHeight: 16 }
-        );
-        this.textures.addSpriteSheetFromAtlas("npc", {
-            frameWidth: 16,
-            frameHeight: 16,
-            atlas: "humans",
-            frame: "base_idle_1.png",
-        });
-        this.textures.addSpriteSheetFromAtlas("npc_longhair", {
-            frameWidth: 16,
-            frameHeight: 16,
-            atlas: "humans",
-            frame: "longhair_idle_1.png",
-        });
-        this.load.audio('playerAttack',  import.meta.env.BASE_URL + 'assets/sound/17_orc_atk_sword_2.wav')
+        // this.load.spritesheet(
+        //     "player",
+        //     import.meta.env.BASE_URL + "assets/goblin_spritesheet.png",
+        //     { frameWidth: 16, frameHeight: 16 }
+        // );
+        // this.load.spritesheet(
+        //     "humans",
+        //     import.meta.env.BASE_URL + " assets/humans_phaser3.png",
+        //     { frameWidth: 16, frameHeight: 16 }
+        // );
+        // this.textures.addSpriteSheetFromAtlas("npc", {
+        //     frameWidth: 16,
+        //     frameHeight: 16,
+        //     atlas: "humans",
+        //     frame: "base_idle_1.png",
+        // });
+        // this.textures.addSpriteSheetFromAtlas("npc_longhair", {
+        //     frameWidth: 16,
+        //     frameHeight: 16,
+        //     atlas: "humans",
+        //     frame: "longhair_idle_1.png",
+        // });
+        // player attack sound effect
+        this.load.audio('playerAttack', import.meta.env.BASE_URL + 'assets/sound/17_orc_atk_sword_2.wav')
+        // npc sound effect
+        this.load.audio('npcHurt',  import.meta.env.BASE_URL + 'assets/sound/owie_.wav')
     }
 
     create() {

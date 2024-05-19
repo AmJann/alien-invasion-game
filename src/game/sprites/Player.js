@@ -131,9 +131,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         
     }
     soundEffectManager(key) {
-        console.log( this.playSoundEffect)
+        
         if (key === 'attack' && this.playSoundEffect) {
-            console.log('did we make it?')
             this.scene.sound.play('playerAttack')
             this.playSoundEffect = false
         }
