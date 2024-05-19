@@ -7,41 +7,38 @@ import {
     NuckChorris,
     humans,
 } from "../humans";
+import { HypnoRay } from "./captureItem";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
-        
-        this.inventory = [humans[1]];
+
+        this.inventory = [];
+
+        this.items = [new HypnoRay()];
         this.currentDirection = "right";
         this.currentState = "walking";
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.speed = 150;
+        // this.weapon is an invisible sprite used to trigger collision events
         this.weapon = this.scene.physics.add.sprite(-50, -50);
         this.weapon.setSize(30, 15);
         this.weapon.setActive(true).setVisible(true);
         this.playSoundEffect = false
         scene.add.existing(this);
         scene.physics.add.existing(this);
-
-        this.inventory = [
-            new Clown(),
-            new Scientist(),
-            new Firefighter(),
-            new Farmer(),
-            new NuckChorris(),
-        ];
-
     }
 
     addHumanToInventory(human) {
         if (this.inventory.length <= 5) {
             this.inventory.push(human);
+        } else {
+            console.log("You already have 5 humans");
         }
     }
 
-    removeHumanFromInventory(human) {
-        const index = this.inventory.indexOf(human);
+    removeHumanFromInventory(humanId) {
+        const index = this.inventory.findIndex((human) => human.id === humanId);
         if (index !== -1) {
             this.inventory.splice(index, 1);
         }
@@ -65,18 +62,42 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         return this.inventory;
     }
 
-
     savePlayerData() {
-        localStorage.setItem("playerData", JSON.stringify(this.inventory));
+        const playerData = {
+            inventory: this.inventory,
+            hypnoRayCharge:
+                this.items.find((item) => item.name === "HypnoRay")?.charge ||
+                0,
+        };
+        localStorage.setItem("playerData", JSON.stringify(playerData));
     }
 
     loadPlayerData() {
-        const data = localStorage.getItem("playerData");
-        return data ? JSON.parse(data) : null;
-    }
-    drawWeapon(x, y, obj) {
-        
+        console.log("Loading player data...");
+        const playerData = localStorage.getItem("playerData");
+        const hypnoRayItem = this.items.find(
+            (item) => item.name === "HypnoRay"
+        );
+        if (playerData) {
+            console.log("Player data from localStorage:", playerData);
+            const parsedData = JSON.parse(playerData);
+            this.inventory = parsedData.inventory || [];
 
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = parsedData.hypnoRayCharge || 0;
+            }
+        } else {
+            this.inventory = [new Clown(), new Scientist()];
+            const hypnoRayItem = this.items.find(
+                (item) => item.name === "HypnoRay"
+            );
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = 100;
+            }
+        }
+    }
+
+    drawWeapon(x, y, obj) {
         obj.setPosition(x, y);
 
         //setTimeout(this.sheathWeapon, 250, obj)
@@ -155,7 +176,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // player attack right
-        if (this.cursors.space.isDown) {
+        if (this.cursors.space.isDown && this.currentState != "fightScene") {
             this.currentState = "attacking";
             this.atta
             this.swingWeapon(this.currentDirection);

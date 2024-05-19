@@ -164,6 +164,17 @@ export function createAnimations(anims = Animations.anims) {
         frameRate: 12,
     });
 
-
+    // Object Animations
+    anims.create({
+        key: "shroom-powerup",
+        frames: anims.generateFrameNames("powerup", {
+            start: 0,
+            end: 3,
+            prefix: "tile00",
+            suffix: ".png",
+        }),
+        repeat: -1,
+        frameRate: 6,
+    });
 
 }

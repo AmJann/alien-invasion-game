@@ -7,7 +7,7 @@ import {
     NuckChorris,
 } from "../humans";
 import { Player } from "../sprites/Player.js";
-// import { runRiot } from "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3";
+import { HypnoRay } from "../sprites/captureItem.js";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -31,12 +31,18 @@ export class Fight extends Phaser.Scene {
         this.playerCurrentHuman = null;
         this.currentPlayerAttack = null;
         this.music = null;
+        this.switchHumanContainer = null;
+        this.attackMenuContainer = null;
+        this.itemMenuContainer = null;
+        
     }
 
     init(data) {
         // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
+        this.worldData = data.worldData;
+        this.npcObjects = data.npcObjects;
     }
 
     debug() {
@@ -47,13 +53,14 @@ export class Fight extends Phaser.Scene {
     preload() {
         this.load.audio(
             "runRiot",
-            "../../../public/assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
+            import.meta.env.BASE_URL +
+                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
         );
 
         let randomNum = Math.floor(Math.random() * humans.length);
         this.enemy = humans[randomNum];
 
-        if (this.enemy.health <= 0) {
+        if (this.enemy.health < this.enemy.maxHealth) {
             this.enemy.health = this.enemy.maxHealth;
             // console.log(this.enemy.health);
         }
@@ -67,30 +74,45 @@ export class Fight extends Phaser.Scene {
         };
 
         // Retrieve player data from local storage
+
         const playerData = this.player.loadPlayerData();
+        console.log(playerData);
 
         if (playerData) {
-            // Iterate over the saved inventory and recreate the humans
-            this.player.inventory = playerData.map((humanData) => {
-                // Use the mapping object to retrieve the class object based on the class name
-                const HumanClass = classMapping[humanData.name];
-                // Check if the class object exists in the mapping
-                if (HumanClass) {
-                    // Instantiate the class object
-                    return new HumanClass();
-                } else {
-                    // Handle case where class object is not found
-                    console.error(
-                        `Class object not found for class name: ${humanData.name}`
-                    );
-                    return null; // or handle differently based on your application's logic
-                }
-            });
+            this.player.inventory = playerData;
+            console.log("Player inventory:", this.player.inventory);
+
+            this.playerCurrentHuman =
+                this.player.inventory.find((human) => human.health > 0) ||
+                this.player.inventory[0];
+            console.log("Player current human:", this.playerCurrentHuman);
+            
+            const hypnoRayItem = this.player.items.find(
+                (item) => item.name === "HypnoRay"
+            );
+            if (hypnoRayItem) {
+                hypnoRayItem.charge = playerData.hypnoRayCharge || 0;
+            }
+            console.log("HypnoRay item:", hypnoRayItem);
         }
-        this.playerCurrentHuman = this.player.inventory[0];
+
+        for (const human of this.player.inventory) {
+            if (human.health > 0) {
+                this.playerCurrentHuman = human;
+                break;
+            }
+        }
         if (this.playerCurrentHuman.health <= 0) {
-            this.playerCurrentHuman.health = this.playerCurrentHuman.maxHealth;
-            // console.log(this.playerCurrentHuman.health);
+            const remainingHumans = this.player.inventory.filter(
+                (human) => human.health > 0
+            );
+            if (remainingHumans.length === 0) {
+                this.showMessage("Humans are defeated, you flee");
+
+                setTimeout(() => {
+                    this.returnToGameScene();
+                }, 4000);
+            }
         }
 
         if (this.enemy.health <= 0) {
@@ -114,22 +136,27 @@ export class Fight extends Phaser.Scene {
             this.enemy.hurtImage.name,
             import.meta.env.BASE_URL + this.enemy.hurtImage.path
         );
-        this.load.image(
-            this.playerCurrentHuman.hurtImage.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman.hurtImage.path
-        );
-        this.load.image(
-            this.playerCurrentHuman.defeatImage.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman.defeatImage.path
-        );
-        this.load.image(
-            this.playerCurrentHuman.name,
-            import.meta.env.BASE_URL + this.playerCurrentHuman["mainImage"]
-        );
+        this.player.inventory.forEach((human) => {
+            this.load.image(
+                human.name,
+                import.meta.env.BASE_URL + human.mainImage
+            );
+            this.load.image(
+                human.defeatImage.name,
+                import.meta.env.BASE_URL + human.defeatImage.path
+            );
+            this.load.image(
+                human.hurtImage.name,
+                import.meta.env.BASE_URL + human.hurtImage.path
+            );
+        });
+
+        console.log(this.playerCurrentHuman);
     }
 
     create() {
-        // console.log(this.player);
+        console.log(this.playerCurrentHuman);
+        console.log(this.enemy);
         // Add background image
         this.add.image(400, 400, "water_field_bg");
 
@@ -265,10 +292,10 @@ export class Fight extends Phaser.Scene {
             "Switch Human",
             570,
             660,
-            () => this.switchHuman()
+            () => this.switch()
         );
         this.itemButton = this.createActionButton("Item", 400, 735, () =>
-            this.useItem()
+            this.createItemMenu()
         );
         this.runButton = this.createActionButton("Run", 570, 735, () =>
             this.run()
@@ -363,6 +390,7 @@ export class Fight extends Phaser.Scene {
                 this.enableButtons();
                 let attack = this.randomCompAttack();
                 this.reducePlayerHealth(attack["damage"]);
+                this.player.savePlayerData();
             },
         });
     }
@@ -459,8 +487,22 @@ export class Fight extends Phaser.Scene {
 
     attack() {
         // Create and show the attack menu
+        if (this.attackMenuContainer) {
+            this.attackMenuContainer.destroy();
+            this.attackMenuContainer = null;
+        } else {
+            this.createAttackMenu();
+        }
 
-        this.createAttackMenu();
+        if (this.switchHumanContainer) {
+            this.switchHumanContainer.destroy();
+            this.switchHumanContainer = null;
+        }
+
+        if (this.itemMenuContainer) {
+            this.itemMenuContainer.destroy();
+            this.itemMenuContainer = null;
+        }
     }
 
     performAttack() {
@@ -521,6 +563,7 @@ export class Fight extends Phaser.Scene {
                         ease: "Power2",
                         delay: 0,
                     });
+                    this.worldData.removeHumanNPC = true
                     setTimeout(() => {
                         hurtAnimationRan = false;
                         this.returnToGameScene();
@@ -551,10 +594,10 @@ export class Fight extends Phaser.Scene {
         if (this.player.inventory.length > 1) {
             // Define the dimensions of the container
             const containerWidth = 220;
-            const containerHeight = 170;
+            const containerHeight = 150;
 
             // Create a container to hold the list of humans
-            const switchHumanContainer = this.add.container(223, 675);
+            this.switchHumanContainer = this.add.container(228, 694);
 
             // Background for the list
             const background = this.add.rectangle(
@@ -564,9 +607,9 @@ export class Fight extends Phaser.Scene {
                 containerHeight,
                 0x333333
             );
-            switchHumanContainer.add(background);
+            this.switchHumanContainer.add(background);
 
-            const verticalSpacing = 30;
+            const verticalSpacing = 27;
 
             const maxNames = Math.floor(containerHeight / verticalSpacing);
 
@@ -591,8 +634,9 @@ export class Fight extends Phaser.Scene {
                 }
                 humanText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
+                    console.log("switch", this.playerCurrentHuman, human);
 
-                    switchHumanContainer.destroy();
+                    this.switchHumanContainer.destroy();
 
                     this.loadHumanImage(human);
 
@@ -603,10 +647,28 @@ export class Fight extends Phaser.Scene {
                     this.computerAttack();
                 });
 
-                switchHumanContainer.add(humanText);
+                this.switchHumanContainer.add(humanText);
             });
         } else {
             console.log("You have only one human in your inventory.");
+        }
+    }
+
+    switch() {
+        if (this.switchHumanContainer) {
+            this.switchHumanContainer.destroy();
+            this.switchHumanContainer = null;
+        } else {
+            this.switchHuman();
+        }
+        if (this.attackMenuContainer) {
+            this.attackMenuContainer.destroy();
+            this.attackMenuContainer = null;
+        }
+
+        if (this.itemMenuContainer) {
+            this.itemMenuContainer.destroy();
+            this.itemMenuContainer = null;
         }
     }
 
@@ -628,7 +690,7 @@ export class Fight extends Phaser.Scene {
                 480,
                 this.playerCurrentHuman.defeatImage.name
             );
-
+            console.log("defeat Image", this.playerCurrentHuman.defeatImage);
             // Transition the defeated player image
             this.tweens.add({
                 targets: this.playerImg,
@@ -637,8 +699,18 @@ export class Fight extends Phaser.Scene {
                 ease: "Power2",
                 delay: 0,
                 onComplete: () => {
-                    // Create and show the switch human menu
-                    this.createSwitchHumanMenu();
+                    const remainingHumans = this.player.inventory.filter(
+                        (human) => human.health > 0
+                    );
+                    if (remainingHumans.length === 0) {
+                        this.showMessage("All your humans are defeated!");
+
+                        setTimeout(() => {
+                            this.returnToGameScene();
+                        }, 2000);
+                    } else {
+                        this.createSwitchHumanMenu();
+                    }
                 },
             });
         }
@@ -648,6 +720,7 @@ export class Fight extends Phaser.Scene {
     }
 
     createSwitchHumanMenu() {
+        this.disableButtons();
         // Create a container for the switch human menu with 0.5 opacity
         this.switchHumanMenuContainer = this.add.container(0, 0);
         // Set opacity to 0.5
@@ -676,7 +749,6 @@ export class Fight extends Phaser.Scene {
 
         this.switchHumanMenuContainer.add(this.defeatedText);
 
-        // Iterate over the inventory to display options for switching humans
         this.player.inventory.forEach((human, index) => {
             // Calculate the y-coordinate for the current option
             const yPos = 200 + index * 75;
@@ -693,20 +765,16 @@ export class Fight extends Phaser.Scene {
                 );
                 optionText.setInteractive();
                 optionText.setOrigin(0.5);
-                // Add click event to switch to the selected human
+
                 optionText.on("pointerdown", () => {
                     this.playerCurrentHuman = human;
 
-                    // Destroy the defeatedText
                     this.defeatedText.destroy();
 
-                    // Load new human image
                     this.loadHumanImage(human);
 
-                    // Update player name text
                     this.playerNameText.setText(human.name);
 
-                    // Update player health and health bar
                     this.updatePlayerHealth();
 
                     this.switchHumanMenuContainer.destroy();
@@ -717,7 +785,6 @@ export class Fight extends Phaser.Scene {
             }
         });
 
-        // Add the switch human menu container to the scene
         this.add.existing(this.switchHumanMenuContainer);
     }
 
@@ -744,41 +811,234 @@ export class Fight extends Phaser.Scene {
     }
 
     useItem() {
-        // use item logic here
+        const captureProbability = this.calculateCaptureProbability();
+        this.disableButtons();
+        const randomNum = Math.random();
+
+        if (randomNum < captureProbability) {
+            this.captureHuman(this.enemy);
+        } else {
+            this.flashGreenPulse();
+
+            setTimeout(() => {
+                this.showMessage("Failed to capture the human.");
+            }, 6500);
+
+            setTimeout(() => {
+                const hypnoRayItem = this.player.items.find(
+                    (item) => item.name === "HypnoRay"
+                );
+                if (hypnoRayItem) {
+                    hypnoRayItem.charge -= 5;
+                }
+                this.computerAttack();
+            }, 8000);
+        }
+        console.log(this);
+
+        this.itemMenuContainer.destroy();
+        this.disableButtons;
+    }
+
+    createItemMenu() {
+        if (this.switchHumanContainer) {
+            this.switchHumanContainer.destroy();
+            this.switchHumanContainer = null;
+        }
+
+        if (this.itemMenuContainer) {
+            this.itemMenuContainer.destroy();
+            this.itemMenuContainer = null;
+        } else {
+            this.itemMenuContainer = this.add.container(223, 695);
+            const menuBackground = this.add.rectangle(0, 0, 210, 150, 0x333333);
+            this.itemMenuContainer.add(menuBackground);
+
+            this.renderItemButtons();
+        }
+
+        if (this.attackMenuContainer) {
+            this.attackMenuContainer.destroy();
+            this.attackMenuContainer = null;
+        }
+    }
+
+    renderItemButtons() {
+        this.player.items.forEach((item, index) => {
+            const verticalSpacing = 30;
+            const yPos =
+                -100 / 2 + verticalSpacing / 2 + index * verticalSpacing;
+
+            console.log("item", item);
+            let text = item.name;
+            if (item.name === "HypnoRay") {
+                text = `${item.name}: ${item.charge}`;
+            }
+            const button = this.createItemOption(0, yPos, text, () =>
+                this.useItem(item)
+            );
+            this.itemMenuContainer.add(button);
+        });
+    }
+
+    createItemOption(x, y, text, callback) {
+        const button = this.add
+            .text(x, y, text, { fill: "#ffffff" })
+            .setInteractive()
+            .on("pointerdown", callback);
+
+        // Style the button
+        button.setPadding(15, 10, 15, 10);
+        button.setBackgroundColor("#333333");
+        button.setStroke("#ffffff", 1);
+
+        // Center the button's origin
+        button.setOrigin(0.5);
+
+        // Add hover effect
+        button.on("pointerover", () => button.setBackgroundColor("#555555"));
+        button.on("pointerout", () => button.setBackgroundColor("#333333"));
+
+        return button;
+    }
+
+    calculateCaptureProbability() {
+        const maxHealth = this.enemy.maxHealth;
+        const remainingHealth = this.enemy.health;
+        const captureProbability = 1 - remainingHealth / maxHealth;
+
+        const maxProbability = 0.8;
+        return Math.min(captureProbability, maxProbability);
+    }
+
+    showMessage(message) {
+        const text = this.add
+            .text(400, 100, message, { fontSize: "32px", fill: "#000000" })
+            .setOrigin(0.5)
+            .setDepth(1000);
+        this.tweens.add({
+            targets: text,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: "Linear",
+            delay: 2000,
+            onComplete: () => {
+                text.destroy();
+            },
+        });
+    }
+
+    captureHuman() {
+        this.flashGreenPulse();
+
+        const item = this.player.items[0];
+        console.log("item", item);
+
+        if (item.name === "HypnoRay") {
+            if (item.charge >= 5) {
+                if (this.player.inventory.length < 5) {
+                    console.log("human captured");
+                    this.worldData.removeHumanNPC = true
+                    
+                    setTimeout(() => {
+                        this.enemyImg = this.add.image(
+                            550,
+                            290,
+                            this.enemy.name,
+                            0
+                        );
+                    }, 6000);
+
+                    item.captureHuman(this.enemy, this.player);
+                    setTimeout(() => {
+                        this.showMessage("Human captured successfully!");
+                    }, 6500);
+                    setTimeout(() => {
+                        this.returnToGameScene();
+                    }, 10000);
+                } else {
+                    setTimeout(() => {
+                        this.showMessage("You already have 5 humans");
+                    }, 6500);
+                    setTimeout(() => {
+                        this.returnToGameScene();
+                    }, 10000);
+                }
+            } else {
+                this.showMessage("Hypno Ray is out of charges!!");
+            }
+        } else {
+            setTimeout(() => {
+                this.showMessage("Failed to capture the human.");
+            }, 6500);
+
+            this.computerAttack();
+        }
+    }
+
+    flashGreenPulse() {
+        const flash = this.add
+            .rectangle(400, 400, 800, 800, 0x00ff00)
+            .setAlpha(0)
+            .setDepth(1000); // Ensure it's above everything else
+        this.tweens.add({
+            targets: flash,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: "Linear",
+            repeat: 2,
+            yoyo: true,
+            onComplete: () => {
+                flash.destroy();
+            },
+        });
     }
 
     run() {
+        this.disableButtons();
         let randomNum = Math.floor(Math.random() * 11);
         if (randomNum > 5) {
-            this.returnToGameScene();
+            this.showMessage("You fled ...");
+            setTimeout(() => {
+                this.returnToGameScene();
+            }, 2500);
         } else {
-            this.disableButtons();
-            // console.log("miss");
-            this.computerAttack();
-            this.enableButtons();
+            this.showMessage("Failed to escape");
+            setTimeout(() => {
+                this.computerAttack();
+            }, 2500);
         }
     }
 
     returnToGameScene() {
         // Fade out the camera
+        console.log(this.worldData.removeHumanNPC)
         this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
                 // Retrieve player position from the data object
                 const playerX = this.playerPosition.x;
                 const playerY = this.playerPosition.y;
-
+                
                 // Set player position in the Game scene
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
                     gameScene.player.setPosition(playerX, playerY);
+                    gameScene.player.currentState = "walking";
                 } else {
                     console.error("Game scene or player not found.");
                 }
+                // for (let npc in this.npcObjects) {
+                //     let currentNPC = gameScene.registry.get(npc)
+                //     currentNPC.setPosition(npc.xPos, npc.yPos)
+                // }
                 this.music.stop();
                 // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
+                    worldData: this.worldData,
+                    npcObjects: this.npcObjects,
+                    
                 });
             }
         });
