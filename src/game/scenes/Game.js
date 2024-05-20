@@ -64,10 +64,6 @@ export class Game extends Scene {
         //     import.meta.env.BASE_URL + " assets/humans_phaser3.png",
         //     { frameWidth: 16, frameHeight: 16 }
         // );
-        // this.load.spritesheet(
-        //     'powerup',
-        //     import.meta.env.BASE_URL + 'assets/'
-        // )
         // this.textures.addSpriteSheetFromAtlas("npc", {
         //     frameWidth: 16,
         //     frameHeight: 16,
@@ -80,14 +76,22 @@ export class Game extends Scene {
         //     atlas: "humans",
         //     frame: "longhair_idle_1.png",
         // });
+        // player attack sound effect
+        this.load.audio('music', import.meta.env.BASE_URL + 'assets/sound/funny-chase-matt-stewart-evans-main-version-02-12-14899.mp3')
+        this.load.audio('playerAttack', import.meta.env.BASE_URL + 'assets/sound/17_orc_atk_sword_2.wav')
+        // npc sound effect
+        this.load.audio('npcHurt',  import.meta.env.BASE_URL + 'assets/sound/owie_.wav')
     }
 
     create() {
+        this.music = this.sound.add("music");
+        this.music.play();
+        this.music.setLoop(true);
         this.add.image(
             "gameTiles",
             import.meta.env.BASE_URL + "assets/gameTiles.png"
         );
-
+        this.sound.add('playerAttack')
         const map = this.make.tilemap({
             key: "alienMap",
             tileWidth: 16,

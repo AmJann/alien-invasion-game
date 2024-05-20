@@ -190,4 +190,9 @@ Created by [Phaser Studio](mailto:support@phaser.io). Powered by coffee, anime, 
 
 The Phaser logo and characters are &copy; 2011 - 2024 Phaser Studio Inc.
 
+## Credits
+https://uppbeat.io/track/matt-stewart-evans/run-riot
+https://uppbeat.io/t/matt-stewart-evans/funny-chase
+License code: ARFYEYMFYQG6BLQ2
+
 All rights reserved.
