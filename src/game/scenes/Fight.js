@@ -34,7 +34,6 @@ export class Fight extends Phaser.Scene {
         this.switchHumanContainer = null;
         this.attackMenuContainer = null;
         this.itemMenuContainer = null;
-        
     }
 
     init(data) {
@@ -55,6 +54,11 @@ export class Fight extends Phaser.Scene {
             "runRiot",
             import.meta.env.BASE_URL +
                 "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
+        );
+
+        this.load.audio(
+            "attackSoundComputer",
+            import.meta.env.BASE_URL + "assets/sound/punch-6.mp3"
         );
 
         let randomNum = Math.floor(Math.random() * humans.length);
@@ -86,7 +90,7 @@ export class Fight extends Phaser.Scene {
                 this.player.inventory.find((human) => human.health > 0) ||
                 this.player.inventory[0];
             console.log("Player current human:", this.playerCurrentHuman);
-            
+
             const hypnoRayItem = this.player.items.find(
                 (item) => item.name === "HypnoRay"
             );
@@ -387,6 +391,7 @@ export class Fight extends Phaser.Scene {
             yoyo: true,
             repeat: 0,
             onComplete: () => {
+                this.sound.play("attackSoundComputer");
                 this.enableButtons();
                 let attack = this.randomCompAttack();
                 this.reducePlayerHealth(attack["damage"]);
@@ -511,6 +516,8 @@ export class Fight extends Phaser.Scene {
         //hide/destroy attack menu
         this.attackMenuContainer.destroy();
 
+        this.sound.play("attackSound");
+
         this.attackTween = this.tweens.add({
             targets: this.playerImg,
             x: 530,
@@ -563,7 +570,7 @@ export class Fight extends Phaser.Scene {
                         ease: "Power2",
                         delay: 0,
                     });
-                    this.worldData.removeHumanNPC = true
+                    this.worldData.removeHumanNPC = true;
                     setTimeout(() => {
                         hurtAnimationRan = false;
                         this.returnToGameScene();
@@ -938,8 +945,8 @@ export class Fight extends Phaser.Scene {
             if (item.charge >= 5) {
                 if (this.player.inventory.length < 5) {
                     console.log("human captured");
-                    this.worldData.removeHumanNPC = true
-                    
+                    this.worldData.removeHumanNPC = true;
+
                     setTimeout(() => {
                         this.enemyImg = this.add.image(
                             550,
@@ -1012,14 +1019,14 @@ export class Fight extends Phaser.Scene {
 
     returnToGameScene() {
         // Fade out the camera
-        console.log(this.worldData.removeHumanNPC)
+        console.log(this.worldData.removeHumanNPC);
         this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
                 // Retrieve player position from the data object
                 const playerX = this.playerPosition.x;
                 const playerY = this.playerPosition.y;
-                
+
                 // Set player position in the Game scene
                 const gameScene = this.scene.get("Game");
                 if (gameScene && gameScene.player) {
@@ -1038,7 +1045,6 @@ export class Fight extends Phaser.Scene {
                     playerPosition: this.playerPosition,
                     worldData: this.worldData,
                     npcObjects: this.npcObjects,
-                    
                 });
             }
         });
