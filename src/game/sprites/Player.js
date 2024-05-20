@@ -24,7 +24,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.weapon = this.scene.physics.add.sprite(-50, -50);
         this.weapon.setSize(30, 15);
         this.weapon.setActive(true).setVisible(true);
-        this.playSoundEffect = false
+        this.playSoundEffect = false;
         scene.add.existing(this);
         scene.physics.add.existing(this);
     }
@@ -46,13 +46,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     swingWeapon(direction) {
         if (direction == "right") {
             this.anims.play("player-attack-right", true);
-            
         } else {
             this.anims.play("player-attack-left", true);
         }
-        this.playSoundEffect = true
-        this.scene.time.delayedCall(200, () =>  this.soundEffectManager('attack'))
-        
+        this.playSoundEffect = true;
+        this.scene.time.delayedCall(200, () =>
+            this.soundEffectManager("attack")
+        );
     }
     hasHuman(human) {
         return this.inventory.includes(human);
@@ -92,7 +92,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 (item) => item.name === "HypnoRay"
             );
             if (hypnoRayItem) {
-                hypnoRayItem.charge = 100;
+                hypnoRayItem.charge = 25;
             }
         }
     }
@@ -111,7 +111,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             // this.scene.sound.play('playerAttack',)
             if (direction == "left") {
                 this.anims.play("player-attack-left", true);
-                
             } else {
                 this.anims.play("player-attack-right", true);
             }
@@ -128,13 +127,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 this.anims.play("player-idle-right", true);
             }
         }
-        
     }
     soundEffectManager(key) {
-        
-        if (key === 'attack' && this.playSoundEffect) {
-            this.scene.sound.play('playerAttack')
-            this.playSoundEffect = false
+        if (key === "attack" && this.playSoundEffect) {
+            this.scene.sound.play("playerAttack");
+            this.playSoundEffect = false;
         }
     }
     preUpdate(t, dt) {
@@ -177,7 +174,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         // player attack right
         if (this.cursors.space.isDown && this.currentState != "fightScene") {
             this.currentState = "attacking";
-            this.atta
+            this.atta;
             this.swingWeapon(this.currentDirection);
             this.scene.time.delayedCall(350, () => {
                 const xPos = this.body.x;
