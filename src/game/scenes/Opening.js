@@ -29,9 +29,17 @@ export class Opening extends Phaser.Scene {
         ];
         this.currentCoordinateIndex = 0;
         this.currentCoordinateIndex = 0;
+        this.music = null;
+        this.skipButton = null;
     }
 
     preload() {
+        this.load.audio(
+            "bugsInTheAttic",
+            import.meta.env.BASE_URL +
+                "assets/sound/bugs-in-the-attic-matt-stewart-evans-main-version-14921-02-09.mp3"
+        );
+
         this.load.image(
             "stars-bg",
             import.meta.env.BASE_URL + "assets/stars-bg.jpg"
@@ -64,6 +72,10 @@ export class Opening extends Phaser.Scene {
         this.playerImg = this.add
             .image(playerAlienStartX, 550, "player-alien")
             .setFlipX(true);
+
+        this.music = this.sound.add("bugsInTheAttic");
+        this.music.play();
+        this.music.setLoop(true);
 
         this.tweens.add({
             targets: this.playerImg,
@@ -104,14 +116,17 @@ export class Opening extends Phaser.Scene {
             this.typeMessage();
         }, 3000);
 
-        const skipButton = this.add.text(700, 50, "Skip", {
+        this.skipButton = this.add.text(700, 50, "Skip", {
             fontSize: "32px",
             fill: "#ffffff",
         });
 
-        skipButton.setInteractive();
-        skipButton.on("pointerdown", () => {
-            this.scene.start("Game");
+        this.skipButton.setInteractive();
+        this.skipButton.on("pointerdown", () => {
+            this.closingAnimations();
+            setTimeout(() => {
+                this.showButtons();
+            }, 6000);
         });
     }
 
@@ -135,7 +150,7 @@ export class Opening extends Phaser.Scene {
             (this.currentCoordinateIndex + 1) % this.coordinates.length;
 
         this.isTyping = true;
-        this.enterKeyActive = false; // Disable Enter key
+        this.enterKeyActive = false;
 
         if (this.currentMessageIndex === 5) {
             this.enemyImg.destroy();
@@ -161,7 +176,7 @@ export class Opening extends Phaser.Scene {
                     charIndex++;
                 } else {
                     this.isTyping = false;
-                    this.enterKeyActive = true; // Enable Enter key
+                    this.enterKeyActive = true;
                     this.typingEvent.remove();
                 }
             },
@@ -169,92 +184,161 @@ export class Opening extends Phaser.Scene {
         });
 
         if (this.currentMessageIndex >= this.messages.length - 1) {
-            const bounceDelay = 1500;
-            const fallDelay = 2000;
-            const destroyImagesDelay = 3000;
-            const textFadeDelay = 3500;
-            const textDestroyDelay = 4500;
-            const startNextSceneDelay = 5700;
-
-            this.tweens.add({
-                targets: this.playerImg,
-                y: "-=100",
-                duration: 1000,
-                yoyo: true,
-                repeat: 0,
-                delay: bounceDelay,
-            });
-
-            // Bounce animation for enemy alien
-            this.tweens.add({
-                targets: this.enemyImg,
-                y: "-=100",
-                duration: 1000,
-                yoyo: true,
-                repeat: 0,
-                delay: bounceDelay,
-            });
-
-            // Bounce animation for earth
-            this.tweens.add({
-                targets: this.earthImg,
-                y: "-=100",
-                duration: 1000,
-                yoyo: true,
-                repeat: 0,
-                delay: bounceDelay,
-            });
-
-            this.tweens.add({
-                targets: this.playerImg,
-                y: 1000,
-                ease: "Power2",
-                duration: 1000,
-                delay: fallDelay,
-            });
-
-            // Bounce animation for enemy alien
-            this.tweens.add({
-                targets: this.enemyImg,
-                y: 1000,
-                ease: "Power2",
-                duration: 1000,
-                delay: fallDelay,
-            });
-
-            // Bounce animation for earth
-            this.tweens.add({
-                targets: this.earthImg,
-                y: 1000,
-                ease: "Power2",
-                duration: 1000,
-                delay: fallDelay,
-            });
-
-            setTimeout(() => {
-                this.enemyImg.destroy();
-                this.playerImg.destroy();
-                this.earthImg.destroy();
-            }, destroyImagesDelay);
-
-            this.tweens.add({
-                targets: this.textBox,
-                alpha: 0, // Fade out to invisible
-                duration: 1000, // Duration of fade out
-                delay: textFadeDelay,
-                onComplete: () => {
-                    this.textBox.setAlpha(1);
-                },
-            });
-
-            setTimeout(() => {
-                this.textBox.destroy();
-            }, textDestroyDelay);
-
-            setTimeout(() => {
-                this.scene.start("Game");
-            }, startNextSceneDelay);
+            this.closingAnimations();
         }
+    }
+
+    closingAnimations() {
+        const bounceDelay = 1500;
+        const fallDelay = 2000;
+        const destroyImagesDelay = 3000;
+        const textFadeDelay = 3500;
+        const textDestroyDelay = 4500;
+        const startNextSceneDelay = 5700;
+
+        this.tweens.add({
+            targets: this.skipButton,
+            alpha: 0,
+            duration: 1000,
+            ease: "Power2",
+        });
+
+        this.tweens.add({
+            targets: this.playerImg,
+            y: "-=100",
+            duration: 1000,
+            yoyo: true,
+            repeat: 0,
+            delay: bounceDelay,
+        });
+
+        // Bounce animation for enemy alien
+        this.tweens.add({
+            targets: this.enemyImg,
+            y: "-=100",
+            duration: 1000,
+            yoyo: true,
+            repeat: 0,
+            delay: bounceDelay,
+        });
+
+        // Bounce animation for earth
+        this.tweens.add({
+            targets: this.earthImg,
+            y: "-=100",
+            duration: 1000,
+            yoyo: true,
+            repeat: 0,
+            delay: bounceDelay,
+        });
+
+        this.tweens.add({
+            targets: this.playerImg,
+            y: 1000,
+            ease: "Power2",
+            duration: 1000,
+            delay: fallDelay,
+        });
+
+        // Bounce animation for enemy alien
+        this.tweens.add({
+            targets: this.enemyImg,
+            y: 1000,
+            ease: "Power2",
+            duration: 1000,
+            delay: fallDelay,
+        });
+
+        // Bounce animation for earth
+        this.tweens.add({
+            targets: this.earthImg,
+            y: 1000,
+            ease: "Power2",
+            duration: 1000,
+            delay: fallDelay,
+        });
+
+        setTimeout(() => {
+            this.enemyImg.destroy();
+            this.playerImg.destroy();
+            this.earthImg.destroy();
+        }, destroyImagesDelay);
+
+        this.tweens.add({
+            targets: this.textBox,
+            alpha: 0, // Fade out to invisible
+            duration: 1000, // Duration of fade out
+            delay: textFadeDelay,
+            onComplete: () => {
+                this.textBox.setAlpha(1);
+            },
+        });
+
+        setTimeout(() => {
+            this.textBox.destroy();
+        }, textDestroyDelay);
+
+        setTimeout(() => {
+            this.showButtons();
+        }, startNextSceneDelay);
+    }
+
+    showButtons() {
+        const newGameButton = this.add
+            .text(400, 300, "New Game", {
+                fontSize: "32px",
+                fill: "#ffffff",
+            })
+            .setOrigin(0.5)
+            .setAlpha(0);
+
+        const resumeButton = this.add
+            .text(400, 400, "Resume", {
+                fontSize: "32px",
+                fill: "#ffffff",
+            })
+            .setOrigin(0.5)
+            .setAlpha(0);
+
+        this.tweens.add({
+            targets: newGameButton,
+            alpha: 1,
+            duration: 1000,
+            ease: "Power2",
+        });
+
+        this.tweens.add({
+            targets: resumeButton,
+            alpha: 1,
+            duration: 1000,
+            ease: "Power2",
+            delay: 200,
+        });
+
+        newGameButton.setInteractive();
+        newGameButton.on("pointerdown", () => {
+            localStorage.clear();
+            this.music.destroy();
+            this.scene.start("Game");
+        });
+        newGameButton.on("pointerover", () => {
+            newGameButton.setStyle({ fill: "#ff0000" });
+        });
+        newGameButton.on("pointerout", () => {
+            newGameButton.setStyle({ fill: "#ffffff" });
+        });
+
+        resumeButton.setInteractive();
+        resumeButton.on("pointerdown", () => {
+            this.music.destroy();
+            this.scene.start("Game");
+        });
+        resumeButton.on("pointerover", () => {
+            resumeButton.setStyle({ fill: "#ff0000" });
+        });
+        resumeButton.on("pointerout", () => {
+            resumeButton.setStyle({ fill: "#ffffff" });
+        });
     }
 
     update(time, delta) {
