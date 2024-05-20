@@ -125,7 +125,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
                     (camera, progress) => {
                         if (progress === 1) {
                             //passes reference to fight scene and fixes blue border issue with fight scene
-                            //scene.music.stop()
+                            scene.music.stop()
                             scene.scene.start("Fight", {
                                 playerPosition: scene.playerPosition,
                                 player: scene.player,
