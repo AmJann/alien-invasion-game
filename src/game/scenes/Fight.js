@@ -57,7 +57,7 @@ export class Fight extends Phaser.Scene {
         );
 
         this.load.audio(
-            "attackSoundComputer",
+            "attackSound",
             import.meta.env.BASE_URL + "assets/sound/punch-6.mp3"
         );
 
@@ -391,7 +391,7 @@ export class Fight extends Phaser.Scene {
             yoyo: true,
             repeat: 0,
             onComplete: () => {
-                this.sound.play("attackSoundComputer");
+                this.sound.play("attackSound");
                 this.enableButtons();
                 let attack = this.randomCompAttack();
                 this.reducePlayerHealth(attack["damage"]);
