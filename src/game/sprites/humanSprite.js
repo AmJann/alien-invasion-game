@@ -10,6 +10,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
         this.id = id
         this.facing = "right";
         this.currentState = 'walking';
+        this.playSoundEffect = true
         this.projectile = this.scene.physics.add.sprite(-50, -50);
         this.projectile.setSize(8, 8);
         this.projectile.setActive(true).setVisible(true);
@@ -124,7 +125,7 @@ export class humanSprite extends Physics.Arcade.Sprite {
                     (camera, progress) => {
                         if (progress === 1) {
                             //passes reference to fight scene and fixes blue border issue with fight scene
-                            
+                            scene.music.stop()
                             scene.scene.start("Fight", {
                                 playerPosition: scene.playerPosition,
                                 player: scene.player,
@@ -144,15 +145,20 @@ export class humanSprite extends Physics.Arcade.Sprite {
 
     // let's have our NPCs move around at random - None of this is working
     killNPC() {
+        if (this.playSoundEffect) {
+            this.currentState = 'smacked'
+            console.log(this.currentState)
+            this.setVelocity(0, 0)
         
-        this.currentState = 'smacked'
-        console.log(this.currentState)
-        this.setVelocity(0, 0)
-        
-        if (this.facing == "right") {
-            this.anims.play("human-hurt-right");
-        } else {
-            this.anims.play("human-hurt-left");
+            if (this.facing == "right") {
+                this.anims.play("human-hurt-right");
+            
+            } else {
+                this.anims.play("human-hurt-left");
+            }
+            this.playSoundEffect = false
+            this.scene.time.delayedCall(200, () => this.soundEffectManager())
+            //this.scene.sound.play('npcHurt')
         }
     }
     changeDirection() {
@@ -250,6 +256,11 @@ export class humanSprite extends Physics.Arcade.Sprite {
         }
         
         this.setVelocity(xVel, yVel);
+    }
+    soundEffectManager() {
+        this.scene.sound.play('npcHurt')
+        
+        
     }
     updatePosition(scene) {
         scene.worldData[this.id].xPos =  this.x   
