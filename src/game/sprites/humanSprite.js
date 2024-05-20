@@ -186,15 +186,17 @@ export class humanSprite extends Physics.Arcade.Sprite {
         // play the correct animation
         if (xVel === 0 && yVel === 0) {
             if (this.facing === "left") {
-                this.anims.play("human-idle-left");
+                
+                this.anims.play("human-idle-left", true);
             } else {
-                this.anims.play("human-idle-right");
+                this.anims.play("human-idle-right", true);
             }
         } else {
             if (this.facing === "left") {
-                this.anims.play("human-walk-left");
+                
+                this.anims.play("human-walk-left", true);
             } else {
-                this.anims.play("human-walk-right");
+                this.anims.play("human-walk-right", true);
             }
         }
         this.setVelocity(xVel, yVel);
@@ -243,15 +245,15 @@ export class humanSprite extends Physics.Arcade.Sprite {
         // play the correct animation
         if (xVel === 0 && yVel === 0) {
             if (this.facing === "left") {
-                this.anims.play("human-idle-left");
+                this.anims.play("human-idle-left", true);
             } else {
-                this.anims.play("human-idle-right");
+                this.anims.play("human-idle-right", true);
             }
         } else {
             if (this.facing === "left") {
-                this.anims.play("human-walk-left");
+                this.anims.play("human-walk-left", true);
             } else {
-                this.anims.play("human-walk-right");
+                this.anims.play("human-walk-right", true);
             }
         }
         
