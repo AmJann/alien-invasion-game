@@ -2,7 +2,7 @@
 
 We are using Phaser, React, and Vite for our game engine, web UI, and bundling. 
 
-
+Here is the deployed game [Alien Invasion Game](https://amjann.github.io/alien-invasion-game/)
 
 ### Versions
 
