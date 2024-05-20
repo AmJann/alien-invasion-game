@@ -22,7 +22,8 @@ export class powerUpSprite extends Physics.Arcade.Sprite {
                 const playerData = JSON.parse(storage);
 
                 // teleport to another spot on the map
-                if (playerData.inventory) {
+                if (playerData && playerData.inventory) {
+                    
                     // heal the humans in inventory
 
                     for (let obj in playerData.inventory) {
