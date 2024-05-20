@@ -32,6 +32,12 @@ export class Opening extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio(
+            "bugsInTheAttic",
+            import.meta.env.BASE_URL +
+                "assets/sound/bugs-in-the-attic-matt-stewart-evans-main-version-14921-02-09.mp3"
+        );
+
         this.load.image(
             "stars-bg",
             import.meta.env.BASE_URL + "assets/stars-bg.jpg"
@@ -57,6 +63,10 @@ export class Opening extends Phaser.Scene {
     create() {
         const enemyAlienStartX = -300;
         let playerAlienStartX = 1000;
+
+        this.music = this.sound.add("bugsInTheAttic");
+        this.music.play();
+        this.music.setLoop(true);
 
         this.add.image(400, 400, "stars-bg");
         this.earthImg = this.add.image(120, 640, "earth");
