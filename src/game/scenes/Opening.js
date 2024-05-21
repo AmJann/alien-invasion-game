@@ -28,9 +28,9 @@ export class Opening extends Phaser.Scene {
             { x: 300, y: 300 },
         ];
         this.currentCoordinateIndex = 0;
-        this.currentCoordinateIndex = 0;
         this.music = null;
         this.skipButton = null;
+        this.closingAnimationTriggered = false;
     }
 
     preload() {
@@ -109,8 +109,15 @@ export class Opening extends Phaser.Scene {
 
         // Set up Enter key input
         this.enterKey = this.input.keyboard.addKey(
-            Phaser.Input.Keyboard.KeyCodes.ENTER
+            Phaser.Input.Keyboard.KeyCodes.ANY
         );
+
+        this.input.keyboard.on("keydown", (event) => {
+            if (this.enterKeyActive && !this.isTyping) {
+                this.currentMessageIndex++;
+                this.typeMessage();
+            }
+        });
 
         setTimeout(() => {
             this.typeMessage();
@@ -123,15 +130,13 @@ export class Opening extends Phaser.Scene {
 
         this.skipButton.setInteractive();
         this.skipButton.on("pointerdown", () => {
-            this.closingAnimations();
-            setTimeout(() => {
-                this.showButtons();
-            }, 6000);
+            this.triggerClosingAnimations();
         });
     }
 
     typeMessage() {
         if (this.currentMessageIndex >= this.messages.length) {
+            this.triggerClosingAnimations();
             return;
         }
 
@@ -182,10 +187,14 @@ export class Opening extends Phaser.Scene {
             },
             loop: true,
         });
+    }
 
-        if (this.currentMessageIndex >= this.messages.length - 1) {
-            this.closingAnimations();
+    triggerClosingAnimations() {
+        if (this.closingAnimationTriggered) {
+            return;
         }
+        this.closingAnimationTriggered = true;
+        this.closingAnimations();
     }
 
     closingAnimations() {
@@ -279,69 +288,12 @@ export class Opening extends Phaser.Scene {
         }, textDestroyDelay);
 
         setTimeout(() => {
-            this.showButtons();
+            this.music.destroy();
+            this.scene.start("Game");
         }, startNextSceneDelay);
     }
 
-    showButtons() {
-        const newGameButton = this.add
-            .text(400, 300, "New Game", {
-                fontSize: "32px",
-                fill: "#ffffff",
-            })
-            .setOrigin(0.5)
-            .setAlpha(0);
-
-        const resumeButton = this.add
-            .text(400, 400, "Resume", {
-                fontSize: "32px",
-                fill: "#ffffff",
-            })
-            .setOrigin(0.5)
-            .setAlpha(0);
-
-        this.tweens.add({
-            targets: newGameButton,
-            alpha: 1,
-            duration: 1000,
-            ease: "Power2",
-        });
-
-        this.tweens.add({
-            targets: resumeButton,
-            alpha: 1,
-            duration: 1000,
-            ease: "Power2",
-            delay: 200,
-        });
-
-        newGameButton.setInteractive();
-        newGameButton.on("pointerdown", () => {
-            localStorage.clear();
-            this.music.destroy();
-            this.scene.start("Game");
-        });
-        newGameButton.on("pointerover", () => {
-            newGameButton.setStyle({ fill: "#ff0000" });
-        });
-        newGameButton.on("pointerout", () => {
-            newGameButton.setStyle({ fill: "#ffffff" });
-        });
-
-        resumeButton.setInteractive();
-        resumeButton.on("pointerdown", () => {
-            this.music.destroy();
-            this.scene.start("Game");
-        });
-        resumeButton.on("pointerover", () => {
-            resumeButton.setStyle({ fill: "#ff0000" });
-        });
-        resumeButton.on("pointerout", () => {
-            resumeButton.setStyle({ fill: "#ffffff" });
-        });
-    }
-
-    update(time, delta) {
+    update() {
         if (this.earthImg) {
             this.earthImg.rotation += 0.01; // Adjust the rotation speed as needed
         }
@@ -355,32 +307,4 @@ export class Opening extends Phaser.Scene {
             this.typeMessage();
         }
     }
-
-    // endScene() {
-    //     this.tweens.add({
-    //         targets: this.playerImg,
-    //         y: "-=50", // Move up by 50 pixels
-    //         duration: 500, // Duration of the upward movement
-    //         yoyo: true, // Yoyo effect, moves back to the original position
-    //         repeat: 0, // Repeat 0 times (plays only once)
-    //     });
-
-    //     // Bounce animation for enemy alien
-    //     this.tweens.add({
-    //         targets: this.enemyImg,
-    //         y: "-=50", // Move up by 50 pixels
-    //         duration: 500, // Duration of the upward movement
-    //         yoyo: true, // Yoyo effect, moves back to the original position
-    //         repeat: 0, // Repeat 0 times (plays only once)
-    //     });
-
-    //     // Bounce animation for earth
-    //     this.tweens.add({
-    //         targets: this.earthImg,
-    //         y: "-=50", // Move up by 50 pixels
-    //         duration: 500, // Duration of the upward movement
-    //         yoyo: true, // Yoyo effect, moves back to the original position
-    //         repeat: 0, // Repeat 0 times (plays only once)
-    //     });
-    // }
 }
