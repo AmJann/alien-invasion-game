@@ -31,6 +31,9 @@ export class Opening extends Phaser.Scene {
         this.music = null;
         this.skipButton = null;
         this.closingAnimationTriggered = false;
+        this.newGameButton = null;
+        this.resumeButton = null;
+        this.newGame = false;
     }
 
     preload() {
@@ -63,11 +66,95 @@ export class Opening extends Phaser.Scene {
     }
 
     create() {
+        this.add.image(400, 400, "stars-bg");
+        this.earthImg = this.add.image(120, 640, "earth");
+
+        this.showButtons();
+
+        this.enterKey = this.input.keyboard.addKey(
+            Phaser.Input.Keyboard.KeyCodes.ANY
+        );
+    }
+
+    showButtons() {
+        let playerData = localStorage.getItem("playerData");
+        if (playerData) {
+            this.resumeButton = this.add
+                .text(400, 400, "Resume", {
+                    fontSize: "32px",
+                    fill: "#ffffff",
+                })
+                .setOrigin(0.5)
+                .setAlpha(0);
+
+            this.tweens.add({
+                targets: this.resumeButton,
+                alpha: 1,
+                duration: 1000,
+                ease: "Power2",
+                delay: 200,
+            });
+
+            this.resumeButton.setInteractive();
+            this.resumeButton.on("pointerdown", () => {
+                this.scene.start("Game");
+            });
+            this.resumeButton.on("pointerover", () => {
+                this.resumeButton.setStyle({ fill: "#ff0000" });
+            });
+            this.resumeButton.on("pointerout", () => {
+                this.resumeButton.setStyle({ fill: "#ffffff" });
+            });
+        }
+
+        this.newGameButton = this.add
+            .text(400, 300, "New Game", {
+                fontSize: "32px",
+                fill: "#ffffff",
+            })
+            .setOrigin(0.5)
+            .setAlpha(0);
+
+        this.tweens.add({
+            targets: this.newGameButton,
+            alpha: 1,
+            duration: 1000,
+            ease: "Power2",
+        });
+
+        this.newGameButton.setInteractive();
+        this.newGameButton.on("pointerdown", () => {
+            localStorage.clear();
+            this.newGame = true;
+            this.startOpeningSequence();
+        });
+        this.newGameButton.on("pointerover", () => {
+            this.newGameButton.setStyle({ fill: "#ff0000" });
+        });
+        this.newGameButton.on("pointerout", () => {
+            this.newGameButton.setStyle({ fill: "#ffffff" });
+        });
+    }
+
+    startOpeningSequence() {
+        this.tweens.add({
+            targets: this.newGameButton,
+            alpha: 0,
+            duration: 1000,
+            delay: 0,
+        });
+        if (this.resumeButton) {
+            this.tweens.add({
+                targets: this.resumeButton,
+                alpha: 0,
+                duration: 1000,
+                delay: 0,
+            });
+        }
+
         const enemyAlienStartX = -300;
         let playerAlienStartX = 1000;
 
-        this.add.image(400, 400, "stars-bg");
-        this.earthImg = this.add.image(120, 640, "earth");
         this.enemyImg = this.add.image(enemyAlienStartX, 200, "enemy-alien");
         this.playerImg = this.add
             .image(playerAlienStartX, 550, "player-alien")
@@ -107,11 +194,6 @@ export class Opening extends Phaser.Scene {
             }
         );
 
-        // Set up Enter key input
-        this.enterKey = this.input.keyboard.addKey(
-            Phaser.Input.Keyboard.KeyCodes.ANY
-        );
-
         this.input.keyboard.on("keydown", (event) => {
             if (this.enterKeyActive && !this.isTyping) {
                 this.currentMessageIndex++;
@@ -144,13 +226,11 @@ export class Opening extends Phaser.Scene {
         this.textBox.setText("");
         let charIndex = 0;
 
-        // Update text box coordinates
         this.textBox.setPosition(
             this.coordinates[this.currentCoordinateIndex].x,
             this.coordinates[this.currentCoordinateIndex].y
         );
 
-        // Switch to the next coordinate set
         this.currentCoordinateIndex =
             (this.currentCoordinateIndex + 1) % this.coordinates.length;
 
@@ -221,7 +301,6 @@ export class Opening extends Phaser.Scene {
             delay: bounceDelay,
         });
 
-        // Bounce animation for enemy alien
         this.tweens.add({
             targets: this.enemyImg,
             y: "-=100",
@@ -231,7 +310,6 @@ export class Opening extends Phaser.Scene {
             delay: bounceDelay,
         });
 
-        // Bounce animation for earth
         this.tweens.add({
             targets: this.earthImg,
             y: "-=100",
@@ -249,7 +327,6 @@ export class Opening extends Phaser.Scene {
             delay: fallDelay,
         });
 
-        // Bounce animation for enemy alien
         this.tweens.add({
             targets: this.enemyImg,
             y: 1000,
@@ -258,7 +335,6 @@ export class Opening extends Phaser.Scene {
             delay: fallDelay,
         });
 
-        // Bounce animation for earth
         this.tweens.add({
             targets: this.earthImg,
             y: 1000,
@@ -275,8 +351,8 @@ export class Opening extends Phaser.Scene {
 
         this.tweens.add({
             targets: this.textBox,
-            alpha: 0, // Fade out to invisible
-            duration: 1000, // Duration of fade out
+            alpha: 0,
+            duration: 1000,
             delay: textFadeDelay,
             onComplete: () => {
                 this.textBox.setAlpha(1);
@@ -295,10 +371,11 @@ export class Opening extends Phaser.Scene {
 
     update() {
         if (this.earthImg) {
-            this.earthImg.rotation += 0.01; // Adjust the rotation speed as needed
+            this.earthImg.rotation += 0.01;
         }
 
         if (
+            this.newGame &&
             this.enterKeyActive &&
             Phaser.Input.Keyboard.JustDown(this.enterKey) &&
             !this.isTyping
