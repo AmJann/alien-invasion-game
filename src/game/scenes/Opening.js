@@ -36,6 +36,7 @@ export class Opening extends Phaser.Scene {
         this.resumeButton = null;
         this.newGame = false;
         this.newGameButtonBackground = null;
+        this.resumeButtonBackground = null;
     }
 
     preload() {
@@ -83,6 +84,10 @@ export class Opening extends Phaser.Scene {
     showButtons() {
         let playerData = localStorage.getItem("playerData");
         if (playerData) {
+            this.resumeButtonBackground = this.add.graphics();
+            this.resumeButtonBackground.fillStyle(0x000120, 0.5);
+            this.resumeButtonBackground.fillRect(300, 277, 200, 50);
+
             this.resumeButton = this.add
                 .text(400, 400, "Resume", {
                     fontSize: "32px",
@@ -103,11 +108,17 @@ export class Opening extends Phaser.Scene {
             this.resumeButton.on("pointerdown", () => {
                 this.scene.start("Game");
             });
-            this.resumeButton.on("pointerover", () => {
-                this.resumeButton.setStyle({ fill: "#ff0000" });
-            });
+            this.resumeButton
+                .on("pointerover", () => {
+                    this.resumeButton
+                        .setStyle({ fill: "#ff0000" })
+                        .setStroke("#ff0000", 2);
+                })
+                .setStroke("#ffffff", 2);
             this.resumeButton.on("pointerout", () => {
-                this.resumeButton.setStyle({ fill: "#ffffff" });
+                this.resumeButton
+                    .setStyle({ fill: "#ffffff" })
+                    .setStroke("#ffffff", 2);
             });
         }
 
@@ -158,6 +169,7 @@ export class Opening extends Phaser.Scene {
             duration: 1500,
             delay: 0,
         });
+
         if (this.resumeButton) {
             this.tweens.add({
                 targets: this.resumeButton,
@@ -165,7 +177,9 @@ export class Opening extends Phaser.Scene {
                 duration: 1500,
                 delay: 0,
             });
+            this.resumeButtonBackground.clear();
         }
+
         this.newGameButtonBackground.clear();
 
         const enemyAlienStartX = -300;

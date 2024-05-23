@@ -385,7 +385,7 @@ export class Fight extends Phaser.Scene {
             targets: this.enemyImg,
             x: 340,
             y: 450,
-            delay: 2000,
+            delay: 1000,
             duration: 150,
             ease: "Linear",
             yoyo: true,
@@ -399,25 +399,6 @@ export class Fight extends Phaser.Scene {
             },
         });
     }
-
-    // reducePlayerHealth(damage) {
-    //     // console.log("enemy", this.enemy);
-    //     // console.log("player", this.playerCurrentHuman.health);
-    //     // Reduce player health
-    //     this.playerCurrentHuman.health -= damage;
-
-    //     // Update player health bar display
-    //     const newWidth =
-    //         (this.playerCurrentHuman.health /
-    //             this.playerCurrentHuman.maxHealth) *
-    //         200;
-    //     this.playerHealthBar.clear();
-    //     this.playerHealthBar.fillStyle(0xff0000, 1);
-    //     if (this.playerCurrentHuman.health >= 0) {
-    //         this.playerHealthBar.fillRect(0, 0, newWidth, 20);
-    //     }
-    //     // console.log("playerCurrentHuman", this.playerCurrentHuman.health);
-    // }
 
     createAttackMenu() {
         // Create a container for the attack menu
