@@ -23,6 +23,7 @@ export class Opening extends Phaser.Scene {
         this.isTyping = false;
         this.enterKey = null;
         this.enterKeyActive = true;
+        this.messageComplete = false;
         this.coordinates = [
             { x: 370, y: 700 },
             { x: 300, y: 300 },
@@ -74,6 +75,8 @@ export class Opening extends Phaser.Scene {
         this.enterKey = this.input.keyboard.addKey(
             Phaser.Input.Keyboard.KeyCodes.ANY
         );
+
+        this.enterKeyActive = true;
     }
 
     showButtons() {
@@ -183,12 +186,14 @@ export class Opening extends Phaser.Scene {
             delay: 5000,
         });
 
+        this.textBackground = this.add.graphics();
+
         this.textBox = this.add.text(
             this.coordinates[this.currentCoordinateIndex].x,
             this.coordinates[this.currentCoordinateIndex].y,
             "",
             {
-                fontSize: "24px",
+                fontSize: "20px",
                 fill: "#ffffff",
                 wordWrap: { width: 400 },
             }
@@ -200,9 +205,11 @@ export class Opening extends Phaser.Scene {
                 this.typeMessage();
             }
         });
-
+        this.enterKeyActive = false;
         setTimeout(() => {
             this.typeMessage();
+
+            this.messageComplete = false;
         }, 3000);
 
         this.skipButton = this.add.text(700, 50, "Skip", {
@@ -226,9 +233,25 @@ export class Opening extends Phaser.Scene {
         this.textBox.setText("");
         let charIndex = 0;
 
-        this.textBox.setPosition(
-            this.coordinates[this.currentCoordinateIndex].x,
-            this.coordinates[this.currentCoordinateIndex].y
+        const textPosition = this.coordinates[this.currentCoordinateIndex];
+        this.textBox.setPosition(textPosition.x, textPosition.y);
+
+        const textWidth = 400;
+        const textHeight = 100;
+
+        if (!this.textBackground) {
+            this.textBackground = this.add.graphics();
+        }
+
+        this.textBackground.clear();
+
+        this.textBackground.fillStyle(0x000000, 0.5);
+
+        this.textBackground.fillRect(
+            textPosition.x - 10,
+            textPosition.y - 10,
+            textWidth + 20,
+            textHeight + 20
         );
 
         this.currentCoordinateIndex =
@@ -250,7 +273,6 @@ export class Opening extends Phaser.Scene {
             });
         }
 
-        setTimeout(() => {}, 2000);
         this.typingEvent = this.time.addEvent({
             delay: this.typingSpeed,
             callback: () => {
@@ -266,6 +288,7 @@ export class Opening extends Phaser.Scene {
                 }
             },
             loop: true,
+            onComplete: (this.messageComplete = true),
         });
     }
 
@@ -284,6 +307,13 @@ export class Opening extends Phaser.Scene {
         const textFadeDelay = 3500;
         const textDestroyDelay = 4500;
         const startNextSceneDelay = 5700;
+
+        this.tweens.add({
+            targets: this.textBackground,
+            alpha: 0,
+            duration: 1000,
+            ease: "Power2",
+        });
 
         this.tweens.add({
             targets: this.skipButton,
