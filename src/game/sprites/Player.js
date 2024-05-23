@@ -139,33 +139,34 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         //player walk right
         let velX = 0;
         let velY = 0;
+        
         // player walk right
-        if (this.cursors.right.isDown) {
+         if (this.cursors.right.isDown && !this.cursors.left.isDown) {
             velX = this.speed;
             this.currentDirection = "right";
         }
 
         // player walk left
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown && !this.cursors.right.isDown) {
             velX = -this.speed;
             this.currentDirection = "left";
         }
 
         // player walk up with character facing left or right based on current direction
-        if (this.cursors.up.isDown && this.currentDirection === "left") {
+        if (this.cursors.up.isDown && !this.cursors.down.isDown && this.currentDirection === "left") {
             velY = -this.speed;
         } else if (
-            this.cursors.up.isDown &&
+            this.cursors.up.isDown && !this.cursors.down.isDown &&
             this.currentDirection === "right"
         ) {
             velY = -this.speed;
         }
 
         //player walk down with character facing left or right based on current direction
-        if (this.cursors.down.isDown && this.currentDirection === "left") {
+        if (this.cursors.down.isDown && !this.cursors.up.isDown && this.currentDirection === "left") {
             velY = this.speed;
         } else if (
-            this.cursors.down.isDown &&
+            this.cursors.down.isDown && !this.cursors.up.isDown &&
             this.currentDirection === "right"
         ) {
             velY = this.speed;
