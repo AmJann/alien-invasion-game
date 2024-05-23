@@ -35,6 +35,7 @@ export class Opening extends Phaser.Scene {
         this.newGameButton = null;
         this.resumeButton = null;
         this.newGame = false;
+        this.newGameButtonBackground = null;
     }
 
     preload() {
@@ -110,13 +111,18 @@ export class Opening extends Phaser.Scene {
             });
         }
 
+        this.newGameButtonBackground = this.add.graphics();
+        this.newGameButtonBackground.fillStyle(0x000120, 0.5);
+        this.newGameButtonBackground.fillRect(300, 277, 200, 50);
+
         this.newGameButton = this.add
             .text(400, 300, "New Game", {
                 fontSize: "32px",
                 fill: "#ffffff",
             })
             .setOrigin(0.5)
-            .setAlpha(0);
+            .setAlpha(0)
+            .setStroke("#ffffff", 1);
 
         this.tweens.add({
             targets: this.newGameButton,
@@ -131,11 +137,17 @@ export class Opening extends Phaser.Scene {
             this.newGame = true;
             this.startOpeningSequence();
         });
-        this.newGameButton.on("pointerover", () => {
-            this.newGameButton.setStyle({ fill: "#ff0000" });
-        });
+        this.newGameButton
+            .on("pointerover", () => {
+                this.newGameButton
+                    .setStyle({ fill: "#ff0000" })
+                    .setStroke("#ff0000", 2);
+            })
+            .setStroke("#ffffff", 2);
         this.newGameButton.on("pointerout", () => {
-            this.newGameButton.setStyle({ fill: "#ffffff" });
+            this.newGameButton
+                .setStyle({ fill: "#ffffff" })
+                .setStroke("#ffffff", 2);
         });
     }
 
@@ -143,17 +155,18 @@ export class Opening extends Phaser.Scene {
         this.tweens.add({
             targets: this.newGameButton,
             alpha: 0,
-            duration: 1000,
+            duration: 1500,
             delay: 0,
         });
         if (this.resumeButton) {
             this.tweens.add({
                 targets: this.resumeButton,
                 alpha: 0,
-                duration: 1000,
+                duration: 1500,
                 delay: 0,
             });
         }
+        this.newGameButtonBackground.clear();
 
         const enemyAlienStartX = -300;
         let playerAlienStartX = 1000;
