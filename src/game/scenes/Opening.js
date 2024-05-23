@@ -222,6 +222,7 @@ export class Opening extends Phaser.Scene {
             {
                 fontSize: "20px",
                 fill: "#ffffff",
+                fontFamily: "Courier",
                 wordWrap: { width: 400 },
             }
         );
