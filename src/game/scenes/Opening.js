@@ -77,7 +77,6 @@ export class Opening extends Phaser.Scene {
         this.enterKey = this.input.keyboard.addKey(
             Phaser.Input.Keyboard.KeyCodes.ANY
         );
-
         this.enterKeyActive = true;
     }
 
@@ -86,7 +85,7 @@ export class Opening extends Phaser.Scene {
         if (playerData) {
             this.resumeButtonBackground = this.add.graphics();
             this.resumeButtonBackground.fillStyle(0x000120, 0.5);
-            this.resumeButtonBackground.fillRect(300, 277, 200, 50);
+            this.resumeButtonBackground.fillRect(300, 377, 200, 50);
 
             this.resumeButton = this.add
                 .text(400, 400, "Resume", {
@@ -222,6 +221,7 @@ export class Opening extends Phaser.Scene {
             {
                 fontSize: "20px",
                 fill: "#ffffff",
+                fontFamily: "Courier",
                 wordWrap: { width: 400 },
             }
         );
