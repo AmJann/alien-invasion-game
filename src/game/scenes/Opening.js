@@ -77,7 +77,6 @@ export class Opening extends Phaser.Scene {
         this.enterKey = this.input.keyboard.addKey(
             Phaser.Input.Keyboard.KeyCodes.ANY
         );
-
         this.enterKeyActive = true;
     }
 
