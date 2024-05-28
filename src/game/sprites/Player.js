@@ -45,16 +45,22 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.inventory.splice(index, 1);
         }
     }
-    swingWeapon(direction) {
+    swingWeapon(direction, playAnimations=this.playAnimations, clockManager=this.clockManager) {
         if (direction == "right") {
-            this.anims.play("player-attack-right", true);
+            playAnimations("player-attack-right", true);
         } else {
-            this.anims.play("player-attack-left", true);
+            playAnimations("player-attack-left", true);
         }
         this.playSoundEffect = true;
-        this.scene.time.delayedCall(200, () =>
+        clockManager(200, () =>
             this.soundEffectManager("attack")
         );
+    }
+    playAnimations(animsName, animsBool) {
+        this.anims.play(animsName, animsBool)
+    }
+    clockManager(timer, fucnt) {
+        this.scene.time.delayedCall(timer, fucnt)
     }
     hasHuman(human) {
         return this.inventory.includes(human);
