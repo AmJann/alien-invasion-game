@@ -309,7 +309,7 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-
+        this.player.weapon.setPosition(this.player.x, this.player.y)
         // updates the position of every NPC for transition to/from fight scene
         for (let npc in this.npcObjects) {
             this.npcObjects[npc].updatePosition(this);

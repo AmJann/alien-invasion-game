@@ -21,12 +21,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.speed = 150;
         // this.weapon is an invisible sprite used to trigger collision events
-        this.weapon = this.scene.physics.add.sprite(-50, -50);
-        this.weapon.setSize(30, 15);
+        this.weapon = this.scene.physics.add.sprite(300, 400);
+        this.weapon.setSize(3, 3);
         this.weapon.setActive(true).setVisible(true);
+        
         this.playSoundEffect = false;
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
+        
     }
 
     addHumanToInventory(human) {
@@ -36,7 +39,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             console.log("You already have 5 humans");
         }
     }
-
+    newAttackMovement() {
+       console.log('unused right now')
+    }
     removeHumanFromInventory(humanId) {
         const index = this.inventory.findIndex((human) => human.id === humanId);
         if (index !== -1) {
@@ -44,6 +49,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
     swingWeapon(direction) {
+        this.weapon.setSize(10,10)
         if (direction == "right") {
             this.anims.play("player-attack-right", true);
         } else {
@@ -104,7 +110,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.time.delayedCall(300, this.sheathWeapon, [obj]);
     }
     sheathWeapon(obj) {
-        obj.setPosition(-50, -50);
+        obj.setSize(1,1)
     }
     animsManager(direction, state, xVel, yVel) {
         if (state === "attacking") {
@@ -196,5 +202,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     }
     update() {
         super.update();
+        this.weapon.x = this.x
+        this.weapon.y = this.y
     }
 }
