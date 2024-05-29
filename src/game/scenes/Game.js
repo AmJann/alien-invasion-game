@@ -10,7 +10,8 @@ export class Game extends Scene {
     constructor() {
         super("Game");
         this.player;
-        this.playerPosition = { x: 300, y: 400 };
+        // this.playerPosition = { x: 300, y: 400 };
+        this.playerPosition = { x: 30, y: 20 };
         (this.npcStartPositions = {
             farmer: [Math.RND.between(213, 363), Math.RND.between(276, 363)],
             houseNPC: [Math.RND.between(196, 318), Math.RND.between(117, 131)],

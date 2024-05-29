@@ -11,23 +11,24 @@ import { HypnoRay } from "./captureItem";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
+        const container = scene.add.container(x, y)
         super(scene, x, y, texture);
-
+        this.container = container
         this.inventory = [];
-
+        
         this.items = [new HypnoRay()];
         this.currentDirection = "right";
         this.currentState = "walking";
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.speed = 150;
         // this.weapon is an invisible sprite used to trigger collision events
-        this.weapon = this.scene.physics.add.sprite(300, 400);
-        this.weapon.setSize(3, 3);
+        this.weapon = this.scene.physics.add.sprite(0, 0);
+        this.weapon.setSize(1, 1);
         this.weapon.setActive(true).setVisible(true);
         
         
         this.playSoundEffect = false;
-        this.container = this.scene.add.container(this.x, this.y)
+        
         
         
     //     player.body.setSize(5, 5);
@@ -41,7 +42,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     //     }
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.setSize(5, 5)
+        this.setSize(8, 10)
         console.log(this, this.container)
         this.container.add(this)
         this.container.add(this.weapon)
@@ -219,9 +220,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(velX, velY);
         this.animsManager(this.currentDirection, this.currentState, velX, velY);
     }
+    
     update() {
         super.update();
-        this.weapon.x = this.x
-        this.weapon.y = this.y
+        this.weapon.x = this.x;
+        this.weapon.y = this.y;
+        this.container.x = this.container.x + this.body.deltaX(); 
+        this.container.y = this.container.y + this.body.deltaY();
     }
+    
 }
