@@ -173,13 +173,8 @@ export class Game extends Scene {
             "player",
             "goblin_idle_1.png"
         ));
-        //add player position from constructor
-        this.player.setPosition(this.playerPosition.x, this.playerPosition.y);
-
-        //sets size of collision box for player
-        this.player.body.setSize(8, 10);
-        this.player.setPushable(false);
-
+        
+        
         // create powerup
         let shroomCoords = Object.values(this.npcStartPositions);
         const shroomLocationIndex = Math.RND.between(

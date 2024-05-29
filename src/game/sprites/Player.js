@@ -25,10 +25,29 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.weapon.setSize(3, 3);
         this.weapon.setActive(true).setVisible(true);
         
+        
         this.playSoundEffect = false;
+        this.container = this.scene.add.container(this.x, this.y)
+        
+        
+    //     player.body.setSize(5, 5);
+    //     player.setPushable(false);
+    //    // playerContainer.add(player)
+    //     //this.playerContainer.add(player.weapon)
+    //     playerContainer.setSize(8, 10)
+    //     playerContainer.setDepth(4)
+    //     player.setDepth(5)
+    //     console.log(playerContainer.list, playerContainer, player)
+    //     }
         scene.add.existing(this);
         scene.physics.add.existing(this);
-
+        this.setSize(5, 5)
+        console.log(this, this.container)
+        this.container.add(this)
+        this.container.add(this.weapon)
+        this.container.setSize(8, 10)
+        this.setPushable(false)
+        scene.add.existing(this.container)
         
     }
 
@@ -181,7 +200,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         // player attack right
         if (this.cursors.space.isDown && this.currentState != "fightScene") {
             this.currentState = "attacking";
-            this.atta;
+            //this.atta;
             this.swingWeapon(this.currentDirection);
             this.scene.time.delayedCall(350, () => {
                 const xPos = this.body.x;
