@@ -11,22 +11,45 @@ import { HypnoRay } from "./captureItem";
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
+        const container = scene.add.container(x, y)
         super(scene, x, y, texture);
-
+        this.container = container
         this.inventory = [];
-
+        
         this.items = [new HypnoRay()];
         this.currentDirection = "right";
         this.currentState = "walking";
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.speed = 150;
         // this.weapon is an invisible sprite used to trigger collision events
-        this.weapon = this.scene.physics.add.sprite(-50, -50);
-        this.weapon.setSize(30, 15);
+        this.weapon = this.scene.physics.add.sprite(0, 0);
+        this.weapon.setSize(1, 1);
         this.weapon.setActive(true).setVisible(true);
+        
+        
         this.playSoundEffect = false;
+        
+        
+        
+    //     player.body.setSize(5, 5);
+    //     player.setPushable(false);
+    //    // playerContainer.add(player)
+    //     //this.playerContainer.add(player.weapon)
+    //     playerContainer.setSize(8, 10)
+    //     playerContainer.setDepth(4)
+    //     player.setDepth(5)
+    //     console.log(playerContainer.list, playerContainer, player)
+    //     }
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        this.setSize(8, 10)
+        console.log(this, this.container)
+        this.container.add(this)
+        this.container.add(this.weapon)
+        this.container.setSize(8, 10)
+        this.setPushable(false)
+        scene.add.existing(this.container)
+        
     }
 
     addHumanToInventory(human) {
@@ -36,7 +59,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             console.log("You already have 5 humans");
         }
     }
-
+    newAttackMovement() {
+       console.log('unused right now')
+    }
     removeHumanFromInventory(humanId) {
         const index = this.inventory.findIndex((human) => human.id === humanId);
         if (index !== -1) {
@@ -44,6 +69,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
     swingWeapon(direction) {
+        this.weapon.setSize(10,10)
         if (direction == "right") {
             this.anims.play("player-attack-right", true);
         } else {
@@ -104,7 +130,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.time.delayedCall(300, this.sheathWeapon, [obj]);
     }
     sheathWeapon(obj) {
-        obj.setPosition(-50, -50);
+        obj.setSize(1,1)
     }
     animsManager(direction, state, xVel, yVel) {
         if (state === "attacking") {
@@ -175,7 +201,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         // player attack right
         if (this.cursors.space.isDown && this.currentState != "fightScene") {
             this.currentState = "attacking";
-            this.atta;
+            //this.atta;
             this.swingWeapon(this.currentDirection);
             this.scene.time.delayedCall(350, () => {
                 const xPos = this.body.x;
@@ -194,7 +220,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(velX, velY);
         this.animsManager(this.currentDirection, this.currentState, velX, velY);
     }
+    
     update() {
         super.update();
+        this.weapon.x = this.x;
+        this.weapon.y = this.y;
+        this.container.x = this.container.x + this.body.deltaX(); 
+        this.container.y = this.container.y + this.body.deltaY();
     }
+    
 }

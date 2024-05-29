@@ -10,7 +10,8 @@ export class Game extends Scene {
     constructor() {
         super("Game");
         this.player;
-        this.playerPosition = { x: 300, y: 400 };
+        // this.playerPosition = { x: 300, y: 400 };
+        this.playerPosition = { x: 30, y: 20 };
         (this.npcStartPositions = {
             farmer: [Math.RND.between(213, 363), Math.RND.between(276, 363)],
             houseNPC: [Math.RND.between(196, 318), Math.RND.between(117, 131)],
@@ -173,13 +174,8 @@ export class Game extends Scene {
             "player",
             "goblin_idle_1.png"
         ));
-        //add player position from constructor
-        this.player.setPosition(this.playerPosition.x, this.playerPosition.y);
-
-        //sets size of collision box for player
-        this.player.body.setSize(8, 10);
-        this.player.setPushable(false);
-
+        
+        
         // create powerup
         let shroomCoords = Object.values(this.npcStartPositions);
         const shroomLocationIndex = Math.RND.between(
@@ -309,7 +305,7 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-
+        this.player.weapon.setPosition(this.player.x, this.player.y)
         // updates the position of every NPC for transition to/from fight scene
         for (let npc in this.npcObjects) {
             this.npcObjects[npc].updatePosition(this);
