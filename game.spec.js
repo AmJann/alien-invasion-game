@@ -8,8 +8,13 @@ test('something', async ({ page }) => {
     page.on('console', () => {
         
     })
-    expect(gameCanvas).to
+    
     
     //gameCanvas.evaluate(
 })
 
+
+// expecting some url
+// set up some leaky global object with which to test via playwright
+// write tests against the leaky object in all browsers
+// may need to modify game to make it easier to test (fewer and perhaps immobile sprites)
