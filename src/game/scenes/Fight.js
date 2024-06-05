@@ -6,8 +6,6 @@ import {
     Farmer,
     NuckChorris,
 } from "../humans";
-import { Player } from "../sprites/Player.js";
-import { HypnoRay } from "../sprites/captureItem.js";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -55,6 +53,14 @@ export class Fight extends Phaser.Scene {
         this.initializePlayerData();
         this.checkPlayerCurrentHuman();
         this.preloadImages();
+    }
+
+    create() {
+        this.setupBackground();
+        this.playMusic();
+        this.createInfoContainers();
+        this.createCharacters();
+        this.createActionButtons();
     }
 
     loadAudio() {
@@ -155,13 +161,17 @@ export class Fight extends Phaser.Scene {
         });
     }
 
-    create() {
+    setupBackground() {
         this.add.image(400, 400, "water_field_bg");
+    }
 
+    playMusic() {
         this.music = this.sound.add("runRiot");
         this.music.play();
         this.music.setLoop(true);
+    }
 
+    createInfoContainers() {
         const playerNameHealthBackground = this.add.rectangle(
             280,
             210,
@@ -188,17 +198,18 @@ export class Fight extends Phaser.Scene {
             0x000000,
             0.3
         );
+        this.createPlayerInfoContainer();
+        this.createEnemyInfoContainer();
+    }
 
-        //container for player stats (health, name)
+    createPlayerInfoContainer() {
         this.playerInfoContainer = this.add.container(450, 540);
 
-        // health bar
         this.playerHealthBar = this.add.graphics();
         this.playerHealthBar.fillStyle(0xff0000, 1);
         this.playerHealthBar.fillRect(0, 0, 200, 20);
 
         this.updatePlayerHealth();
-        // text and styling for players name
         this.playerNameText = this.add.text(
             0,
             25,
@@ -214,12 +225,13 @@ export class Fight extends Phaser.Scene {
         this.playerNameText.setFontStyle("bold");
         this.playerNameText.setFontSize("20px");
 
-        // add health bar and name to container
         this.playerInfoContainer.add([
             this.playerNameText,
             this.playerHealthBar,
         ]);
+    }
 
+    createEnemyInfoContainer() {
         this.enemyInfoContainer = this.add.container(170, 190);
 
         this.enemyHealthBar = this.add.graphics();
@@ -238,7 +250,9 @@ export class Fight extends Phaser.Scene {
         this.enemyNameText.setFontSize("20px");
 
         this.enemyInfoContainer.add([this.enemyNameText, this.enemyHealthBar]);
+    }
 
+    createCharacters() {
         const enemyStartX = -300;
         let playerStartX = 800;
         const enemyStartY = 290;
@@ -277,7 +291,9 @@ export class Fight extends Phaser.Scene {
                 playerStartX = 250;
             },
         });
+    }
 
+    createActionButtons() {
         this.attackButton = this.createActionButton("Attack", 400, 660, () =>
             this.attack()
         );
