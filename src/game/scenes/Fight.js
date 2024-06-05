@@ -52,8 +52,35 @@ export class Fight extends Phaser.Scene {
     preload() {
         this.loadAudio();
         this.selectRandomEnemy();
-        const playerData = this.player.loadPlayerData();
+        this.initializePlayerData();
+        this.checkPlayerCurrentHuman();
+        this.preloadImages();
+    }
 
+    loadAudio() {
+        this.load.audio(
+            "runRiot",
+            import.meta.env.BASE_URL +
+                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
+        );
+
+        this.load.audio(
+            "attackSound",
+            import.meta.env.BASE_URL + "assets/sound/punch-6.mp3"
+        );
+    }
+
+    selectRandomEnemy() {
+        let randomNum = Math.floor(Math.random() * humans.length);
+        this.enemy = humans[randomNum];
+
+        if (this.enemy.health < this.enemy.maxHealth) {
+            this.enemy.health = this.enemy.maxHealth;
+        }
+    }
+
+    initializePlayerData() {
+        const playerData = this.player.loadPlayerData();
         if (playerData) {
             this.player.inventory = playerData;
             console.log("Player inventory:", this.player.inventory);
@@ -61,7 +88,6 @@ export class Fight extends Phaser.Scene {
             this.playerCurrentHuman =
                 this.player.inventory.find((human) => human.health > 0) ||
                 this.player.inventory[0];
-            console.log("Player current human:", this.playerCurrentHuman);
 
             const hypnoRayItem = this.player.items.find(
                 (item) => item.name === "HypnoRay"
@@ -69,9 +95,10 @@ export class Fight extends Phaser.Scene {
             if (hypnoRayItem) {
                 hypnoRayItem.charge = playerData.hypnoRayCharge || 0;
             }
-            console.log("HypnoRay item:", hypnoRayItem);
         }
+    }
 
+    checkPlayerCurrentHuman() {
         for (const human of this.player.inventory) {
             if (human.health > 0) {
                 this.playerCurrentHuman = human;
@@ -90,11 +117,12 @@ export class Fight extends Phaser.Scene {
                 }, 4000);
             }
         }
-
         if (this.enemy.health <= 0) {
             this.enemy.health = this.enemy.maxHealth;
         }
-        // Preload images
+    }
+
+    preloadImages() {
         this.load.image(
             "water_field_bg",
             import.meta.env.BASE_URL + "assets/water_field_bg.jpg"
@@ -125,35 +153,9 @@ export class Fight extends Phaser.Scene {
                 import.meta.env.BASE_URL + human.hurtImage.path
             );
         });
-
-        console.log(this.playerCurrentHuman);
-    }
-
-    loadAudio() {
-        this.load.audio(
-            "runRiot",
-            import.meta.env.BASE_URL +
-                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
-        );
-
-        this.load.audio(
-            "attackSound",
-            import.meta.env.BASE_URL + "assets/sound/punch-6.mp3"
-        );
-    }
-
-    selectRandomEnemy() {
-        let randomNum = Math.floor(Math.random() * humans.length);
-        this.enemy = humans[randomNum];
-
-        if (this.enemy.health < this.enemy.maxHealth) {
-            this.enemy.health = this.enemy.maxHealth;
-        }
     }
 
     create() {
-        console.log(this.playerCurrentHuman);
-        console.log(this.enemy);
         this.add.image(400, 400, "water_field_bg");
 
         this.music = this.sound.add("runRiot");
