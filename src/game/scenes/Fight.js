@@ -6,6 +6,7 @@ import {
     Farmer,
     NuckChorris,
 } from "../humans";
+import { loadAudio } from "./fightHelpers/loadAudio";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -35,7 +36,6 @@ export class Fight extends Phaser.Scene {
     }
 
     init(data) {
-        // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
         this.worldData = data.worldData;
@@ -48,7 +48,7 @@ export class Fight extends Phaser.Scene {
     }
 
     preload() {
-        this.loadAudio();
+        loadAudio(this);
         this.selectRandomEnemy();
         this.initializePlayerData();
         this.checkPlayerCurrentHuman();
@@ -61,19 +61,6 @@ export class Fight extends Phaser.Scene {
         this.createInfoContainers();
         this.createCharacters();
         this.createActionButtons();
-    }
-
-    loadAudio() {
-        this.load.audio(
-            "runRiot",
-            import.meta.env.BASE_URL +
-                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
-        );
-
-        this.load.audio(
-            "attackSound",
-            import.meta.env.BASE_URL + "assets/sound/punch-6.mp3"
-        );
     }
 
     selectRandomEnemy() {
