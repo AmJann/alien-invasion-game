@@ -7,6 +7,7 @@ import {
     NuckChorris,
 } from "../humans";
 import { loadAudio } from "./fightHelpers/loadAudio";
+import { selectRandomEnemy } from "./fightHelpers/selectRandomEnemy";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -21,7 +22,7 @@ export class Fight extends Phaser.Scene {
     constructor() {
         super("Fight");
         this.humans = humans;
-        this.enemy = null;
+        this.enemy = selectRandomEnemy();
         this.player = null;
         this.attackTween = null;
         this.playerImg = null;
@@ -49,7 +50,7 @@ export class Fight extends Phaser.Scene {
 
     preload() {
         loadAudio(this);
-        this.selectRandomEnemy();
+        selectRandomEnemy();
         this.initializePlayerData();
         this.checkPlayerCurrentHuman();
         this.preloadImages();
@@ -61,15 +62,6 @@ export class Fight extends Phaser.Scene {
         this.createInfoContainers();
         this.createCharacters();
         this.createActionButtons();
-    }
-
-    selectRandomEnemy() {
-        let randomNum = Math.floor(Math.random() * humans.length);
-        this.enemy = humans[randomNum];
-
-        if (this.enemy.health < this.enemy.maxHealth) {
-            this.enemy.health = this.enemy.maxHealth;
-        }
     }
 
     initializePlayerData() {
