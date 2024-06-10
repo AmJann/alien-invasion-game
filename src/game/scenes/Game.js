@@ -309,11 +309,19 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-
+        
         // updates the position of every NPC for transition to/from fight scene
         for (let npc in this.npcObjects) {
             this.npcObjects[npc].updatePosition(this);
         }
+        // DEBUGGING INTEGRATION TESTS
+        // if (this.flag) {
+        //     this.flag = false
+        //     console.log(window.GAME_REF)
+        //     this.time.delayedCall(5000, () => {
+        //         this.flag = true
+        //     })
+        // }
         // if (this.counter < 2) {
         //     this.flag = false;
         //     this.counter++;
@@ -325,3 +333,5 @@ export class Game extends Scene {
         // });
     }
 }
+
+
