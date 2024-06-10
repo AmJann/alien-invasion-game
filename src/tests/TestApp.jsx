@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { PhaserGame } from "./game/PhaserGame";
+import { TestPhaserGame } from "./TestPhaserGame";
+
 
 function App() {
     const [canMoveSprite, setCanMoveSprite] = useState(true);
@@ -53,7 +54,7 @@ function App() {
 
     return (
         <div id="app">
-            <PhaserGame
+            <TestPhaserGame
                 id="game"
                 ref={phaserRef}
                 currentActiveScene={currentScene}

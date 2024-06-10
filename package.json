@@ -23,7 +23,10 @@
   "scripts": {
     "dev": "vite --config vite/config.dev.mjs",
     "build": "vite build --config vite/config.prod.mjs",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "testEnvironment" : "vite --config vite/config.test.mjs",
+    "test": "npx playwright test",
+    "integrationTests": "./run_tests.sh"
+
   },
   "dependencies": {
     "jest": "^29.7.0",
