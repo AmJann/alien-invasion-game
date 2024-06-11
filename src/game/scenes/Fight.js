@@ -6,8 +6,8 @@ import {
     Farmer,
     NuckChorris,
 } from "../humans";
-import { Player } from "../sprites/Player.js";
-import { HypnoRay } from "../sprites/captureItem.js";
+import { loadAudio } from "./fightHelpers/loadAudio";
+import { selectRandomEnemy } from "./fightHelpers/selectRandomEnemy";
 let hurtAnimationRan = false;
 let hurtAnimationPlayerRan = false;
 const humans = [
@@ -22,7 +22,7 @@ export class Fight extends Phaser.Scene {
     constructor() {
         super("Fight");
         this.humans = humans;
-        this.enemy = null;
+        this.enemy = selectRandomEnemy();
         this.player = null;
         this.attackTween = null;
         this.playerImg = null;
@@ -37,7 +37,6 @@ export class Fight extends Phaser.Scene {
     }
 
     init(data) {
-        // Access the passed data object here
         this.playerPosition = data.playerPosition;
         this.player = data.player;
         this.worldData = data.worldData;
@@ -50,38 +49,23 @@ export class Fight extends Phaser.Scene {
     }
 
     preload() {
-        this.load.audio(
-            "runRiot",
-            import.meta.env.BASE_URL +
-                "assets/sound/run-riot-matt-stewart-evans-main-version-02-03-14904.mp3"
-        );
+        loadAudio(this);
+        selectRandomEnemy();
+        this.initializePlayerData();
+        this.checkPlayerCurrentHuman();
+        this.preloadImages();
+    }
 
-        this.load.audio(
-            "attackSound",
-            import.meta.env.BASE_URL + "assets/sound/punch-6.mp3"
-        );
+    create() {
+        this.setupBackground();
+        this.playMusic();
+        this.createInfoContainers();
+        this.createCharacters();
+        this.createActionButtons();
+    }
 
-        let randomNum = Math.floor(Math.random() * humans.length);
-        this.enemy = humans[randomNum];
-
-        if (this.enemy.health < this.enemy.maxHealth) {
-            this.enemy.health = this.enemy.maxHealth;
-            // console.log(this.enemy.health);
-        }
-
-        const classMapping = {
-            Clown: Clown,
-            Scientist: Scientist,
-            Firefighter: Firefighter,
-            Farmer: Farmer,
-            NuckChorris: NuckChorris,
-        };
-
-        // Retrieve player data from local storage
-
+    initializePlayerData() {
         const playerData = this.player.loadPlayerData();
-        console.log(playerData);
-
         if (playerData) {
             this.player.inventory = playerData;
             console.log("Player inventory:", this.player.inventory);
@@ -89,7 +73,6 @@ export class Fight extends Phaser.Scene {
             this.playerCurrentHuman =
                 this.player.inventory.find((human) => human.health > 0) ||
                 this.player.inventory[0];
-            console.log("Player current human:", this.playerCurrentHuman);
 
             const hypnoRayItem = this.player.items.find(
                 (item) => item.name === "HypnoRay"
@@ -97,9 +80,10 @@ export class Fight extends Phaser.Scene {
             if (hypnoRayItem) {
                 hypnoRayItem.charge = playerData.hypnoRayCharge || 0;
             }
-            console.log("HypnoRay item:", hypnoRayItem);
         }
+    }
 
+    checkPlayerCurrentHuman() {
         for (const human of this.player.inventory) {
             if (human.health > 0) {
                 this.playerCurrentHuman = human;
@@ -118,12 +102,12 @@ export class Fight extends Phaser.Scene {
                 }, 4000);
             }
         }
-
         if (this.enemy.health <= 0) {
             this.enemy.health = this.enemy.maxHealth;
-            // console.log(this.enemy.health);
         }
-        // Preload images
+    }
+
+    preloadImages() {
         this.load.image(
             "water_field_bg",
             import.meta.env.BASE_URL + "assets/water_field_bg.jpg"
@@ -154,20 +138,19 @@ export class Fight extends Phaser.Scene {
                 import.meta.env.BASE_URL + human.hurtImage.path
             );
         });
-
-        console.log(this.playerCurrentHuman);
     }
 
-    create() {
-        console.log(this.playerCurrentHuman);
-        console.log(this.enemy);
-        // Add background image
+    setupBackground() {
         this.add.image(400, 400, "water_field_bg");
+    }
 
+    playMusic() {
         this.music = this.sound.add("runRiot");
         this.music.play();
         this.music.setLoop(true);
+    }
 
+    createInfoContainers() {
         const playerNameHealthBackground = this.add.rectangle(
             280,
             210,
@@ -194,17 +177,18 @@ export class Fight extends Phaser.Scene {
             0x000000,
             0.3
         );
+        this.createPlayerInfoContainer();
+        this.createEnemyInfoContainer();
+    }
 
-        //container for player stats (health, name)
+    createPlayerInfoContainer() {
         this.playerInfoContainer = this.add.container(450, 540);
 
-        // health bar
         this.playerHealthBar = this.add.graphics();
         this.playerHealthBar.fillStyle(0xff0000, 1);
         this.playerHealthBar.fillRect(0, 0, 200, 20);
 
         this.updatePlayerHealth();
-        // text and styling for players name
         this.playerNameText = this.add.text(
             0,
             25,
@@ -220,13 +204,13 @@ export class Fight extends Phaser.Scene {
         this.playerNameText.setFontStyle("bold");
         this.playerNameText.setFontSize("20px");
 
-        // add health bar and name to container
         this.playerInfoContainer.add([
             this.playerNameText,
             this.playerHealthBar,
         ]);
+    }
 
-        //next blocks of code are the same as player healthbar and name but for enemy. Only coordinates are different
+    createEnemyInfoContainer() {
         this.enemyInfoContainer = this.add.container(170, 190);
 
         this.enemyHealthBar = this.add.graphics();
@@ -245,13 +229,14 @@ export class Fight extends Phaser.Scene {
         this.enemyNameText.setFontSize("20px");
 
         this.enemyInfoContainer.add([this.enemyNameText, this.enemyHealthBar]);
+    }
 
+    createCharacters() {
         const enemyStartX = -300;
         let playerStartX = 800;
         const enemyStartY = 290;
         const playerStartY = 480;
 
-        // Add human images at starting positions
         this.enemyImg = this.add.image(
             enemyStartX,
             enemyStartY,
@@ -267,7 +252,6 @@ export class Fight extends Phaser.Scene {
             )
             .setFlipX(true);
 
-        // Tween animations for character movement
         this.tweens.add({
             targets: this.enemyImg,
             x: 550,
@@ -275,8 +259,6 @@ export class Fight extends Phaser.Scene {
             ease: "Power2",
             delay: 500,
         });
-
-        // Create a tween for the sprite
 
         this.tweens.add({
             targets: this.playerImg,
@@ -288,7 +270,9 @@ export class Fight extends Phaser.Scene {
                 playerStartX = 250;
             },
         });
+    }
 
+    createActionButtons() {
         this.attackButton = this.createActionButton("Attack", 400, 660, () =>
             this.attack()
         );
@@ -307,42 +291,24 @@ export class Fight extends Phaser.Scene {
     }
 
     createActionButton(text, x, y, callback) {
-        // Create a text button for an action
         const button = this.add
             .text(x, y, text, { fill: "#ffffff" })
             .setInteractive()
             .on("pointerdown", callback);
 
-        // Style the button
         button.setPadding(15, 10, 15, 10);
         button.setBackgroundColor("#333333");
         button.setStroke("#ffffff", 2);
 
-        // Center the button's origin
         button.setOrigin(0.5);
 
-        // Add hover effect
         button.on("pointerover", () => button.setBackgroundColor("#555555"));
         button.on("pointerout", () => button.setBackgroundColor("#333333"));
 
         return button;
     }
 
-    battle() {
-        // Disable buttons at the start of the enemy's turn
-        this.disableButtons();
-
-        // Example enemy turn logic
-        setTimeout(() => {
-            // Perform enemy's attack logic here
-
-            // Re-enable buttons at the end of the enemy's turn
-            this.enableButtons();
-        }, 3000); // Adjust delay as needed
-    }
-
     disableButtons() {
-        // Disable all action buttons
         this.attackButton.disableInteractive();
         this.switchButton.disableInteractive();
         this.itemButton.disableInteractive();
@@ -354,7 +320,6 @@ export class Fight extends Phaser.Scene {
     }
 
     enableButtons() {
-        // Enable all action buttons
         this.attackButton.setInteractive();
         this.switchButton.setInteractive();
         this.itemButton.setInteractive();
@@ -371,14 +336,11 @@ export class Fight extends Phaser.Scene {
             this.enemy.special,
         ];
         const randomAttackIndex = Math.floor(Math.random() * 3);
-        // console.log(attacks);
         const selectedAttack = attacks[randomAttackIndex];
         return selectedAttack;
     }
 
     computerAttack() {
-        //computer attacks after player with 3 second delay
-        // Disable all action buttons
         this.disableButtons();
 
         this.attackTween = this.tweens.add({
@@ -401,14 +363,11 @@ export class Fight extends Phaser.Scene {
     }
 
     createAttackMenu() {
-        // Create a container for the attack menu
         this.attackMenuContainer = this.add.container(223, 695);
 
-        // Add background for the attack menu
         const menuBackground = this.add.rectangle(0, 0, 210, 150, 0x333333);
         this.attackMenuContainer.add(menuBackground);
 
-        // Add attack options
         const attack1 = this.createAttackOption(
             0,
             -40,
@@ -425,14 +384,12 @@ export class Fight extends Phaser.Scene {
             this.playerCurrentHuman.special["name"]
         );
 
-        // Add attack options to the container
         this.attackMenuContainer.add([attack1, attack2, special]);
 
         attack1.setInteractive();
         attack2.setInteractive();
         special.setInteractive();
 
-        //sets current attack to be able to apply damage
         attack1.on("pointerdown", () =>
             this.performAttack(
                 (this.currentPlayerAttack = this.playerCurrentHuman.attack1)
@@ -450,7 +407,6 @@ export class Fight extends Phaser.Scene {
             )
         );
 
-        // Add the attack menu to the scene
         this.add.existing(this.attackMenuContainer);
     }
 
@@ -472,7 +428,6 @@ export class Fight extends Phaser.Scene {
     }
 
     attack() {
-        // Create and show the attack menu
         if (this.attackMenuContainer) {
             this.attackMenuContainer.destroy();
             this.attackMenuContainer = null;
@@ -494,7 +449,6 @@ export class Fight extends Phaser.Scene {
     performAttack() {
         this.debug();
         this.playerImg.x = 250;
-        //hide/destroy attack menu
         this.attackMenuContainer.destroy();
 
         this.sound.play("attackSound");
@@ -509,7 +463,6 @@ export class Fight extends Phaser.Scene {
             repeat: 0,
             onComplete: () => {
                 const damage = this.currentPlayerAttack.damage;
-                // console.log("damage before reduce health", damage);
                 this.reduceEnemyHealth(damage);
                 const halfHealth = this.enemy.maxHealth / 2;
 
@@ -519,9 +472,7 @@ export class Fight extends Phaser.Scene {
                     !hurtAnimationRan
                 ) {
                     hurtAnimationRan = true;
-                    // Remove the current enemy image
                     this.enemyImg.destroy();
-                    // Add the defeated enemy image
                     this.enemyImg = this.add.image(
                         800,
                         290,
@@ -536,9 +487,7 @@ export class Fight extends Phaser.Scene {
                     });
                 }
                 if (this.enemy.health < 1) {
-                    // Remove the current enemy image
                     this.enemyImg.destroy();
-                    // Add the defeated enemy image
                     this.enemyImg = this.add.image(
                         800,
                         290,
@@ -565,10 +514,7 @@ export class Fight extends Phaser.Scene {
     }
 
     reduceEnemyHealth(damage) {
-        // Reduce enemy health
         this.enemy.health -= damage;
-
-        // Update enemy health bar display
         const newWidth = (this.enemy.health / this.enemy.maxHealth) * 200;
         this.enemyHealthBar.clear();
         this.enemyHealthBar.fillStyle(0xff0000, 1);
@@ -578,16 +524,11 @@ export class Fight extends Phaser.Scene {
     }
 
     switchHuman() {
-        // Check if the player has more than one human in the inventory
         if (this.player.inventory.length > 1) {
-            // Define the dimensions of the container
             const containerWidth = 220;
             const containerHeight = 150;
 
-            // Create a container to hold the list of humans
             this.switchHumanContainer = this.add.container(228, 694);
-
-            // Background for the list
             const background = this.add.rectangle(
                 0,
                 0,
@@ -602,13 +543,10 @@ export class Fight extends Phaser.Scene {
             const maxNames = Math.floor(containerHeight / verticalSpacing);
 
             this.player.inventory.slice(0, maxNames).forEach((human, index) => {
-                // Calculate the y-coordinate for the current text element
                 const yPos =
                     -containerHeight / 2 +
                     verticalSpacing / 2 +
                     index * verticalSpacing;
-
-                // Check if the human's health is zero
                 const isDisabled = human.health <= 0;
 
                 const humanText = this.add
@@ -661,25 +599,16 @@ export class Fight extends Phaser.Scene {
     }
 
     reducePlayerHealth(damage) {
-        // Reduce player health
         this.playerCurrentHuman.health -= damage;
 
-        // Check if health is less than or equal to 0
         if (this.playerCurrentHuman.health <= 0) {
-            // Set health to 0
             this.playerCurrentHuman.health = 0;
-
-            // Remove the current player image
             this.playerImg.destroy();
-
-            // Add the defeated player image
             this.playerImg = this.add.image(
                 800,
                 480,
                 this.playerCurrentHuman.defeatImage.name
             );
-            console.log("defeat Image", this.playerCurrentHuman.defeatImage);
-            // Transition the defeated player image
             this.tweens.add({
                 targets: this.playerImg,
                 x: 250,
@@ -703,22 +632,16 @@ export class Fight extends Phaser.Scene {
             });
         }
 
-        // Update player health bar display
         this.updatePlayerHealth();
     }
 
     createSwitchHumanMenu() {
         this.disableButtons();
-        // Create a container for the switch human menu with 0.5 opacity
         this.switchHumanMenuContainer = this.add.container(0, 0);
-        // Set opacity to 0.5
-
-        // Background for the menu with 0.5 opacity
         const background = this.add.rectangle(300, 450, 800, 800, 0x000000);
-        background.setAlpha(0.5); // Set opacity to 0.5
+        background.setAlpha(0.5);
         this.switchHumanMenuContainer.add(background);
 
-        // Add text for informing the player about the defeated human
         this.defeatedText = this.add.text(
             170,
             25,
@@ -738,16 +661,14 @@ export class Fight extends Phaser.Scene {
         this.switchHumanMenuContainer.add(this.defeatedText);
 
         this.player.inventory.forEach((human, index) => {
-            // Calculate the y-coordinate for the current option
             const yPos = 200 + index * 75;
-            // Create a text option for the human if their health is greater than 0
             if (human.health > 0) {
                 const optionText = this.add.text(
                     400,
                     yPos,
                     `${human.name} HP: ${human.health}`,
                     {
-                        fill: "#ffffff", // Fixed color format
+                        fill: "#ffffff",
                         fontSize: "20px",
                     }
                 );
@@ -968,7 +889,7 @@ export class Fight extends Phaser.Scene {
         const flash = this.add
             .rectangle(400, 400, 800, 800, 0x00ff00)
             .setAlpha(0)
-            .setDepth(1000); // Ensure it's above everything else
+            .setDepth(1000);
         this.tweens.add({
             targets: flash,
             alpha: { from: 1, to: 0 },
@@ -999,17 +920,14 @@ export class Fight extends Phaser.Scene {
     }
 
     returnToGameScene() {
-        // Fade out the camera
         console.log(this.worldData.removeHumanNPC);
         this.player.savePlayerData();
         this.cameras.main.fadeOut(1200, 0, 0, 0, (camera, progress) => {
             if (progress === 1) {
-                // Retrieve player position from the data object
                 const playerX = this.playerPosition.x;
                 const playerY = this.playerPosition.y;
-
-                // Set player position in the Game scene
                 const gameScene = this.scene.get("Game");
+
                 if (gameScene && gameScene.player) {
                     gameScene.player.setPosition(playerX, playerY);
                     gameScene.player.currentState = "walking";
@@ -1021,7 +939,6 @@ export class Fight extends Phaser.Scene {
                 //     currentNPC.setPosition(npc.xPos, npc.yPos)
                 // }
                 this.music.stop();
-                // Transition back to the Game scene
                 this.scene.start("Game", {
                     playerPosition: this.playerPosition,
                     worldData: this.worldData,
