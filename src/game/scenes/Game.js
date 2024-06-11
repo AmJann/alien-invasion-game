@@ -5,6 +5,7 @@ import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
 import { powerUpSprite } from "../sprites/powerUpSprite";
 import { createAnimations } from "../animations";
+import { bossSprite } from "../sprites/bossSprite";
 
 export class Game extends Scene {
     constructor() {
@@ -180,6 +181,7 @@ export class Game extends Scene {
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
 
+        const boss = (this.bossSprite = new bossSprite(this, 734, 135, 'player',  "goblin_idle_1.png"))
         // create powerup
         let shroomCoords = Object.values(this.npcStartPositions);
         const shroomLocationIndex = Math.RND.between(
@@ -309,7 +311,12 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-
+        if (this.counter < 2) {
+            this.flag = false;
+            this.counter++;
+            console.log(this.playerPosition);
+            this.time.delayedCall(5000, () => { this.counter = 0})
+        }
         // updates the position of every NPC for transition to/from fight scene
         for (let npc in this.npcObjects) {
             this.npcObjects[npc].updatePosition(this);
