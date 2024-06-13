@@ -78,10 +78,20 @@ export class Game extends Scene {
         //     frame: "longhair_idle_1.png",
         // });
         // player attack sound effect
-        this.load.audio('music', import.meta.env.BASE_URL + 'assets/sound/funny-chase-matt-stewart-evans-main-version-02-12-14899.mp3')
-        this.load.audio('playerAttack', import.meta.env.BASE_URL + 'assets/sound/17_orc_atk_sword_2.wav')
+        this.load.audio(
+            "music",
+            import.meta.env.BASE_URL +
+                "assets/sound/funny-chase-matt-stewart-evans-main-version-02-12-14899.mp3"
+        );
+        this.load.audio(
+            "playerAttack",
+            import.meta.env.BASE_URL + "assets/sound/17_orc_atk_sword_2.wav"
+        );
         // npc sound effect
-        this.load.audio('npcHurt',  import.meta.env.BASE_URL + 'assets/sound/owie_.wav')
+        this.load.audio(
+            "npcHurt",
+            import.meta.env.BASE_URL + "assets/sound/owie_.wav"
+        );
     }
 
     create() {
@@ -92,7 +102,7 @@ export class Game extends Scene {
             "gameTiles",
             import.meta.env.BASE_URL + "assets/gameTiles.png"
         );
-        this.sound.add('playerAttack')
+        this.sound.add("playerAttack");
         const map = this.make.tilemap({
             key: "alienMap",
             tileWidth: 16,
@@ -181,7 +191,13 @@ export class Game extends Scene {
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
 
-        const boss = (this.bossSprite = new bossSprite(this, 645, 135, 'player',  "goblin_idle_1.png"))
+        const boss = (this.bossSprite = new bossSprite(
+            this,
+            645,
+            135,
+            "player",
+            "goblin_idle_1.png"
+        ));
         // create powerup
         let shroomCoords = Object.values(this.npcStartPositions);
         const shroomLocationIndex = Math.RND.between(
@@ -311,20 +327,17 @@ export class Game extends Scene {
     update() {
         //setting player position refernce for transition back from fight scene
         this.playerPosition = { x: this.player.x, y: this.player.y };
-        
+
         // updates the position of every NPC for transition to/from fight scene
         for (let npc in this.npcObjects) {
             this.npcObjects[npc].updatePosition(this);
         }
         if (this.bossSprite.flag) {
-            this.bossSprite.flag = false
+            this.bossSprite.flag = false;
             this.time.delayedCall(2500, () => {
-                this.bossSprite.flag = true
-                this.bossSprite.changeDirection()
-               
-            })
+                this.bossSprite.flag = true;
+                this.bossSprite.changeDirection();
+            });
         }
-        
-        
     }
 }
