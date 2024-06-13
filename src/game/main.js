@@ -7,6 +7,7 @@ import { Preloader } from "./scenes/Preloader";
 import { Fight } from "./scenes/Fight";
 import { Opening } from "./scenes/Opening";
 import { Start } from "./scenes/Start";
+import { BossFight } from "./scenes/BossFight";
 
 // Find out more information about the Game Config at:
 // https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -19,7 +20,17 @@ const config = {
     pixelArt: true,
     parent: "game-container",
     backgroundColor: "#00000",
-    scene: [Boot, Preloader, MainMenu, Start, Opening, Game, Fight, GameOver],
+    scene: [
+        Boot,
+        Preloader,
+        MainMenu,
+        Start,
+        Opening,
+        Game,
+        Fight,
+        BossFight,
+        GameOver,
+    ],
     physics: {
         default: "arcade",
         arcade: {
