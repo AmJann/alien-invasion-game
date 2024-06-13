@@ -5,6 +5,7 @@ import { Player } from "../sprites/Player";
 import { humanSprite } from "../sprites/humanSprite";
 import { powerUpSprite } from "../sprites/powerUpSprite";
 import { createAnimations } from "../animations";
+import { bossSprite } from "../sprites/bossSprite";
 
 export class Game extends Scene {
     constructor() {
@@ -77,10 +78,20 @@ export class Game extends Scene {
         //     frame: "longhair_idle_1.png",
         // });
         // player attack sound effect
-        this.load.audio('music', import.meta.env.BASE_URL + 'assets/sound/funny-chase-matt-stewart-evans-main-version-02-12-14899.mp3')
-        this.load.audio('playerAttack', import.meta.env.BASE_URL + 'assets/sound/17_orc_atk_sword_2.wav')
+        this.load.audio(
+            "music",
+            import.meta.env.BASE_URL +
+                "assets/sound/funny-chase-matt-stewart-evans-main-version-02-12-14899.mp3"
+        );
+        this.load.audio(
+            "playerAttack",
+            import.meta.env.BASE_URL + "assets/sound/17_orc_atk_sword_2.wav"
+        );
         // npc sound effect
-        this.load.audio('npcHurt',  import.meta.env.BASE_URL + 'assets/sound/owie_.wav')
+        this.load.audio(
+            "npcHurt",
+            import.meta.env.BASE_URL + "assets/sound/owie_.wav"
+        );
     }
 
     create() {
@@ -91,7 +102,7 @@ export class Game extends Scene {
             "gameTiles",
             import.meta.env.BASE_URL + "assets/gameTiles.png"
         );
-        this.sound.add('playerAttack')
+        this.sound.add("playerAttack");
         const map = this.make.tilemap({
             key: "alienMap",
             tileWidth: 16,
@@ -180,6 +191,13 @@ export class Game extends Scene {
         this.player.body.setSize(8, 10);
         this.player.setPushable(false);
 
+        const boss = (this.bossSprite = new bossSprite(
+            this,
+            645,
+            135,
+            "player",
+            "goblin_idle_1.png"
+        ));
         // create powerup
         let shroomCoords = Object.values(this.npcStartPositions);
         const shroomLocationIndex = Math.RND.between(
@@ -314,14 +332,12 @@ export class Game extends Scene {
         for (let npc in this.npcObjects) {
             this.npcObjects[npc].updatePosition(this);
         }
-        // if (this.counter < 2) {
-        //     this.flag = false;
-        //     this.counter++;
-        //     console.log(this.worldData, this);
-        // }
-
-        // this.time.delayedCall(25000, () => {
-        //     this.scene.start("Fight");
-        // });
+        if (this.bossSprite.flag) {
+            this.bossSprite.flag = false;
+            this.time.delayedCall(2500, () => {
+                this.bossSprite.flag = true;
+                this.bossSprite.changeDirection();
+            });
+        }
     }
 }
