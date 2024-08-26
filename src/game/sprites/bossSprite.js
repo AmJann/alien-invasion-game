@@ -126,7 +126,7 @@ export class bossSprite extends Physics.Arcade.Sprite {
         if (this.moveEvent) {
             this.moveEvent.destroy();
         }
-        
+
         super.destroy(fromScene);
     }
 
