@@ -13,6 +13,7 @@ export class BossFight extends Phaser.Scene {
         super("BossFight");
         this.player = null;
         this.humans = humans;
+        this.playerImg = null;
     }
 
     init(data) {
@@ -51,6 +52,17 @@ export class BossFight extends Phaser.Scene {
                 import.meta.env.BASE_URL + human.hurtImage.path
             );
         });
+
+        this.load.image(
+            "playerAlien",
+            import.meta.env.BASE_URL +
+                "assets/characters/alien-imgs/alien-char-4.png"
+        );
+    }
+
+    create() {
+        this.setupBackground();
+        this.createCharacters();
     }
 
     initializePlayerData() {
@@ -99,5 +111,55 @@ export class BossFight extends Phaser.Scene {
 
     setupBackground() {
         this.add.image(400, 400, "bossBG");
+    }
+
+    createCharacters() {
+        const enemyStartX = -300;
+        let playerStartX = 900;
+        const enemyStartY = 290;
+        const playerStartY = 600;
+
+        // this.enemyImg = this.add.image(
+        //     enemyStartX,
+        //     enemyStartY,
+        //     this.enemy.name,
+        //     0
+        // );
+        this.playerImg = this.add.image(
+            playerStartX,
+            playerStartY,
+            "playerAlien",
+            0
+        );
+
+        // this.tweens.add({
+        //     targets: this.enemyImg,
+        //     x: 550,
+        //     duration: 1000,
+        //     ease: "Power2",
+        //     delay: 500,
+        // });
+
+        this.tweens.add({
+            targets: this.playerImg,
+            x: 250,
+            duration: 1000,
+            ease: "Power2",
+            delay: 0,
+            onComplete: () => {
+                playerStartX = 250;
+                setTimeout(() => {
+                    this.returnToGameScene();
+                }, 3000);
+            },
+        });
+    }
+
+    returnToGameScene() {
+        this.scene.start("Game", {
+            playerPosition: this.playerPosition,
+            worldData: this.worldData,
+            npcObjects: this.npcObjects,
+        });
     }
 }
